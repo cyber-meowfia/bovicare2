@@ -1,0 +1,22 @@
+{
+  "name": "bovicare",
+  "version": "1.0.0",
+  "description": "AI-Based Bovine Mastitis Detection and Veterinary Assistance System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node smoke_test.js",
+    "cap:add:android": "npx @capacitor/cli add android",
+    "cap:sync": "npx @capacitor/cli sync android",
+    "cap:open": "npx @capacitor/cli open android"
+  },
+  "keywords": [
+    "bovicare",
+    "bovine",
+    "mastitis",
+    "veterinary"
+  ],
+  "author": "",
+  "license": "ISC"
+}

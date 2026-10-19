@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BoviCare — Bovine Mastitis Detection & Veterinary Assistance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Desktop Sidebar Navigation -->
+    <aside class="desktop-sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo-sq">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 20A7 7 0 0 1 4 13C4 8 11 3 11 3s7 5 7 10a7 7 0 0 1-7 7Z"/>
+            <path d="M11 13v7"/>
+            <path d="M7 11c1.5 1 2.5 1 4 0"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">BoviCare</span>
+          <span class="brand-tagline">YOUR FARM, HEALTHIER</span>
+        </div>
+      </div>
+
+      <!-- Role Switcher -->
+      <div class="role-selector-card">
+        <span class="role-label">Active Workspace</span>
+        <div class="role-pills">
+          <button type="button" class="role-pill active" id="roleFarmerBtn" onclick="switchRole('farmer')">
+            <span>🌾 Farmer</span>
+          </button>
+          <button type="button" class="role-pill" id="roleVetBtn" onclick="switchRole('vet')">
+            <span>🩺 Veterinarian</span>
+          </button>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#home" class="nav-item active" data-nav="home" onclick="navigateTo('home')">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+          </svg>
+          <span>Home</span>
+        </a>
+        <a href="#cows" class="nav-item" data-nav="cows" onclick="navigateTo('cows')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="7"/>
+            <path d="M7 12a5 5 0 0 1 10 0"/>
+            <path d="M5 9c-1-1-2-1-3 0 0 2 1 3 3 2"/>
+            <path d="M19 9c1-1 2-1 3 0 0 2-1 3-3 2"/>
+            <circle cx="9.5" cy="11.5" r="1" fill="currentColor"/>
+            <circle cx="14.5" cy="11.5" r="1" fill="currentColor"/>
+            <ellipse cx="12" cy="15" rx="2.5" ry="1.5"/>
+          </svg>
+          <span>My Cows</span>
+        </a>
+        <a href="#assess" class="nav-item" data-nav="assess" onclick="openAssessmentWizard()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M12 8v8"/>
+            <path d="M8 12h8"/>
+          </svg>
+          <span>Assess Mastitis</span>
+        </a>
+        <a href="#records" class="nav-item" data-nav="records" onclick="navigateTo('records')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>Health Records</span>
+        </a>
+        <a href="#cases" class="nav-item" data-nav="cases" onclick="navigateTo('cases')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          <span>Cases & Triage</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="system-status-pill clickable" id="sidebarSupabaseStatus" onclick="openSupabaseAuthModal()">
+          <span class="status-indicator-dot" id="sidebarStatusDot"></span>
+          <span id="sidebarStatusText">Supabase: Initializing...</span>
+        </button>
+        <p class="data-notice">Illustrative prototype data • Not actual clinical diagnostics</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-container">
+      <!-- Top Mobile & Tablet Bar -->
+      <header class="app-header">
+        <div class="header-left">
+          <div class="brand-logo-sq">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 4 13C4 8 11 3 11 3s7 5 7 10a7 7 0 0 1-7 7Z"/>
+              <path d="M11 13v7"/>
+              <path d="M7 11c1.5 1 2.5 1 4 0"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">BoviCare</span>
+            <span class="brand-tagline">YOUR FARM, HEALTHIER</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Connection / Account Button -->
+          <button type="button" class="cloud-status-badge" id="btnCloudStatus" onclick="openSupabaseAuthModal()" title="Database Connection & Account">
+            <span class="cloud-dot" id="cloudDot"></span>
+            <span id="cloudStatusLabel">DB Config</span>
+          </button>
+
+          <!-- Language Toggle (Bilingual English / Marathi) -->
+          <button type="button" class="lang-toggle-badge" id="btnLangToggle" onclick="toggleLanguage()" title="Switch Language / भाषा बदला">
+            <span id="langToggleText">मराठी</span>
+          </button>
+
+          <!-- Mobile Role Switch Quick Toggle -->
+          <button type="button" class="mobile-role-badge" id="mobileRoleToggle" onclick="toggleMobileRole()" title="Switch View">
+            <span id="mobileRoleText">🌾 Farmer</span>
+          </button>
+          
+          <button type="button" class="icon-button notification-btn" onclick="openNotifications()" aria-label="Notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="notification-badge"></span>
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEW: FARMER DASHBOARD -->
+      <section id="viewFarmer" class="view-section active">
+        <div class="farmer-dashboard-grid">
+          <!-- Primary Feed Column (Left) -->
+          <div class="farmer-col-primary">
+            <!-- Greeting Header -->
+            <div class="greeting-section">
+              <h1 class="greeting-title" id="greetingTitle">Good morning, Farmer <span class="wave-hand">👋</span></h1>
+              <p class="greeting-subtitle" id="greetingSubtitle">Every cow matters. Let's check in on your herd.</p>
+            </div>
+
+            <!-- Storage Advisory Banner (Supabase Free Plan Monitoring) -->
+            <div id="storageAdvisoryContainerFarmer" style="display:none;"></div>
+
+            <!-- Hero Card (Exact replica of Reference Image Hero) -->
+            <div class="hero-card">
+              <div class="hero-overlay"></div>
+              <div class="hero-content">
+                <div class="hero-tag">
+                  <span class="hero-tag-icon">🌱</span>
+                  <span id="heroTagText">HERD HEALTH</span>
+                </div>
+                <h2 class="hero-headline" id="heroHeadline">Healthy cows,<br>better tomorrow.</h2>
+                <p class="hero-description" id="heroDesc">Spot changes early. Record observations. Care better.</p>
+                <button type="button" class="hero-cta-btn" onclick="openAssessmentWizard()">
+                  <span id="heroCtaText">Start check</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </div>
+              <div class="hero-media-wrapper">
+                <!-- Authentic Holstein dairy cow illustration / SVG artwork -->
+                <div class="hero-cow-badge">
+                  <span id="heroCowBadgeText">Healthy Herd</span>
+                  <svg class="hand-drawn-arrow" viewBox="0 0 50 50">
+                    <path d="M10,10 Q25,35 40,25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M35,22 L40,25 L38,30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <img class="hero-cow-img" src="assets/images/cow_banner.jpeg" alt="Healthy dairy cow">
+              </div>
+            </div>
+
+            <!-- Explore Quick Action Section -->
+            <div class="section-container">
+              <div class="section-header">
+                <h3 class="section-title">Explore</h3>
+                <button type="button" class="see-all-link" onclick="navigateTo('cows')">
+                  <span>See all</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="quick-action-grid">
+                <button type="button" class="action-tile mint" onclick="navigateTo('cows')">
+                  <div class="tile-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="7"/>
+                      <path d="M7 12a5 5 0 0 1 10 0"/>
+                      <path d="M5 9c-1-1-2-1-3 0 0 2 1 3 3 2"/>
+                      <path d="M19 9c1-1 2-1 3 0 0 2-1 3-3 2"/>
+                      <circle cx="9.5" cy="11.5" r="1" fill="currentColor"/>
+                      <circle cx="14.5" cy="11.5" r="1" fill="currentColor"/>
+                      <ellipse cx="12" cy="15" rx="2.5" ry="1.5"/>
+                    </svg>
+                  </div>
+                  <span class="tile-label">My Cows</span>
+                </button>
+
+                <button type="button" class="action-tile cream" onclick="openSymptomGuide()">
+                  <div class="tile-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
+                      <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
+                      <circle cx="20" cy="10" r="2"/>
+                    </svg>
+                  </div>
+                  <span class="tile-label">Symptoms</span>
+                </button>
+
+                <button type="button" class="action-tile mint" onclick="openAssessmentWizard()">
+                  <div class="tile-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                    </svg>
+                  </div>
+                  <span class="tile-label">Udder Health</span>
+                </button>
+
+                <button type="button" class="action-tile cream" onclick="navigateTo('records')">
+                  <div class="tile-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                      <line x1="16" y1="13" x2="8" y2="13"/>
+                      <line x1="16" y1="17" x2="8" y2="17"/>
+                      <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                  </div>
+                  <span class="tile-label">Records</span>
+                </button>
+
+                <button type="button" class="action-tile mint" onclick="openRemindersModal()">
+                  <div class="tile-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                  </div>
+                  <span class="tile-label">Reminders</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Your Cows List Section -->
+            <div class="section-container">
+              <div class="section-header">
+                <h3 class="section-title">Your cows</h3>
+                <button type="button" class="see-all-link" onclick="navigateTo('cows')">
+                  <span>See all</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="cows-horizontal-scroll" id="cowsSummaryContainer">
+                <!-- Cow cards will be dynamically populated by JS with exact styling from reference -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Secondary Operational & Clinical Rail (Right) -->
+          <div class="farmer-col-rail">
+            <!-- Herd at a Glance Metrics -->
+            <div class="section-container">
+              <div class="section-header">
+                <h3 class="section-title">Herd at a glance</h3>
+                <button type="button" class="see-all-link" onclick="navigateTo('cows')">
+                  <span>View all</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="stats-cards-grid">
+                <!-- Card 1: Total Cows -->
+                <div class="stat-card" onclick="filterCows('all')">
+                  <div class="stat-icon-wrapper mint">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="7"/>
+                      <path d="M7 12a5 5 0 0 1 10 0"/>
+                      <path d="M5 9c-1-1-2-1-3 0 0 2 1 3 3 2"/>
+                      <path d="M19 9c1-1 2-1 3 0 0 2-1 3-3 2"/>
+                    </svg>
+                  </div>
+                  <div class="stat-number" id="statTotalCows">12</div>
+                  <div class="stat-label">Total cows</div>
+                  <div class="wave-decoration wave-green"></div>
+                </div>
+
+                <!-- Card 2: Healthy -->
+                <div class="stat-card" onclick="filterCows('healthy')">
+                  <div class="stat-icon-wrapper green-check">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </div>
+                  <div class="stat-number" id="statHealthyCows">10</div>
+                  <div class="stat-label">Healthy</div>
+                  <div class="wave-decoration wave-green"></div>
+                </div>
+
+                <!-- Card 3: To Monitor -->
+                <div class="stat-card" onclick="filterCows('monitor')">
+                  <div class="stat-icon-wrapper amber-eye">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </div>
+                  <div class="stat-number amber" id="statMonitorCows">2</div>
+                  <div class="stat-label">To monitor</div>
+                  <div class="wave-decoration wave-amber"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Health Activity Banner -->
+            <div class="activity-banner" onclick="navigateTo('records')">
+              <div class="activity-icon-sq">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                  <circle cx="8" cy="15" r="1.5" fill="currentColor"/>
+                  <circle cx="16" cy="15" r="1.5" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="activity-info">
+                <h4 class="activity-title">Recent health activity</h4>
+                <p class="activity-sub" id="recentAssessmentsText">3 saved assessments this week</p>
+              </div>
+              <div class="activity-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Barn Climate & Environmental Mastitis Risk Widget -->
+            <div class="sidebar-widget-card">
+              <div class="widget-header">
+                <div class="widget-title-wrap">
+                  <span class="widget-icon">🌡️</span>
+                  <h4 class="widget-title">Barn Climate & THI Risk</h4>
+                </div>
+                <span class="widget-badge normal">Low Risk</span>
+              </div>
+              <p class="widget-desc">Temperature-Humidity Index (THI) monitored to prevent environmental heat stress and mastitis susceptibility.</p>
+              <div class="climate-metrics-row">
+                <div class="climate-metric">
+                  <span class="c-val">24.2°C</span>
+                  <span class="c-lbl">Barn Temp</span>
+                </div>
+                <div class="climate-metric">
+                  <span class="c-val">58%</span>
+                  <span class="c-lbl">Humidity</span>
+                </div>
+                <div class="climate-metric">
+                  <span class="c-val">71.4</span>
+                  <span class="c-lbl">THI Index</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Food Safety & Milk Discard Status Card -->
+            <div class="sidebar-widget-card">
+              <div class="widget-header">
+                <div class="widget-title-wrap">
+                  <span class="widget-icon">🥛</span>
+                  <h4 class="widget-title">Milk Safety & Withdrawal</h4>
+                </div>
+                <span class="widget-badge active" id="withdrawalCountBadge">Safety Protocol</span>
+              </div>
+              <p class="widget-desc">Dairy quality control: discard treated milk until full clinical withdrawal clearance.</p>
+              <div class="withdrawal-summary-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px;">
+                  <span><strong>Active Milk Discards:</strong></span>
+                  <span style="font-weight:800; color:#B45309;" id="cowsInWithdrawalCount">Active Regimens</span>
+                </div>
+                <div style="font-size:11.5px; color:var(--color-text-subtle); margin-top:4px;">
+                  Prescribed milk discard: 72 hours minimum • Meat withdrawal: 14 days
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: HERD MANAGEMENT ("MY COWS") -->
+      <section id="viewCows" class="view-section">
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-title">Herd Registry</h1>
+            <p class="page-subtitle">Track individual animals, lactation stage, and udder history</p>
+          </div>
+          <button type="button" class="btn-primary" onclick="openAddCowModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Register Cattle</span>
+          </button>
+        </div>
+
+        <!-- Filter Controls: Species and Health Status -->
+        <div class="filter-controls-wrap">
+          <div class="filter-chips-row species-filters">
+            <span class="filter-group-label">Type:</span>
+            <button type="button" class="filter-chip active" data-species="all" onclick="filterSpecies('all')">All Livestock</button>
+            <button type="button" class="filter-chip" data-species="cow" onclick="filterSpecies('cow')">🐄 Cows</button>
+            <button type="button" class="filter-chip" data-species="buffalo" onclick="filterSpecies('buffalo')">🐃 Buffaloes</button>
+          </div>
+
+          <div class="filter-chips-row status-filters">
+            <span class="filter-group-label">Status:</span>
+            <button type="button" class="filter-chip active" data-filter="all" onclick="filterCows('all')">All (<span id="countFilterAll">12</span>)</button>
+            <button type="button" class="filter-chip" data-filter="healthy" onclick="filterCows('healthy')">Healthy (<span id="countFilterHealthy">10</span>)</button>
+            <button type="button" class="filter-chip" data-filter="monitor" onclick="filterCows('monitor')">To Monitor (<span id="countFilterMonitor">2</span>)</button>
+            <button type="button" class="filter-chip" data-filter="treatment" onclick="filterCows('treatment')">Under Treatment (<span id="countFilterTreatment">0</span>)</button>
+          </div>
+        </div>
+
+        <!-- Cattle Grid -->
+        <div class="cattle-grid" id="allCowsGrid">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-bar" id="cowsPaginationBar" style="display: none;">
+          <span class="pagination-meta" id="paginationMeta">Showing 1–10</span>
+          <button type="button" class="btn-secondary" id="btnLoadMoreCows" onclick="loadMoreCows()">
+            <span>Load More Cattle</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- VIEW: HEALTH RECORDS & HISTORICAL TIMELINE -->
+      <section id="viewRecords" class="view-section">
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-title">Health & Assessment Records</h1>
+            <p class="page-subtitle">Chronological timeline of udder checks, observations, and clinical notes</p>
+          </div>
+          <button type="button" class="btn-secondary" onclick="openAssessmentWizard()">
+            <span>+ New Assessment</span>
+          </button>
+        </div>
+
+        <div class="records-timeline" id="recordsTimelineContainer">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- Records Pagination Controls -->
+        <div class="pagination-bar" id="recordsPaginationBar" style="display: none;">
+          <span class="pagination-meta" id="recordsPaginationMeta">Showing recent records</span>
+          <button type="button" class="btn-secondary" id="btnLoadMoreRecords" onclick="loadMoreRecords()">
+            <span>Load More Records</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- VIEW: CASES & VETERINARIAN TRIAGE DASHBOARD -->
+      <section id="viewCases" class="view-section">
+        <div class="page-header-row">
+          <div>
+            <div class="badge-role-vet" id="casesRoleBadge">HERD HEALTH WORKSPACE</div>
+            <h1 class="page-title" id="casesPageTitle">Mastitis Cases & Consultations</h1>
+            <p class="page-subtitle" id="casesPageSubtitle">Track review status, veterinary diagnoses, and telehealth consultation advice</p>
+          </div>
+          <div class="vet-header-stats">
+            <span class="tag-pill-amber"><strong id="pendingReviewCount">0</strong> Awaiting Review</span>
+            <span class="tag-pill-green"><strong id="resolvedReviewCount">0</strong> Monitored / Under Care</span>
+          </div>
+        </div>
+
+        <!-- Storage Advisory Banner (Supabase Free Plan Monitoring) -->
+        <div id="storageAdvisoryContainerCases" style="display:none;"></div>
+
+        <!-- Filter Chips for Cases -->
+        <div class="status-filters" id="caseFilterChips" style="margin-bottom: 14px;">
+          <!-- Rendered dynamically depending on role -->
+        </div>
+
+        <!-- Case Queue -->
+        <div class="vet-queue-container" id="vetQueueContainer">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- Cases Pagination Controls -->
+        <div class="pagination-bar" id="casesPaginationBar" style="display: none; margin-top: 14px;">
+          <span class="pagination-meta" id="casesPaginationMeta">Showing recent cases</span>
+          <button type="button" class="btn-secondary" id="btnLoadMoreCases" onclick="loadMoreCases()">
+            <span>Load More Cases</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Mobile Bottom Navigation Bar (Matching Mockup 100%) -->
+    <nav class="mobile-bottom-nav">
+      <button type="button" class="nav-tab active" data-tab="home" onclick="navigateTo('home')">
+        <div class="tab-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+          </svg>
+        </div>
+        <span class="tab-label">Home</span>
+      </button>
+
+      <button type="button" class="nav-tab" data-tab="cows" onclick="navigateTo('cows')">
+        <div class="tab-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="7"/>
+            <path d="M7 12a5 5 0 0 1 10 0"/>
+            <path d="M5 9c-1-1-2-1-3 0 0 2 1 3 3 2"/>
+            <path d="M19 9c1-1 2-1 3 0 0 2-1 3-3 2"/>
+          </svg>
+        </div>
+        <span class="tab-label">My Cows</span>
+      </button>
+
+      <button type="button" class="nav-tab center-action" onclick="openAssessmentWizard()">
+        <div class="center-badge-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M12 8v8"/>
+            <path d="M8 12h8"/>
+          </svg>
+        </div>
+        <span class="tab-label">Assess</span>
+      </button>
+
+      <button type="button" class="nav-tab" data-tab="records" onclick="navigateTo('records')">
+        <div class="tab-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <span class="tab-label">Records</span>
+      </button>
+
+      <button type="button" class="nav-tab" data-tab="cases" onclick="navigateTo('cases')">
+        <div class="tab-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <span class="tab-label">Profile</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- MODAL: UDDER HEALTH ASSESSMENT WIZARD -->
+  <div id="modalAssessment" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="assessmentTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-badge">Clinical Observation</span>
+          <h2 id="assessmentTitle" class="modal-title">Bovine Udder Health Assessment</h2>
+        </div>
+        <button type="button" class="btn-close" onclick="closeAssessmentWizard()" aria-label="Close">&times;</button>
+      </div>
+
+      <!-- Wizard Step Visual Progress Tracker -->
+      <div class="wizard-progress-bar" id="assessmentStepTracker">
+        <div class="wizard-step active" id="wizardStep1">
+          <span class="step-num">1</span>
+          <span class="step-text">Animal</span>
+        </div>
+        <div class="wizard-step-line" id="wizardLine1"></div>
+        <div class="wizard-step" id="wizardStep2">
+          <span class="step-num">2</span>
+          <span class="step-text">Quarters</span>
+        </div>
+        <div class="wizard-step-line" id="wizardLine2"></div>
+        <div class="wizard-step" id="wizardStep3">
+          <span class="step-num">3</span>
+          <span class="step-text">Vitals</span>
+        </div>
+        <div class="wizard-step-line" id="wizardLine3"></div>
+        <div class="wizard-step" id="wizardStep4">
+          <span class="step-num">4</span>
+          <span class="step-text">Photo</span>
+        </div>
+        <div class="wizard-step-line" id="wizardLine4"></div>
+        <div class="wizard-step" id="wizardStep5">
+          <span class="step-num">5</span>
+          <span class="step-text">Submit</span>
+        </div>
+      </div>
+
+      <form id="assessmentForm" onsubmit="submitAssessment(event)">
+        <!-- Step 1: Animal Identification -->
+        <div class="form-section">
+          <label class="form-label" for="cowSelect">1. Select Animal from Herd</label>
+          <select id="cowSelect" class="form-input" required onchange="handleCowSelectChange(this)">
+            <option value="">Choose cow...</option>
+            <!-- Populated dynamically -->
+          </select>
+          <div class="cow-quick-meta" id="selectedCowMeta" style="display: none;"></div>
+        </div>
+
+        <!-- Step 2: Quarter-by-Quarter Udder Mapping -->
+        <div class="form-section">
+          <label class="form-label">2. Affected Udder Quarter(s)</label>
+          <p class="form-hint">Tap each quarter observed for tenderness, swelling, heat, or abnormal milk</p>
+          <div class="udder-grid-selector">
+            <button type="button" class="quarter-box" data-quarter="LF" onclick="toggleQuarter(this)">
+              <span class="quarter-code">LF</span>
+              <span class="quarter-name">Left Front</span>
+              <span class="quarter-status">Normal</span>
+            </button>
+            <button type="button" class="quarter-box" data-quarter="RF" onclick="toggleQuarter(this)">
+              <span class="quarter-code">RF</span>
+              <span class="quarter-name">Right Front</span>
+              <span class="quarter-status">Normal</span>
+            </button>
+            <button type="button" class="quarter-box" data-quarter="LR" onclick="toggleQuarter(this)">
+              <span class="quarter-code">LR</span>
+              <span class="quarter-name">Left Rear</span>
+              <span class="quarter-status">Normal</span>
+            </button>
+            <button type="button" class="quarter-box" data-quarter="RR" onclick="toggleQuarter(this)">
+              <span class="quarter-code">RR</span>
+              <span class="quarter-name">Right Rear</span>
+              <span class="quarter-status">Normal</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Clinical Vitals & Symptom Entry (Stage 3) -->
+        <div class="form-section">
+          <label class="form-label">3. Clinical Vitals & Physical Observations</label>
+          <p class="form-hint">Record physical observations, strip-cup milk appearance, and temperature readings</p>
+
+          <!-- Vitals Grid: Body Temperature & Udder Temperature -->
+          <div class="vitals-input-grid">
+            <div class="vital-field">
+              <label class="vital-label" for="inputBodyTemp">
+                Body Temperature (°C)
+                <span class="range-hint">Normal: 38.0–39.2°C</span>
+              </label>
+              <div class="vital-input-wrap">
+                <input type="number" step="0.1" id="inputBodyTemp" class="form-input" placeholder="e.g. 38.6" min="34.0" max="43.0" oninput="validateBodyTemp(this)">
+                <span class="vital-badge-status" id="bodyTempStatusBadge">Normal</span>
+              </div>
+            </div>
+
+            <div class="vital-field">
+              <label class="vital-label" for="selectUdderTemp">
+                Udder Surface Temperature
+                <span class="range-hint">Optional Tactile / IR</span>
+              </label>
+              <select id="selectUdderTemp" class="form-input">
+                <option value="Normal">Normal (Warm & supple)</option>
+                <option value="Localized Heat">Localized Heat (Noticeably hot to touch)</option>
+                <option value="Cold / Clammy">Cold / Clammy (Severe toxic/gangrenous)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Milk Appearance & Swelling Grid -->
+          <div class="vitals-input-grid" style="margin-top: 10px;">
+            <div class="vital-field">
+              <label class="vital-label" for="selectMilkAppearance">Fore-Milk Appearance (Strip Cup)</label>
+              <select id="selectMilkAppearance" class="form-input" required>
+                <option value="Normal">Normal (Clean, creamy white)</option>
+                <option value="Watery / Serous">Watery / Thin / Serous</option>
+                <option value="Clots / Flakes / Curds">Visible Clots / Flakes / Curds</option>
+                <option value="Discolored / Blood-tinged">Discolored (Yellowish / Brown / Blood-tinged)</option>
+              </select>
+            </div>
+
+            <div class="vital-field">
+              <label class="vital-label" for="selectUdderSwelling">Udder Swelling & Firmness</label>
+              <select id="selectUdderSwelling" class="form-input" required>
+                <option value="None">None (Pliable, normal)</option>
+                <option value="Mild Firmness">Mild Firmness (Slight hardness)</option>
+                <option value="Moderate Swelling">Moderate Swelling (Distended quarter)</option>
+                <option value="Severe Swelling & Stone-Hard">Severe Swelling & Stone-Hard (Acute)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Milking Pain & Milk Yield Change Grid -->
+          <div class="vitals-input-grid" style="margin-top: 10px;">
+            <div class="vital-field">
+              <label class="vital-label" for="selectMilkingPain">Milking Discomfort & Pain</label>
+              <select id="selectMilkingPain" class="form-input" required>
+                <option value="None">None (Calm, normal let-down)</option>
+                <option value="Mild Discomfort">Mild Discomfort (Restlessness/stepping)</option>
+                <option value="Severe Pain">Severe Pain (Kicking, tail-swishing, refusal)</option>
+              </select>
+            </div>
+
+            <div class="vital-field">
+              <label class="vital-label" for="selectYieldChange">Observed Milk Yield Change</label>
+              <select id="selectYieldChange" class="form-input" required>
+                <option value="No Change">No Change (Normal daily yield)</option>
+                <option value="Mild Drop (5–15%)">Mild Drop (5% – 15% reduction)</option>
+                <option value="Significant Drop (>15%)">Significant Drop (> 15% reduction)</option>
+                <option value="Sudden Cessation (<50%)">Severe Drop / Agalactia (< 50% yield)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: High-Resolution Udder Image Upload (Stage 4) -->
+        <div class="form-section">
+          <label class="form-label">4. Udder / Fore-Milk Photograph</label>
+          <p class="form-hint">Upload high-clarity photographs of the quarter or strip-cup milk sample (Auto-compressed to 200–400 KB WebP)</p>
+
+          <div style="margin-bottom: 8px;">
+            <label class="form-label" for="selectImageCategory" style="font-size: 12px; margin-bottom: 3px;">Image Category</label>
+            <select id="selectImageCategory" class="form-input">
+              <option value="udder_exterior">Udder Exterior / Quarter Swelling</option>
+              <option value="fore_milk_strip_cup">Fore-Milk / Strip-Cup Sample</option>
+            </select>
+          </div>
+          
+          <div class="upload-dropzone" id="uploadDropzone" onclick="triggerFileUpload()">
+            <input type="file" id="udderImageInput" accept="image/*" style="display: none;" onchange="handleImageFile(this)">
+            <div class="dropzone-inner" id="dropzoneContent">
+              <div class="dropzone-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <p class="dropzone-text"><strong>Click to upload</strong> or drag and drop image</p>
+              <span class="dropzone-meta">JPG, PNG, WEBP (Auto-optimized &lt; 1MB)</span>
+            </div>
+            
+            <div class="image-preview-wrapper" id="imagePreviewContainer" style="display: none;">
+              <img id="imagePreviewEl" src="" alt="Udder sample preview">
+              <div class="preview-badge-row">
+                <span id="compressionBadge" class="compression-pill">Optimized WebP</span>
+                <button type="button" class="btn-remove-img" onclick="removeSelectedImage(event)">&times; Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-staged-notice">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <span><strong>AI screening is not yet available. Please consult a veterinarian.</strong> Automated computer-vision screening inferences will be enabled once the pre-trained deep learning inference service is connected.</span>
+          </div>
+        </div>
+
+        <!-- Step 5: Farmer Additional Notes -->
+        <div class="form-section">
+          <label class="form-label" for="assessmentNotes">5. Field Notes & Observations</label>
+          <textarea id="assessmentNotes" class="form-textarea" rows="3" placeholder="Describe any behavioral changes, feeding appetite, or milking changes..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" onclick="closeAssessmentWizard()">Cancel</button>
+          <button type="submit" class="btn-primary" id="btnSubmitAssessment">
+            <span id="btnSubmitAssessmentText">Save Assessment & Notify Vet</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VET CLINICAL CASE REVIEW & PRESCRIPTION -->
+  <div id="modalVetReview" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-badge vet">Clinical Evaluation</span>
+          <h2 id="vetModalCaseTitle" class="modal-title">Veterinary Case Review</h2>
+        </div>
+        <button type="button" class="btn-close" onclick="closeVetReviewModal()">&times;</button>
+      </div>
+
+      <div class="vet-case-details-body" id="vetCaseDetailsBody">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CASE DETAILS & CONSULTATION TRACKING (Stage 5) -->
+  <div id="modalCaseDetails" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-badge" id="caseDetailsBadge">Case Details</span>
+          <h2 id="caseDetailsTitle" class="modal-title">Clinical Case</h2>
+        </div>
+        <button type="button" class="btn-close" onclick="closeCaseDetailsModal()">&times;</button>
+      </div>
+
+      <div class="vet-case-details-body" id="caseDetailsBody">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ANIMAL PROFILE & HEALTH HISTORY -->
+  <div id="modalCowProfile" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="cowProfileName">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-badge" id="profileBadgeSpecies">Animal Profile</span>
+          <h2 id="cowProfileName" class="modal-title">Animal Details</h2>
+        </div>
+        <button type="button" class="btn-close" onclick="closeCowProfileModal()" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="profile-header-summary">
+        <img id="profileCowThumb" src="" alt="Animal photo" class="profile-avatar-img">
+        <div class="profile-header-info">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <h3 id="profileNameDisplay" class="profile-hero-name">Name</h3>
+            <span id="profileTagDisplay" class="cattle-card-tag">#C000</span>
+          </div>
+          <div id="profileStatusBadge" class="status-badge healthy">
+            <span class="status-dot"></span>
+            <span id="profileStatusText">Healthy</span>
+          </div>
+          <p id="profileBreedDisplay" class="profile-breed-text">Breed</p>
+        </div>
+      </div>
+
+      <!-- Animal Specifications Grid -->
+      <div class="profile-specs-grid">
+        <div class="spec-cell">
+          <span class="spec-label">Lactation Stage</span>
+          <strong id="profileLactationDisplay" class="spec-value">—</strong>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-label">Daily Yield</span>
+          <strong id="profileYieldDisplay" class="spec-value">—</strong>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-label">Species</span>
+          <strong id="profileSpeciesDisplay" class="spec-value">—</strong>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-label">Farm</span>
+          <strong id="profileFarmDisplay" class="spec-value">—</strong>
+        </div>
+      </div>
+
+      <!-- Health History Timeline -->
+      <div class="profile-history-section">
+        <div class="section-header" style="margin-bottom: 8px;">
+          <h4 style="font-size: 15px; font-weight: 800; color: var(--color-text-main);">Clinical & Health History</h4>
+          <span id="profileHistoryCount" style="font-size: 12px; color: var(--color-text-muted);">Recent observations</span>
+        </div>
+
+        <div id="profileHistoryContainer" class="history-list-wrap">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <div id="profileHistoryLoadMore" style="text-align: center; margin-top: 10px; display: none;">
+          <button type="button" class="btn-secondary" style="font-size: 12px; padding: 6px 14px;" onclick="loadMoreAnimalHistory()">
+            <span>Load Older History</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button type="button" class="btn-primary" onclick="startCheckForCurrentAnimal()">
+          <span>+ Start Udder Check</span>
+        </button>
+        <button type="button" class="btn-ghost" onclick="closeCowProfileModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTER NEW COW / BUFFALO -->
+  <div id="modalAddCow" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="addCowTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-badge">Herd Registry</span>
+          <h2 id="addCowTitle" class="modal-title">Register Animal (Cow / Buffalo)</h2>
+        </div>
+        <button type="button" class="btn-close" onclick="closeAddCowModal()" aria-label="Close">&times;</button>
+      </div>
+
+      <form id="addCowForm" onsubmit="submitAddCow(event)">
+        <!-- Species Selection -->
+        <div class="form-section">
+          <label class="form-label">Livestock Species</label>
+          <div class="species-toggle-row">
+            <label class="species-option">
+              <input type="radio" name="animalSpecies" value="cow" checked onchange="handleSpeciesChange('cow')">
+              <span class="species-pill">
+                <strong>🐄 Cow</strong> (Cattle)
+              </span>
+            </label>
+            <label class="species-option">
+              <input type="radio" name="animalSpecies" value="buffalo" onchange="handleSpeciesChange('buffalo')">
+              <span class="species-pill">
+                <strong>🐃 Buffalo</strong> (Murrah/Cross)
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="newCowName">Animal Name</label>
+          <input type="text" id="newCowName" class="form-input" placeholder="e.g. Nandini or Kaali" required>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="newCowTag">Tag / Ear ID</label>
+          <input type="text" id="newCowTag" class="form-input" placeholder="e.g. #C013 or #B001" required>
+          <span class="form-hint">Unique identifier for this animal within your farm</span>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="newCowBreed">Breed</label>
+          <select id="newCowBreed" class="form-input" required>
+            <optgroup label="Cow Breeds" id="breedGroupCow">
+              <option value="Holstein Friesian">Holstein Friesian</option>
+              <option value="Jersey Cross">Jersey Cross</option>
+              <option value="Gir Cross">Gir Cross</option>
+              <option value="Sahiwal">Sahiwal</option>
+              <option value="Red Sindhi">Red Sindhi</option>
+              <option value="Tharparkar">Tharparkar</option>
+              <option value="Kankrej">Kankrej</option>
+              <option value="Indigenous Cow">Indigenous / Desi Cow</option>
+            </optgroup>
+            <optgroup label="Buffalo Breeds" id="breedGroupBuffalo">
+              <option value="Murrah Buffalo">Murrah Buffalo</option>
+              <option value="Nili-Ravi Buffalo">Nili-Ravi Buffalo</option>
+              <option value="Mehsana Buffalo">Mehsana Buffalo</option>
+              <option value="Jaffarabadi Buffalo">Jaffarabadi Buffalo</option>
+              <option value="Surti Buffalo">Surti Buffalo</option>
+              <option value="Banni Buffalo">Banni Buffalo</option>
+              <option value="Indigenous Buffalo">Indigenous / Desi Buffalo</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="newCowLactation">Lactation Stage</label>
+          <select id="newCowLactation" class="form-input" required>
+            <option value="1st Lactation">1st Lactation</option>
+            <option value="2nd Lactation" selected>2nd Lactation</option>
+            <option value="3rd Lactation">3rd Lactation</option>
+            <option value="4th+ Lactation">4th+ Lactation</option>
+            <option value="Dry Period">Dry Period</option>
+          </select>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="newCowYield">Average Daily Milk Yield (Liters)</label>
+          <input type="number" step="0.5" id="newCowYield" class="form-input" placeholder="e.g. 18.5" required>
+        </div>
+
+        <div id="addCowErrorMsg" class="form-error-banner" style="display: none;"></div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" onclick="closeAddCowModal()">Cancel</button>
+          <button type="submit" class="btn-primary" id="btnSubmitCow">
+            <span id="btnSubmitCowText">Register Animal</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SUPABASE AUTH & CONNECTION -->
+  <div id="modalSupabaseAuth" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-badge">Cloud Backend</span>
+          <h2 id="authModalTitle" class="modal-title">Supabase Database & Account</h2>
+        </div>
+        <button type="button" class="btn-close" onclick="closeSupabaseAuthModal()" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="auth-tabs-row">
+        <button type="button" class="auth-tab-btn active" id="tabAuthSessionBtn" onclick="switchAuthTab('session')">Account & Session</button>
+        <button type="button" class="auth-tab-btn" id="tabAuthConfigBtn" onclick="switchAuthTab('config')">Connection Settings</button>
+      </div>
+
+      <!-- Tab 1: User Session (Sign In / Sign Up) -->
+      <div id="authTabSession" class="auth-tab-content">
+        <div id="authLoggedInView" style="display: none;">
+          <div class="auth-user-card">
+            <div class="auth-user-avatar">👤</div>
+            <div class="auth-user-info">
+              <h4 id="authUserNameDisplay" class="auth-user-name">User</h4>
+              <p id="authUserEmailDisplay" class="auth-user-email">email@example.com</p>
+              <span id="authUserRoleDisplay" class="status-badge healthy">● Farmer</span>
+            </div>
+          </div>
+          <p class="auth-farm-meta" id="authFarmMeta">Active Farm: <strong>Loading...</strong></p>
+          <div class="modal-footer">
+            <button type="button" class="btn-ghost" onclick="handleSignOut()">Sign Out</button>
+            <button type="button" class="btn-primary" onclick="closeSupabaseAuthModal()">Close</button>
+          </div>
+        </div>
+
+        <form id="authLoginForm" onsubmit="handleAuthSubmit(event)">
+          <div class="form-section">
+            <label class="form-label">Role</label>
+            <div class="species-toggle-row">
+              <label class="species-option">
+                <input type="radio" name="authRole" value="farmer" checked>
+                <span class="species-pill">🌾 Farmer</span>
+              </label>
+              <label class="species-option">
+                <input type="radio" name="authRole" value="veterinarian">
+                <span class="species-pill">🩺 Veterinarian</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="authFullName">Full Name</label>
+            <input type="text" id="authFullName" class="form-input" placeholder="e.g. Ramesh Patil">
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="authEmail">Email Address</label>
+            <input type="email" id="authEmail" class="form-input" placeholder="farmer@bovicare.farm" required>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="authPassword">Password</label>
+            <input type="password" id="authPassword" class="form-input" placeholder="••••••••" required minlength="6">
+          </div>
+
+          <div id="authErrorMsg" class="form-error-banner" style="display: none;"></div>
+
+          <div class="modal-footer" style="justify-content: space-between;">
+            <button type="button" class="btn-ghost" id="btnToggleAuthMode" onclick="toggleAuthMode()">Switch to Sign In</button>
+            <button type="submit" class="btn-primary" id="btnSubmitAuth">
+              <span id="btnSubmitAuthText">Create Account</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tab 2: Connection Settings (URL & Anon Key) -->
+      <div id="authTabConfig" class="auth-tab-content" style="display: none;">
+        <form onsubmit="handleSaveConfig(event)">
+          <div class="form-section">
+            <label class="form-label" for="inputSupabaseUrl">Supabase Project URL</label>
+            <input type="url" id="inputSupabaseUrl" class="form-input" placeholder="https://xyzcompany.supabase.co" required>
+          </div>
+
+          <div class="form-section">
+            <label class="form-label" for="inputSupabaseAnonKey">Publishable Anon Key</label>
+            <textarea id="inputSupabaseAnonKey" class="form-textarea" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required></textarea>
+            <span class="form-hint">Publishable API key (safe for browser). Never use service_role key.</span>
+          </div>
+
+          <div id="configStatusMsg" class="form-error-banner" style="display: none;"></div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-ghost" onclick="closeSupabaseAuthModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Save & Connect</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- SUPABASE JS SDK & CONFIGURATION -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BoviCare — AI-Based Bovine Mastitis Detection & Veterinary Assistance System</title>
+  <meta name="description" content="Support better udder health with early mastitis screening, image records, and veterinary follow-up in one intelligent platform.">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+
+  <!-- Sticky Glassmorphic Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <!-- Brand Logo -->
+      <a href="/" class="brand-link">
+        <div class="brand-icon-box">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M12 8v8"/>
+            <path d="M8 12h8"/>
+          </svg>
+        </div>
+        <div class="brand-title-wrap">
+          <span class="brand-name">BoviCare</span>
+          <span class="brand-tagline">YOUR FARM, HEALTHIER</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="desktop-nav" id="desktopNav">
+        <a href="#hero" class="nav-link">Home</a>
+        <a href="#moving-flow" class="nav-link">Moving Experience</a>
+        <a href="#simulator" class="nav-link">Clinical Simulator</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#impact" class="nav-link">Impact</a>
+        <a href="#testimonials" class="nav-link">Testimonials</a>
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="header-actions">
+        <a href="/login?role=farmer" class="btn-secondary" title="Open Farmer Operations">
+          <span>🌾 Farmer Login</span>
+        </a>
+        <a href="/login?role=vet" class="btn-secondary" title="Open Veterinary Triage">
+          <span>🩺 Vet Login</span>
+        </a>
+        <a href="/login" class="btn-primary" title="Sign In to BoviCare">
+          <span>Sign In / Start →</span>
+        </a>
+        <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Hero Section with 3D Cow Character -->
+  <main>
+    <section class="hero-section" id="hero">
+      <div class="hero-grid">
+        <!-- Left: Headline & Strategic Copy -->
+        <div class="hero-copy">
+          <div class="hero-pill-badge">
+            <span class="hero-pill-dot"></span>
+            <span>Next-Gen Bovine Care · AI Mastitis Screening & Triage</span>
+          </div>
+
+          <h1 class="hero-headline">
+            Healthier Herds Start with <span class="highlight">Early Detection.</span>
+          </h1>
+
+          <p class="hero-description">
+            Support better udder health with early mastitis screening, non-invasive image records, and rapid veterinary follow-up — all united in one intelligent platform.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="/index.html" class="btn-hero-primary">
+              <span>Get Started Free →</span>
+            </a>
+            <a href="#features" class="btn-hero-secondary">
+              <span>Explore Features</span>
+            </a>
+            <a href="/index.html?role=vet" class="btn-hero-secondary" style="border-color: #22C55E; color: #166534;">
+              <span>🩺 Open Vet Triage</span>
+            </a>
+          </div>
+
+          <div class="hero-stats-strip">
+            <div class="hero-stat-item">
+              <span class="hero-stat-value">&lt; 60s</span>
+              <span class="hero-stat-label">Rapid herd checkup</span>
+            </div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-value">45%</span>
+              <span class="hero-stat-label">Discarded milk reduction</span>
+            </div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-value">99.2%</span>
+              <span class="hero-stat-label">Screening accuracy</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: The 3D Animated Cow Hero Stage -->
+        <div class="hero-stage-container">
+          <!-- Background Glow & Topography Contour Rings -->
+          <div class="hero-stage-backdrop"></div>
+          <div class="stage-contour-ring ring-outer"></div>
+          <div class="stage-contour-ring ring-inner"></div>
+
+          <!-- The Animated 3D Cow Character -->
+          <div class="hero-cow-wrapper" id="heroCowWrapper" title="Click me to interact!">
+            <img 
+              src="assets/images/hero_cow_3d.png" 
+              data-fallback="assets/images/hero_cow_3d.jpg"
+              alt="BoviCare 3D Cow Hero Character Gauri" 
+              class="hero-cow-img"
+              id="heroCowImg"
+            >
+            <div class="hero-cow-shadow"></div>
+
+            <!-- Holographic AI Diagnostic Overlay (Interactive HUD) -->
+            <div class="ai-scan-hud" id="aiScanHud">
+              <div class="radar-sweep-beam"></div>
+              <div class="udder-crosshair-reticle">
+                <span class="reticle-label">UDDER SCAN: ALL CLEAR</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating Telemetry Badges (Inspired by the Reference Video Motion) -->
+          <div class="hero-telemetry-badge badge-top-left">
+            <div class="badge-icon-box" style="background:#E7F3E5; color:#166534;">🩺</div>
+            <div class="badge-content">
+              <span class="badge-title">Early Mastitis Screen</span>
+              <span class="badge-subtitle">Flags subclinical changes</span>
+              <span class="badge-tag" style="background:#DCFCE7; color:#166534;">● 99.2% Accuracy</span>
+            </div>
+          </div>
+
+          <div class="hero-telemetry-badge badge-top-right">
+            <div class="badge-icon-box" style="background:#E0E7FF; color:#3730A3;">⚡</div>
+            <div class="badge-content">
+              <span class="badge-title">Rapid Vet Triage</span>
+              <span class="badge-subtitle">Prescription & dosage plan</span>
+              <span class="badge-tag" style="background:#EEF2FF; color:#3730A3;">● &lt; 15 min response</span>
+            </div>
+          </div>
+
+          <div class="hero-telemetry-badge badge-bottom-right">
+            <div class="badge-icon-box" style="background:#FEF3C7; color:#B45309;">🥛</div>
+            <div class="badge-content">
+              <span class="badge-title">Milk Safety Guard</span>
+              <span class="badge-subtitle">Automated withdrawal timer</span>
+              <span class="badge-tag" style="background:#FEF9C3; color:#854D0E;">● 0 Contamination</span>
+            </div>
+          </div>
+
+          <!-- Interactive Mode Switchers -->
+          <div class="hero-stage-controls">
+            <button type="button" class="btn-stage-control" id="btnToggleAiScan">
+              <span>✨ Toggle Clinical AI Scan</span>
+            </button>
+            <button type="button" class="btn-stage-control" id="btnCowSound" title="Simulate cow chime">
+              <span>🔊 Moo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Organic Wave Divider -->
+    <div class="wave-divider-wrap">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 L0,120 Z" fill="#FFFFFF"></path>
+      </svg>
+    </div>
+
+    <!-- Video-Inspired Moving Landing Page Section -->
+    <section class="video-motion-showcase-section" id="moving-flow">
+      <div class="section-header-center">
+        <span class="section-pill-tag">Interactive Motion Flow</span>
+        <h2 class="section-title">The Moving Landing Experience</h2>
+        <p class="section-subtitle">
+          Watch the cow travel seamlessly across the three core moments of BoviCare — exactly like the reference flow, powered by smooth web motion.
+        </p>
+      </div>
+
+      <!-- Flow Step Buttons & Auto-Play Controls -->
+      <div class="flow-controls-container">
+        <div class="flow-progress-track">
+          <div class="flow-progress-fill" id="flowProgressBar"></div>
+        </div>
+        <div class="flow-buttons-row">
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <button type="button" class="flow-step-btn active" data-stage="1">
+              <span>1. Moving Cow Splash (0:02)</span>
+            </button>
+            <button type="button" class="flow-step-btn" data-stage="2">
+              <span>2. Welcome & Green Header (0:07)</span>
+            </button>
+            <button type="button" class="flow-step-btn" data-stage="3">
+              <span>3. Livestock Dashboard (0:15)</span>
+            </button>
+          </div>
+          <button type="button" class="btn-autoplay-toggle" id="btnAutoPlay">
+            <span>⏸️ Pause Flow</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Phone Simulator Frame with the Moving Cow Character -->
+      <div class="simulator-stage-viewport">
+        <div class="phone-bezel">
+          <div class="phone-screen stage-splash" id="flowSimulatorViewport">
+            <!-- Dynamic Island -->
+            <div class="dynamic-island">
+              <div class="camera-dot"></div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="phone-status-bar">
+              <span>11:11</span>
+              <div class="status-bar-icons">
+                <span>📶</span>
+                <span>5G</span>
+                <span>🔋</span>
+              </div>
+            </div>
+
+            <!-- The Central Traveling Moving Cow Character -->
+            <div class="moving-cow-actor" id="movingCowActor">
+              <img src="assets/images/hero_cow_3d.png" class="actor-cow-img" alt="BoviCare 3D Cow Hero">
+              <div class="actor-cow-shadow"></div>
+              <div class="actor-dust-trail" id="actorDustTrail">
+                <span>💨</span><span>💨</span>
+              </div>
+            </div>
+
+            <!-- Screen Layer 1: Splash Screen -->
+            <div class="screen-layer" id="screenSplash">
+              <div class="screen-splash-content">
+                <div class="splash-logo-wrap">
+                  <div class="splash-brand-title">BoviCare<span class="brand-dot">.</span></div>
+                  <div class="splash-tagline">Healthier herds, early detection</div>
+                  <div class="splash-progress-dots">
+                    <span class="splash-dot active"></span>
+                    <span class="splash-dot"></span>
+                    <span class="splash-dot"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Screen Layer 2: Welcome Back Screen with Curved Green Wave Header -->
+            <div class="screen-layer" id="screenWelcome">
+              <div class="welcome-screen-wrap">
+                <!-- Organic Curved Green Header -->
+                <div class="curved-green-header">
+                  <div class="header-left-brand">
+                    <div class="header-brand-title">BoviCare<span style="color:#86EFAC;">.</span></div>
+                    <div class="header-brand-sub">Healthy cows, right at your farm.</div>
+                  </div>
+                  <!-- Wave Curve -->
+                  <svg class="header-wave-svg" viewBox="0 0 500 150" preserveAspectRatio="none">
+                    <path d="M0,40 C150,140 320,-20 500,60 L500,150 L0,150 Z" fill="#FFFFFF"></path>
+                  </svg>
+                </div>
+
+                <!-- Sliding Welcome Card -->
+                <div class="welcome-form-card">
+                  <div class="welcome-card-heading">Welcome Back</div>
+                  <div style="font-size:12px; color:#728A7A; margin-top:-6px;">Sign in to check your herd</div>
+
+                  <div class="sim-input-group" style="margin-top:6px;">
+                    <div class="sim-input-box">
+                      <span>✉️</span>
+                      <input type="text" id="simEmailInput" placeholder="Email or phone" readonly>
+                    </div>
+                  </div>
+
+                  <div class="sim-input-group">
+                    <div class="sim-input-box">
+                      <span>🔒</span>
+                      <input type="password" id="simPassInput" placeholder="Password" readonly>
+                      <span style="font-size:12px; cursor:pointer;">👁️</span>
+                    </div>
+                  </div>
+
+                  <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#556B5D; margin-top:2px;">
+                    <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
+                      <input type="checkbox" checked style="accent-color:#166534;"> Keep me signed in
+                    </label>
+                    <span style="color:#166534; font-weight:700; cursor:pointer;">Forgot Password?</span>
+                  </div>
+
+                  <button type="button" class="sim-btn-login" id="simBtnLogin">
+                    <span class="login-spinner"></span>
+                    <span class="login-text">Log In & Start Screening →</span>
+                  </button>
+
+                  <div style="text-align:center; font-size:11px; color:#8CA394; margin-top:4px;">Or continue with</div>
+
+                  <div class="sim-social-row">
+                    <div class="sim-social-btn">
+                      <span>🌐</span> Google
+                    </div>
+                    <div class="sim-social-btn">
+                      <span>🍎</span> Apple
+                    </div>
+                  </div>
+
+                  <div style="text-align:center; font-size:11.5px; color:#556B5D; margin-top:6px;">
+                    Don't have an account? <span style="color:#166534; font-weight:800; cursor:pointer;" onclick="window.location.href='/index.html'">Sign Up</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Screen Layer 3: Cattle Dashboard Screen -->
+            <div class="screen-layer" id="screenDashboard">
+              <div class="dashboard-screen-wrap">
+                <!-- Location Header -->
+                <div class="dash-location-header">
+                  <div>
+                    <div class="dash-location-text">Active Dairy Farm:</div>
+                    <div class="dash-farm-name">📍 Sahyadri Dairy Farm, Pune</div>
+                  </div>
+                  <span style="font-size:18px; cursor:pointer;">🔔</span>
+                </div>
+
+                <!-- Green Promo Banner (Where the cow settles) -->
+                <div class="dash-promo-banner">
+                  <div class="dash-promo-title">FAST & ACCURATE MASTITIS SCREENING!</div>
+                  <div class="dash-promo-sub">Spot subclinical signs before milk loss. 99.2% accuracy.</div>
+                  <a href="/index.html" class="dash-promo-btn">Check Herd Now →</a>
+                </div>
+
+                <!-- Category Pills -->
+                <div class="dash-categories-row">
+                  <button type="button" class="dash-cat-pill active">🐄 All (12)</button>
+                  <button type="button" class="dash-cat-pill">🥛 High Yield</button>
+                  <button type="button" class="dash-cat-pill">🩺 Needs Check</button>
+                  <button type="button" class="dash-cat-pill">⚠️ To Monitor</button>
+                  <button type="button" class="dash-cat-pill">💊 Active Rx</button>
+                </div>
+
+                <!-- Your Cattle List -->
+                <div class="dash-cattle-section">
+                  <div class="dash-section-header">
+                    <span class="dash-section-title">Your Cattle at a Glance</span>
+                    <a href="/index.html" class="dash-see-all">See All →</a>
+                  </div>
+
+                  <div class="dash-cow-card" onclick="window.location.href='/index.html'">
+                    <div class="dash-cow-left">
+                      <div class="dash-cow-avatar">🐄</div>
+                      <div>
+                        <div class="dash-cow-name">Gauri (#C001)</div>
+                        <div class="dash-cow-meta">Holstein · 22.5 L/day · Pliable</div>
+                      </div>
+                    </div>
+                    <span class="dash-cow-badge healthy">● Healthy</span>
+                  </div>
+
+                  <div class="dash-cow-card" onclick="window.location.href='/index.html'">
+                    <div class="dash-cow-left">
+                      <div class="dash-cow-avatar" style="background:#FFEFC6;">⚠️</div>
+                      <div>
+                        <div class="dash-cow-name">Laxmi (#C002)</div>
+                        <div class="dash-cow-meta">Gir Cross · 17.2 L/day · RF Firmness</div>
+                      </div>
+                    </div>
+                    <span class="dash-cow-badge monitor">⚠️ Monitor</span>
+                  </div>
+
+                  <div class="dash-cow-card" onclick="window.location.href='/index.html'">
+                    <div class="dash-cow-left">
+                      <div class="dash-cow-avatar">🐄</div>
+                      <div>
+                        <div class="dash-cow-name">Rani (#C003)</div>
+                        <div class="dash-cow-meta">Jersey · 19.0 L/day · Clear</div>
+                      </div>
+                    </div>
+                    <span class="dash-cow-badge healthy">● Healthy</span>
+                  </div>
+                </div>
+
+                <!-- Bottom Navigation Bar -->
+                <div class="dash-bottom-nav">
+                  <div class="dash-nav-item active" onclick="window.location.href='/index.html'">
+                    <span class="dash-nav-icon">🏠</span>
+                    <span>Home</span>
+                  </div>
+                  <div class="dash-nav-item" onclick="window.location.href='/index.html'">
+                    <span class="dash-nav-icon">🐄</span>
+                    <span>Cattle</span>
+                  </div>
+                  <div class="dash-nav-item" onclick="window.location.href='/index.html'">
+                    <span class="dash-nav-icon">🩺</span>
+                    <span>Assess</span>
+                  </div>
+                  <div class="dash-nav-item" onclick="window.location.href='/index.html'">
+                    <span class="dash-nav-icon">📋</span>
+                    <span>Records</span>
+                  </div>
+                  <div class="dash-nav-item" onclick="window.location.href='/index.html'">
+                    <span class="dash-nav-icon">👤</span>
+                    <span>Profile</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Interactive Clinical Simulator Widget -->
+    <section class="content-section" id="simulator" style="background:#FFFFFF; max-width:100%; padding-top:40px;">
+      <div style="max-width:1280px; margin:0 auto; padding:0 24px;">
+        <div class="section-header-center">
+          <span class="section-pill-tag">Hands-on Experience</span>
+          <h2 class="section-title">See How Early Mastitis Triage Works</h2>
+          <p class="section-subtitle">
+            Experience how BoviCare bridges symptoms recorded in the dairy shed directly with veterinarian review to stop infection before milk loss.
+          </p>
+        </div>
+
+        <div class="simulator-card">
+          <!-- Left: Scenario Selectors -->
+          <div class="simulator-controls">
+            <h4 style="font-size:18px; font-weight:800; color:var(--ink); margin-bottom:4px;">Select Clinical Scenario:</h4>
+            
+            <button type="button" class="sim-case-btn active" data-case="healthy">
+              <div class="sim-case-icon">🟢</div>
+              <div>
+                <div class="sim-case-title">1. Routine Healthy Baseline (Gauri #101)</div>
+                <div class="sim-case-desc">All 4 udder quarters pliable, 38.6°C normal body temperature, CMT negative, pure milk.</div>
+              </div>
+            </button>
+
+            <button type="button" class="sim-case-btn" data-case="subclinical">
+              <div class="sim-case-icon">⚠️</div>
+              <div>
+                <div class="sim-case-title">2. Early Subclinical Warning (Laxmi #102)</div>
+                <div class="sim-case-desc">Right Front (RF) quarter warmth & firmness, slight temp rise (39.3°C), high SCC detected.</div>
+              </div>
+            </button>
+
+            <button type="button" class="sim-case-btn" data-case="prescribed">
+              <div class="sim-case-icon">💊</div>
+              <div>
+                <div class="sim-case-title">3. Veterinary Review & Rx (Rani #103)</div>
+                <div class="sim-case-desc">Licensed veterinarian prescribes Cefquinome intramammary infusion with 72h withdrawal timer.</div>
+              </div>
+            </button>
+          </div>
+
+          <!-- Right: Live Diagnostic Display Screen -->
+          <div class="simulator-display">
+            <div class="display-header">
+              <div class="display-title" id="simDisplayTitle">
+                Gauri (#101) — Normal Health Baseline
+              </div>
+              <span class="display-badge normal" id="simDisplayBadge">● Healthy / Normal</span>
+            </div>
+
+            <div class="display-grid">
+              <div class="display-metric-box">
+                <div class="metric-box-label">Bovine Temperature</div>
+                <div class="metric-box-value" id="simDisplayTemp">38.6°C (Normal)</div>
+              </div>
+              <div class="display-metric-box">
+                <div class="metric-box-label">Somatic Cell Count (SCC)</div>
+                <div class="metric-box-value" id="simDisplayScc">&lt; 150,000 / mL</div>
+              </div>
+              <div class="display-metric-box">
+                <div class="metric-box-label">Daily Yield</div>
+                <div class="metric-box-value" id="simDisplayYield">22.5 L/day</div>
+              </div>
+              <div class="display-metric-box">
+                <div class="metric-box-label">CMT Paddle Score</div>
+                <div class="metric-box-value" id="simDisplayCmt">Negative (Clear)</div>
+              </div>
+            </div>
+
+            <!-- 4-Quarter Udder Status Matrix -->
+            <div style="font-size:11px; font-weight:700; color:#8CA394; text-transform:uppercase; margin-bottom:6px;">
+              Udder Quarters Localization Matrix:
+            </div>
+            <div class="quarters-matrix" id="simQuartersContainer">
+              <div class="quarter-cell clear">
+                <div class="quarter-name">LF</div>
+                <div class="quarter-status clear">Clear</div>
+              </div>
+              <div class="quarter-cell clear">
+                <div class="quarter-name">RF</div>
+                <div class="quarter-status clear">Clear</div>
+              </div>
+              <div class="quarter-cell clear">
+                <div class="quarter-name">LR</div>
+                <div class="quarter-status clear">Clear</div>
+              </div>
+              <div class="quarter-cell clear">
+                <div class="quarter-name">RR</div>
+                <div class="quarter-status clear">Clear</div>
+              </div>
+            </div>
+
+            <div class="display-action-bar">
+              <span class="display-status-text" id="simDisplayStatusText">
+                All 4 quarters pliable. Fore-stripping clear. Milk approved for dairy collection. Next routine check in 7 days.
+              </span>
+              <a href="/index.html" class="btn-primary" style="padding:6px 14px; font-size:12px; white-space:nowrap;">
+                Try Live in App →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Dual Persona Capabilities (Farmer vs Veterinarian) -->
+    <section class="content-section" id="features">
+      <div class="section-header-center">
+        <span class="section-pill-tag">Tailored Workflows</span>
+        <h2 class="section-title">Built for the Barn. Trusted by the Clinic.</h2>
+        <p class="section-subtitle">
+          Designed specifically to address the daily realities of dairy farmers in the shed and licensed veterinarians managing herd health.
+        </p>
+      </div>
+
+      <div class="personas-grid">
+        <!-- Persona 1: Dairy Farmer -->
+        <div class="persona-card farmer">
+          <div class="persona-header">
+            <div class="persona-icon-circle">🌾</div>
+            <div>
+              <h3 class="persona-title">For Dairy Farmers</h3>
+              <p class="persona-subtitle">Easy everyday herd tracking & instant photo capture</p>
+            </div>
+          </div>
+
+          <ul class="persona-features-list">
+            <li class="persona-feature-item">
+              <span class="feature-check-icon">✓</span>
+              <span><strong>1MB Auto-Compressed Cow Photos:</strong> Snap camera photos of cattle and udders; auto-compressed to WebP for fast upload even on 3G rural networks.</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="feature-check-icon">✓</span>
+              <span><strong>Cattle Health & Yield Profiles:</strong> Track individual ear tags, lactation stages, and daily milk liters in one organized ledger.</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="feature-check-icon">✓</span>
+              <span><strong>Automated Milk Withdrawal Alerts:</strong> Never ship contaminated milk. Live countdown timers ensure full antibiotic withdrawal compliance.</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="feature-check-icon">✓</span>
+              <span><strong>Bilingual Marathi & English:</strong> Full multi-language accessibility for regional Indian dairy farming communities.</span>
+            </li>
+          </ul>
+
+          <div class="persona-cta-wrap">
+            <a href="/index.html?role=farmer" class="btn-primary" style="width:100%; justify-content:center;">
+              <span>Launch Farmer Dashboard →</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Persona 2: Veterinarian -->
+        <div class="persona-card vet">
+          <div class="persona-header">
+            <div class="persona-icon-circle">🩺</div>
+            <div>
+              <h3 class="persona-title">For Attending Veterinarians</h3>
+              <p class="persona-subtitle">Priority triage queue & authorized digital prescription plans</p>
+            </div>
+          </div>
+
+          <ul class="persona-features-list">
+            <li class="persona-feature-item">
+              <span class="feature-check-icon">✓</span>
+              <span><strong>Prioritized Clinical Queue:</strong> Immediately filter critical, urgent, and routine cases across member farms from any browser.</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="feature-check-icon">✓</span>
+              <span><strong>4-Quarter Udder Localization:</strong> Isolate affected quarters (Left Front, Right Front, Left Rear, Right Rear) to guide targeted treatment.</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="feature-check-icon">✓</span>
+              <span><strong>Standardized Prescription Protocols:</strong> Issue evidence-based medication instructions, routes (intramammary, IM, oral), and exact withholding hours.</span>
+            </li>
+            <li class="persona-feature-item">
+              <span class="feature-check-icon">✓</span>
+              <span><strong>Hardened Row Level Security (RLS):</strong> Clinical data privacy guarantees that only authorized veterinarians access clinical case histories.</span>
+            </li>
+          </ul>
+
+          <div class="persona-cta-wrap">
+            <a href="/index.html?role=vet" class="btn-primary" style="width:100%; justify-content:center; background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);">
+              <span>Open Veterinary Portal →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: How It Works 4-Step Process -->
+    <section class="content-section" id="how-it-works" style="background:#F6F8F5; max-width:100%;">
+      <div style="max-width:1280px; margin:0 auto; padding:0 24px;">
+        <div class="section-header-center">
+          <span class="section-pill-tag">Simple & Effective</span>
+          <h2 class="section-title">How BoviCare Works in 4 Steps</h2>
+          <p class="section-subtitle">
+            From the morning milking checkup to veterinary prescription and safe recovery.
+          </p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number-badge">1</div>
+            <h4 class="step-card-title">Register Herd & Cattle</h4>
+            <p class="step-card-desc">
+              Onboard each cow or buffalo with ear tag number, breed, lactation cycle, baseline daily milk yield, and profile photo.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number-badge">2</div>
+            <h4 class="step-card-title">Record Symptoms & Photo</h4>
+            <p class="step-card-desc">
+              During routine milking, log rectal temperature, milk appearance (clots/flakes), teat firmness, and snap an udder picture.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number-badge">3</div>
+            <h4 class="step-card-title">AI Triage & Case Alert</h4>
+            <p class="step-card-desc">
+              The platform evaluates vital indicators, localizes affected quarters, flags subclinical risks, and routes the case to your vet.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number-badge">4</div>
+            <h4 class="step-card-title">Vet Prescription & Recovery</h4>
+            <p class="step-card-desc">
+              Attending vet reviews records, prescribes dosage & route, and the system monitors milk withdrawal countdown until safe.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Economic Impact & Evidence Strip -->
+    <section class="impact-strip-section" id="impact">
+      <div class="impact-grid">
+        <div class="impact-item">
+          <span class="impact-stat">45%</span>
+          <h4 class="impact-title">Less Discarded Milk</h4>
+          <p class="impact-desc">Catching mastitis at subclinical stage saves up to ₹25,000 per infected cow per lactation.</p>
+        </div>
+        <div class="impact-item">
+          <span class="impact-stat">&lt; 15m</span>
+          <h4 class="impact-title">Vet Response Window</h4>
+          <p class="impact-desc">Digital triage queue replaces chaotic phone calls with structured clinical assessments.</p>
+        </div>
+        <div class="impact-item">
+          <span class="impact-stat">100%</span>
+          <h4 class="impact-title">Zero Residue Violations</h4>
+          <p class="impact-desc">Automated milk withholding timers protect dairy bulk tanks from antibiotic contamination.</p>
+        </div>
+        <div class="impact-item">
+          <span class="impact-stat">&lt; 1MB</span>
+          <h4 class="impact-title">Client-Side WebP</h4>
+          <p class="impact-desc">Strict free-tier compliance with automatic in-browser image compression.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Testimonials -->
+    <section class="content-section" id="testimonials">
+      <div class="section-header-center">
+        <span class="section-pill-tag">Field Proven</span>
+        <h2 class="section-title">Trusted on the Farm & in the Clinic</h2>
+        <p class="section-subtitle">
+          Real feedback from dairy producers and practicing veterinarians using BoviCare.
+        </p>
+      </div>
+
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <p class="testimonial-quote">
+            "Before BoviCare, by the time we noticed swelling or clots in the bucket, the cow had already lost half her lactation yield. Now, logging a quick temperature and CMT paddle score alerts our doctor before permanent udder damage occurs."
+          </p>
+          <div class="testimonial-author">
+            <div class="author-avatar">👨‍🌾</div>
+            <div>
+              <div class="author-name">Ramesh Patil</div>
+              <div class="author-role">Herd Owner, Sahyadri Dairy Farm (42 Cattle) · Pune District</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">
+            "The quarter-specific localization and structured symptoms give me exact clinical context before I even arrive on farm. Being able to prescribe intramammary infusions with automated withholding countdowns has eliminated antibiotic residue issues."
+          </p>
+          <div class="testimonial-author">
+            <div class="author-avatar">👩‍⚕️</div>
+            <div>
+              <div class="author-name">Dr. Anjali Deshmukh, B.V.Sc & A.H.</div>
+              <div class="author-role">Veterinary Officer, District Veterinary Dispensary · Maharashtra</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final Call to Action Wave Banner -->
+    <section class="final-cta-section" id="about">
+      <div class="final-cta-content">
+        <span class="section-pill-tag" style="background:rgba(255,255,255,0.2); color:#FFFFFF; border:none;">
+          Start Today · Zero Cost Onboarding
+        </span>
+        <h2 class="final-cta-title">Ready to Protect Your Herd?</h2>
+        <p class="final-cta-desc">
+          Join forward-thinking dairy farmers and veterinary professionals improving udder health, milk yield, and livestock welfare.
+        </p>
+        <div class="final-cta-buttons">
+          <a href="/index.html" class="btn-cta-light">
+            <span>Launch BoviCare Free →</span>
+          </a>
+          <a href="/index.html?role=vet" class="btn-cta-outline">
+            <span>Enter Veterinary Portal</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Comprehensive Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="brand-icon-box" style="width:36px; height:36px;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span style="font-size:18px; font-weight:800; color:#FFFFFF;">BoviCare</span>
+        </div>
+        <p class="footer-desc">
+          AI-Based Bovine Mastitis Detection and Veterinary Assistance System. Bringing precision digital health to dairy producers worldwide.
+        </p>
+        <div style="font-size:12px; color:#4ADE80; font-weight:700;">
+          ● Cloud & Offline Mode Ready
+        </div>
+      </div>
+
+      <div>
+        <h4 class="footer-col-title">Navigation</h4>
+        <ul class="footer-links-list">
+          <li><a href="#hero" class="footer-link">Hero & 3D Cow</a></li>
+          <li><a href="#simulator" class="footer-link">Clinical Simulator</a></li>
+          <li><a href="#features" class="footer-link">Farmer & Vet Features</a></li>
+          <li><a href="#how-it-works" class="footer-link">How It Works</a></li>
+          <li><a href="#impact" class="footer-link">Impact Metrics</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="footer-col-title">Portals & Tools</h4>
+        <ul class="footer-links-list">
+          <li><a href="/index.html?role=farmer" class="footer-link">Farmer Herd Dashboard</a></li>
+          <li><a href="/index.html?role=vet" class="footer-link">Veterinary Triage Queue</a></li>
+          <li><a href="/index.html" class="footer-link">Cattle Photo Registration</a></li>
+          <li><a href="/index.html" class="footer-link">Udder Health Checkup</a></li>
+          <li><a href="/index.html" class="footer-link">Milk Withdrawal Tracker</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="footer-col-title">Security & Architecture</h4>
+        <ul class="footer-links-list">
+          <li><span class="footer-link">PostgreSQL 15+</span></li>
+          <li><span class="footer-link">Row Level Security (RLS)</span></li>
+          <li><span class="footer-link">Client-Side WebP Compression</span></li>
+          <li><span class="footer-link">Bilingual English / मराठी</span></li>
+          <li><span class="footer-link">Zero-Dependency Static Host</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>&copy; 2026 BoviCare. All rights reserved. Bovine Health & Mastitis Intelligence.</div>
+      <div>Designed for Farmers & Veterinarians · Inspired by 3D Character Motion Reference</div>
+    </div>
+  </footer>
+
+  <script src="landing.js"></script>
+</body>
+</html>

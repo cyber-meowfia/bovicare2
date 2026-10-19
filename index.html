@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BoviCare — Bovine Mastitis Detection & Veterinary Assistance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Mobile Floating Menu Toggle (Visible on Mobile screens only) -->
+    <button type="button" class="mobile-sidebar-toggle-float" id="btnMobileFloatToggle" onclick="toggleSidebar()" aria-label="Toggle navigation menu" title="Open navigation">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Application Body Layout: Left Gemini Icon Rail Sidebar + Right Content Area -->
+    <div class="app-body-layout">
+      <!-- Collapsible Gemini-Style Icon Rail Sidebar -->
+      <aside class="app-sidebar collapsed" id="appSidebar">
+        <div class="sidebar-top-box">
+          <div class="top-nav-left">
+            <div class="brand-wrapper" onclick="switchTab(0)" title="BoviCare Home">
+              <div class="brand-icon-box" id="brandIconBox">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 20A7 7 0 0 1 4 13C4 8 11 3 11 3s7 5 7 10a7 7 0 0 1-7 7Z"/>
+                  <path d="M11 13v7"/>
+                  <path d="M7 11c1.5 1 2.5 1 4 0"/>
+                </svg>
+              </div>
+              <div class="brand-text-col sidebar-brand-text">
+                <span class="brand-title">BoviCare</span>
+                <span class="brand-tagline" id="txtTagline">YOUR FARM, HEALTHIER</span>
+              </div>
+            </div>
+            <button type="button" class="sidebar-rail-toggle" id="btnRailToggle" onclick="toggleSidebar()" aria-label="Toggle navigation menu" title="Collapse / Expand menu">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <button type="button" class="btn-sidebar-close" id="btnSidebarClose" onclick="closeSidebar()" aria-label="Close menu" title="Close menu">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Action: "+ Add Cow" / Triage (Gemini "+ New Chat" style button) -->
+        <div class="sidebar-quick-action">
+          <button type="button" class="sidebar-action-pill-btn" id="btnSidebarQuickAction" onclick="openAddCowModal()" title="Add Cow to Herd">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span class="sidebar-nav-label" id="lblSidebarQuickAction">Add Cow</span>
+          </button>
+        </div>
+
+        <!-- Navigation Section: Icon Rail with Labels -->
+        <div class="sidebar-nav-group">
+          <div class="sidebar-group-label">NAVIGATION</div>
+          <nav class="sidebar-nav-list">
+            <!-- Farmer Home Link -->
+            <button type="button" class="sidebar-nav-btn farmer-only active" data-tab="tabHome" onclick="switchTab('tabHome')" title="Home">
+              <div class="sidebar-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </div>
+              <span class="sidebar-nav-label" id="sideLinkHome">Home</span>
+            </button>
+            <!-- Vet Clinical Overview & Triage Links -->
+            <button type="button" class="sidebar-nav-btn vet-only" data-tab="tabClinicalOverview" onclick="switchTab('tabClinicalOverview')" title="Clinical Overview">
+              <div class="sidebar-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              </div>
+              <span class="sidebar-nav-label" id="sideLinkOverview">Clinical Overview</span>
+            </button>
+            <button type="button" class="sidebar-nav-btn vet-only" data-tab="tabTriage" onclick="switchTab('tabTriage')" title="Clinical Triage">
+              <div class="sidebar-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              </div>
+              <span class="sidebar-nav-label" id="sideLinkTriage">Clinical Triage</span>
+            </button>
+            <!-- Shared Links -->
+            <button type="button" class="sidebar-nav-btn" data-tab="tabCows" onclick="switchTab('tabCows')" title="Assigned Herds">
+              <div class="sidebar-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><path d="M7 12a5 5 0 0 1 10 0"/></svg>
+              </div>
+              <span class="sidebar-nav-label" id="sideLinkCows">Assigned Herds</span>
+            </button>
+            <button type="button" class="sidebar-nav-btn" data-tab="tabAssess" onclick="switchTab('tabAssess')" title="Assess">
+              <div class="sidebar-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+              </div>
+              <span class="sidebar-nav-label" id="sideLinkAssess">Assess</span>
+            </button>
+            <button type="button" class="sidebar-nav-btn" data-tab="tabRecords" onclick="switchTab('tabRecords')" title="Records & Holds">
+              <div class="sidebar-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <span class="sidebar-nav-label" id="sideLinkRecords">Records & Holds</span>
+            </button>
+            <button type="button" class="sidebar-nav-btn" data-tab="tabProfile" onclick="switchTab('tabProfile')" title="Doctor Profile">
+              <div class="sidebar-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <span class="sidebar-nav-label" id="sideLinkVet">Doctor Profile</span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- Shortcuts & Utility Section -->
+        <div class="sidebar-nav-group sidebar-secondary-group">
+          <div class="sidebar-group-label">SHORTCUTS</div>
+          <button type="button" class="sidebar-nav-btn secondary-assess" onclick="switchTab('tabAssess')" title="Start Assessment">
+            <div class="sidebar-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            </div>
+            <span class="sidebar-nav-label">Start Check</span>
+          </button>
+          <button type="button" class="sidebar-nav-btn" onclick="openNotifications()" title="Notifications">
+            <div class="sidebar-icon-wrap" style="position:relative;">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              <span class="notification-dot" style="top:2px; right:2px;"></span>
+            </div>
+            <span class="sidebar-nav-label">Notifications</span>
+          </button>
+          <a href="/" class="sidebar-nav-btn" style="text-decoration:none;" title="View BoviCare Website Landing Page">
+            <div class="sidebar-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <span class="sidebar-nav-label">Website</span>
+          </a>
+          <a href="/login" class="sidebar-nav-btn" style="text-decoration:none;" title="Sign In or Switch Role">
+            <div class="sidebar-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            </div>
+            <span class="sidebar-nav-label">Login</span>
+          </a>
+        </div>
+
+        <!-- Sidebar Footer (Compact in Rail, Expanded in Full) -->
+        <div class="sidebar-footer-box">
+          <div class="sidebar-role-cluster" title="Active Role">
+            <span class="sidebar-footer-sub sidebar-nav-label">ACTIVE ROLE</span>
+            <div class="active-role-indicator-badge sidebar-role-badge" id="sideActiveRoleBadge">
+              <span class="role-icon">🌾</span>
+              <span class="sidebar-nav-label role-text">Farmer</span>
+            </div>
+            <div class="active-role-indicator-badge" id="activeRoleBadge" style="display:none;" aria-hidden="true">
+              🌾 Dairy Farmer
+            </div>
+          </div>
+
+          <div class="sidebar-meta-cluster" style="margin-top:10px;">
+            <button type="button" class="lang-toggle-btn sidebar-lang-btn" id="sideBtnLangToggle" onclick="toggleLanguage()" title="Switch Language / भाषा बदला">
+              <span>🌐</span>
+              <span class="sidebar-nav-label" id="sideLangToggleText">मराठी</span>
+            </button>
+            <button type="button" id="btnLangToggle" onclick="toggleLanguage()" style="display:none;" aria-hidden="true">
+              <span id="langToggleText">मराठी</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Sidebar Backdrop Overlay -->
+      <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+      <!-- Main Responsive Application Column -->
+      <div class="app-main-col">
+
+      <!-- Main Responsive Application Container -->
+      <main class="app-main-content">
+
+                        <!-- ====================================================================
+             TAB 0: HOME DASHBOARD (EXPANDED PRIMARY FEED + BOTTOM OPERATIONS)
+             ==================================================================== -->
+        <section id="tabHome" class="tab-view active">
+          <!-- ================================================================
+               FARMER HOME FEED (SHOWN IN FARMER ROLE)
+               ================================================================ -->
+          <div id="farmerHomeFeed">
+            <!-- Expanded Middle Primary Feed -->
+            <div class="dashboard-expanded-feed">
+            <!-- Farmer Greeting -->
+            <div class="greeting-section">
+              <h1 class="greeting-title" id="greetingTitle">Good morning, Farmer 👋</h1>
+              <p class="greeting-subtitle" id="greetingSubtitle">Every cow matters. Let's check in on your herd.</p>
+            </div>
+
+            <!-- Panoramic Hero Banner Card (Full Width) -->
+            <div class="hero-card">
+              <img class="hero-img-bg" src="assets/images/cow_banner.jpeg" alt="Healthy dairy cow">
+              <div class="hero-gradient-overlay"></div>
+              
+              <div class="hero-content">
+                <div class="hero-tag-badge">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 20A7 7 0 0 1 4 13C4 8 11 3 11 3s7 5 7 10a7 7 0 0 1-7 7Z"/>
+                  </svg>
+                  <span id="heroTagText">HERD HEALTH</span>
+                </div>
+                <h2 class="hero-headline" id="heroHeadline">Healthy cows,<br>better tomorrow.</h2>
+                <p class="hero-description" id="heroDesc">Spot changes early. Record observations. Care better.</p>
+                <button type="button" class="hero-cta-btn" onclick="switchTab('tabAssess')">
+                  <span id="heroCtaText">Start check</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Hand-drawn "Healthy Herd" arrow callout -->
+              <div class="hero-doodle-arrow">
+                <span class="doodle-text" id="heroDoodleText">Healthy Herd</span>
+                <svg viewBox="0 0 48 36" width="38" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M4 28 C 16 32, 34 26, 42 10" stroke-dasharray="2 2"/>
+                  <path d="M34 8 L 44 8 L 42 18"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Quick Action Explore Tiles Row -->
+            <div class="section-row-header">
+              <h3 class="section-title" id="txtExploreTitle">Explore</h3>
+              <button type="button" class="section-link" onclick="switchTab('tabCows')">
+                <span id="txtExploreSeeAll">See all</span>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+
+            <div class="explore-tiles-row explore-grid-row">
+              <button type="button" class="explore-tile" onclick="switchTab('tabCows')">
+                <div class="explore-icon-box mint">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="7"/>
+                    <path d="M7 12a5 5 0 0 1 10 0"/>
+                    <path d="M5 9c-1-1-2-1-3 0 0 2 1 3 3 2"/>
+                    <path d="M19 9c1-1 2-1 3 0 0 2-1 3-3 2"/>
+                  </svg>
+                </div>
+                <span class="explore-label" id="lblTileCows">My Cows</span>
+                <span class="explore-sub">Cattle Catalog</span>
+              </button>
+
+              <button type="button" class="explore-tile" onclick="openSymptomGuide()">
+                <div class="explore-icon-box cream">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
+                    <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
+                    <circle cx="20" cy="10" r="2"/>
+                  </svg>
+                </div>
+                <span class="explore-label" id="lblTileSymptoms">Symptoms</span>
+                <span class="explore-sub">Visual CMT Guide</span>
+              </button>
+
+              <button type="button" class="explore-tile" onclick="switchTab('tabAssess')">
+                <div class="explore-icon-box teal">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                  </svg>
+                </div>
+                <span class="explore-label" id="lblTileUdder">Udder Health</span>
+                <span class="explore-sub">Start Check</span>
+              </button>
+
+              <button type="button" class="explore-tile" onclick="switchTab('tabRecords')">
+                <div class="explore-icon-box blue">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                  </svg>
+                </div>
+                <span class="explore-label" id="lblTileRecords">Records</span>
+                <span class="explore-sub">Past Logs</span>
+              </button>
+
+              <button type="button" class="explore-tile" onclick="openRemindersModal()">
+                <div class="explore-icon-box rose">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                  </svg>
+                </div>
+                <span class="explore-label" id="lblTileReminders">Reminders</span>
+                <span class="explore-sub">Safety Timers</span>
+              </button>
+            </div>
+
+            <!-- Your Cows Feed Section (Expands across full width) -->
+            <div class="section-row-header">
+              <h3 class="section-title" id="txtYourCowsTitle">Your cows</h3>
+              <button type="button" class="section-link" onclick="switchTab('tabCows')">
+                <span id="txtYourCowsSeeAll">See all →</span>
+              </button>
+            </div>
+
+            <div class="cows-grid" id="homeCowsContainer">
+              <!-- Dynamically populated from JS -->
+            </div>
+
+            <!-- Recent Health Activity Card -->
+            <div class="activity-banner-card" onclick="switchTab('tabRecords')">
+              <div class="activity-icon-box">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </div>
+              <div class="activity-text-col">
+                <div class="activity-title" id="lblActivityTitle">Recent health activity</div>
+                <div class="activity-subtitle" id="lblActivitySubtitle">3 saved assessments this week</div>
+              </div>
+              <div class="activity-chevron">›</div>
+            </div>
+          </div>
+
+          <!-- Bottom Operational Section (Moved from Right Side to Bottom) -->
+          <div class="home-bottom-operational-section">
+            <!-- Herd at a Glance Header & Stats Cards -->
+            <div class="section-row-header">
+              <h3 class="section-title" id="txtHerdGlanceTitle">Your herd at a glance</h3>
+              <button type="button" class="section-link" onclick="switchTab('tabCows')">
+                <span id="txtHerdViewAll">View all</span>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+
+            <div class="stats-cards-row">
+              <!-- Card 1: Total Cows -->
+              <div class="stat-card" onclick="filterCattleList('all')">
+                <div class="stat-card-accent mint"></div>
+                <div class="stat-icon-wrap mint">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><path d="M7 12a5 5 0 0 1 10 0"/></svg>
+                </div>
+                <div class="stat-value" id="statTotalCows">12</div>
+                <div class="stat-label" id="lblStatTotal">Total cows</div>
+              </div>
+
+              <!-- Card 2: Healthy -->
+              <div class="stat-card" onclick="filterCattleList('healthy')">
+                <div class="stat-card-accent mint"></div>
+                <div class="stat-icon-wrap mint">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                </div>
+                <div class="stat-value" id="statHealthyCows">10</div>
+                <div class="stat-label" id="lblStatHealthy">Healthy</div>
+              </div>
+
+              <!-- Card 3: To Monitor -->
+              <div class="stat-card" onclick="filterCattleList('monitor')">
+                <div class="stat-card-accent amber"></div>
+                <div class="stat-icon-wrap amber">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <div class="stat-value" id="statMonitorCows">2</div>
+                <div class="stat-label" id="lblStatMonitor">To monitor</div>
+              </div>
+            </div>
+
+            <!-- Dual Bottom Operational Grid: Clinical Triage Queue + Barn Climate & THI -->
+            <div class="bottom-operational-grid">
+              <!-- Active Clinical Cases Queue -->
+              <div class="rail-widget-card bottom-operational-card">
+                <div class="rail-widget-header">
+                  <h3 class="rail-widget-title">🩺 Clinical Triage Queue</h3>
+                  <button type="button" class="section-link" onclick="switchTab('tabTriage')">
+                    <span>Open Queue →</span>
+                  </button>
+                </div>
+                <div id="railCasesContainer" style="display:flex; flex-direction:column; gap:8px;">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+
+              <!-- Barn Climate & Heat Stress Risk -->
+              <div class="rail-widget-card bottom-operational-card" style="background: linear-gradient(135deg, #F9FBF8 0%, #EFF6ED 100%);">
+                <div class="rail-widget-header">
+                  <h3 class="rail-widget-title">🌡️ Barn Climate & THI</h3>
+                  <span class="status-pill-badge healthy">Normal Risk</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:12.5px;">
+                  <div>
+                    <span style="color:var(--muted); font-size:11px;">Barn Temperature</span>
+                    <div style="font-size:20px; font-weight:800; color:var(--ink);">24.2°C</div>
+                  </div>
+                  <div>
+                    <span style="color:var(--muted); font-size:11px;">Relative Humidity</span>
+                    <div style="font-size:20px; font-weight:800; color:var(--ink);">58%</div>
+                  </div>
+                  <div>
+                    <span style="color:var(--muted); font-size:11px;">THI Comfort Index</span>
+                    <div style="font-size:20px; font-weight:800; color:var(--forest);">68 (Comfort)</div>
+                  </div>
+                </div>
+                <div style="margin-top:14px; padding:12px 14px; background:rgba(255,255,255,0.75); border-radius:12px; font-size:12px; color:var(--ink); line-height:1.45;">
+                  🌿 <strong>Optimal Housing Conditions:</strong> Ambient barn temperature and relative humidity remain well below heat-stress thresholds ( < 72$), promoting strong bovine immunity and lower somatic cell counts.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- Close #farmerHomeFeed -->
+      </section> <!-- Close #tabHome -->
+
+<!-- ====================================================================
+           TAB 5: CLINICAL OVERVIEW & EPIDEMIOLOGY DASHBOARD
+           ==================================================================== -->
+      <section id="tabClinicalOverview" class="tab-view">
+        <div class="clinical-overview-container">
+          <!-- Hero Section -->
+          <div class="clinical-overview-hero">
+            <div class="clinical-hero-top">
+              <div class="clinical-live-pill">
+                <span class="clinical-live-dot"></span>
+                <span>Real-Time Clinical Herd Surveillance Active</span>
+              </div>
+              <div class="clinical-hero-actions">
+                <button type="button" class="btn-hero-action" onclick="showToast('Exporting epidemiological herd report (PDF)...')">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Export Report</span>
+                </button>
+                <button type="button" class="btn-hero-action primary" onclick="renderClinicalOverviewDashboard(); showToast('Clinical telemetry refreshed!');">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                  <span>Refresh Telemetry</span>
+                </button>
+              </div>
+            </div>
+            <h2 class="clinical-hero-title">Herd Clinical Health & Udder Epidemiology</h2>
+            <p class="clinical-hero-desc">
+              Continuous multi-quarter inflammatory surveillance, California Mastitis Test (CMT) tracking, Somatic Cell Count (SCC) benchmarking, and automated food safety milk withholding governance.
+            </p>
+          </div>
+
+          <!-- Top High-Impact Clinical KPIs Grid -->
+          <div class="clinical-kpi-grid">
+            <!-- KPI 1: Clinical Mastitis Rate -->
+            <div class="clinical-kpi-card mint">
+              <div class="clinical-kpi-header">
+                <div class="clinical-kpi-icon mint">🐄</div>
+                <span class="clinical-kpi-badge mint">Grade A (&lt;10%)</span>
+              </div>
+              <div class="clinical-kpi-value" id="kpiMastitisRate">4.8%</div>
+              <div class="clinical-kpi-label">Herd Mastitis Incidence Rate</div>
+              <div class="clinical-kpi-sub">3 of 12 active lactating cows under watch</div>
+            </div>
+
+            <!-- KPI 2: Active Triage Cases -->
+            <div class="clinical-kpi-card amber">
+              <div class="clinical-kpi-header">
+                <div class="clinical-kpi-icon amber">🩺</div>
+                <span class="clinical-kpi-badge amber">High Priority</span>
+              </div>
+              <div class="clinical-kpi-value" id="kpiActiveTriageCases">3 Active</div>
+              <div class="clinical-kpi-label">Cases in Clinical Triage</div>
+              <div class="clinical-kpi-sub">2 Acute Clinical · 1 Subclinical SCC Spike</div>
+            </div>
+
+            <!-- KPI 3: Quarters at Risk -->
+            <div class="clinical-kpi-card rose">
+              <div class="clinical-kpi-header">
+                <div class="clinical-kpi-icon rose">⚠️</div>
+                <span class="clinical-kpi-badge rose">RF Peak Risk</span>
+              </div>
+              <div class="clinical-kpi-value" id="kpiQuartersAtRisk">5 Quarters</div>
+              <div class="clinical-kpi-label">Inflamed Udder Quarters</div>
+              <div class="clinical-kpi-sub">Right Front: 45% of total herd lesions</div>
+            </div>
+
+            <!-- KPI 4: Food Safety Shield -->
+            <div class="clinical-kpi-card blue">
+              <div class="clinical-kpi-header">
+                <div class="clinical-kpi-icon blue">🛡️</div>
+                <span class="clinical-kpi-badge blue">0 Residues</span>
+              </div>
+              <div class="clinical-kpi-value" id="kpiSafeWithholdingLiters">132 Liters</div>
+              <div class="clinical-kpi-label">Safely Withheld Milk</div>
+              <div class="clinical-kpi-sub">2 cows on active antibiotic withhold</div>
+            </div>
+          </div>
+
+          <!-- Row 2: 4-Quarter Heatmap & Somatic Cell Count (SCC) Benchmark -->
+          <div class="clinical-dashboard-grid-2">
+            <!-- 4-Quarter Heatmap Card -->
+            <div class="clinical-chart-card">
+              <div class="clinical-card-header">
+                <div>
+                  <h3 class="clinical-card-title">
+                    <span>📍</span> 4-Quarter Udder Inflammation Heatmap
+                  </h3>
+                  <div class="clinical-card-subtitle">Anatomical distribution across affected bovine quarters</div>
+                </div>
+                <span class="status-pill-badge monitor" style="font-size:11px;">RF Most Vulnerable</span>
+              </div>
+
+              <div class="quarter-heatmap-grid">
+                <!-- Left Front (LF) -->
+                <div class="quarter-heat-box moderate">
+                  <div class="quarter-heat-box-top">
+                    <span class="quarter-heat-code">LF · Left Front</span>
+                    <span class="quarter-heat-badge mod">25% Risk</span>
+                  </div>
+                  <div class="quarter-heat-pct" style="color:#B45309;">25%</div>
+                  <div class="quarter-heat-bar">
+                    <div class="quarter-heat-bar-fill" style="width:25%; background:#F59E0B;"></div>
+                  </div>
+                  <div class="quarter-heat-detail">1 active case (Gauri #C001) · Subclinical SCC</div>
+                </div>
+
+                <!-- Right Front (RF) -->
+                <div class="quarter-heat-box high-alert">
+                  <div class="quarter-heat-box-top">
+                    <span class="quarter-heat-code">RF · Right Front</span>
+                    <span class="quarter-heat-badge high">45% Peak</span>
+                  </div>
+                  <div class="quarter-heat-pct" style="color:#DC2626;">45%</div>
+                  <div class="quarter-heat-bar">
+                    <div class="quarter-heat-bar-fill" style="width:45%; background:#EF4444;"></div>
+                  </div>
+                  <div class="quarter-heat-detail">🚨 Acute Firmness & Heat (Laxmi #C002)</div>
+                </div>
+
+                <!-- Left Rear (LR) -->
+                <div class="quarter-heat-box stable">
+                  <div class="quarter-heat-box-top">
+                    <span class="quarter-heat-code">LR · Left Rear</span>
+                    <span class="quarter-heat-badge low">12% Low</span>
+                  </div>
+                  <div class="quarter-heat-pct" style="color:#15803D;">12%</div>
+                  <div class="quarter-heat-bar">
+                    <div class="quarter-heat-bar-fill" style="width:12%; background:#10B981;"></div>
+                  </div>
+                  <div class="quarter-heat-detail">1 post-calving edema case (Nandini #C003)</div>
+                </div>
+
+                <!-- Right Rear (RR) -->
+                <div class="quarter-heat-box moderate">
+                  <div class="quarter-heat-box-top">
+                    <span class="quarter-heat-code">RR · Right Rear</span>
+                    <span class="quarter-heat-badge mod">18% Resolving</span>
+                  </div>
+                  <div class="quarter-heat-pct" style="color:#2563EB;">18%</div>
+                  <div class="quarter-heat-bar">
+                    <div class="quarter-heat-bar-fill" style="width:18%; background:#3B82F6;"></div>
+                  </div>
+                  <div class="quarter-heat-detail">Under active Rx (Radha #C004) · 36h hold</div>
+                </div>
+              </div>
+
+              <div style="background:#F8FAFC; border-radius:12px; padding:12px 14px; font-size:12px; color:#334155; line-height:1.45; border:1px solid #E2E8F0;">
+                💡 <strong>Clinical Observation:</strong> Front quarters exhibit heightened inflammation frequency due to liner slip during milking cluster takeoff. Ensure vacuum regulation is calibrated to 42 kPa.
+              </div>
+            </div>
+
+            <!-- Somatic Cell Count (SCC) Benchmark Card -->
+            <div class="clinical-chart-card">
+              <div class="clinical-card-header">
+                <div>
+                  <h3 class="clinical-card-title">
+                    <span>🔬</span> Somatic Cell Count (SCC) Herd Benchmark
+                  </h3>
+                  <div class="clinical-card-subtitle">Immune reaction profiling & dairy grade quality tiers</div>
+                </div>
+                <span class="status-pill-badge healthy" style="font-size:11px;">+₹2.50/L Incentive Bonus</span>
+              </div>
+
+              <div class="scc-meter-wrap">
+                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:var(--ink);">
+                  <span>Herd Average SCC: <strong style="color:var(--forest);">238,000 / mL</strong></span>
+                  <span style="color:#16A34A;">Grade A Premium</span>
+                </div>
+
+                <div class="scc-bar-multi">
+                  <div class="scc-segment green" style="width:82%;" title="82% Healthy (&lt;200k)"></div>
+                  <div class="scc-segment amber" style="width:12%;" title="12% Subclinical (200k-400k)"></div>
+                  <div class="scc-segment red" style="width:6%;" title="6% Infection (&gt;400k)"></div>
+                </div>
+
+                <div class="scc-legend-row">
+                  <div class="scc-legend-box">
+                    <div class="scc-legend-title">
+                      <span style="width:8px; height:8px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+                      Healthy
+                    </div>
+                    <div class="scc-legend-value">82% <span style="font-size:11px; font-weight:500; color:var(--muted);">(10 cows)</span></div>
+                    <div class="scc-legend-sub">&lt; 200,000 / mL</div>
+                  </div>
+
+                  <div class="scc-legend-box">
+                    <div class="scc-legend-title">
+                      <span style="width:8px; height:8px; border-radius:50%; background:#F59E0B; display:inline-block;"></span>
+                      Subclinical
+                    </div>
+                    <div class="scc-legend-value">12% <span style="font-size:11px; font-weight:500; color:var(--muted);">(1 cow)</span></div>
+                    <div class="scc-legend-sub">200k – 400k / mL</div>
+                  </div>
+
+                  <div class="scc-legend-box">
+                    <div class="scc-legend-title">
+                      <span style="width:8px; height:8px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
+                      Clinical
+                    </div>
+                    <div class="scc-legend-value">6% <span style="font-size:11px; font-weight:500; color:var(--muted);">(1 cow)</span></div>
+                    <div class="scc-legend-sub">&gt; 400,000 / mL</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- California Mastitis Test (CMT) Distribution -->
+              <div style="margin-top:6px;">
+                <div style="font-size:13px; font-weight:700; color:var(--ink); margin-bottom:10px;">
+                  🥛 California Mastitis Test (CMT) Severity Profile
+                </div>
+                <div class="clinical-progress-list">
+                  <div class="clinical-progress-item">
+                    <div class="clinical-progress-labels">
+                      <span>Negative (0) — Clear / Liquid</span>
+                      <span>68% (8 Cows)</span>
+                    </div>
+                    <div class="clinical-progress-track">
+                      <div class="clinical-progress-bar" style="width:68%; background:#10B981;"></div>
+                    </div>
+                  </div>
+
+                  <div class="clinical-progress-item">
+                    <div class="clinical-progress-labels">
+                      <span>Trace (T) — Slight Slime Precipitate</span>
+                      <span>14% (2 Cows)</span>
+                    </div>
+                    <div class="clinical-progress-track">
+                      <div class="clinical-progress-bar" style="width:14%; background:#34D399;"></div>
+                    </div>
+                  </div>
+
+                  <div class="clinical-progress-item">
+                    <div class="clinical-progress-labels">
+                      <span>1+ Mild / 2+ Moderate Thickening</span>
+                      <span>12% (1 Cow)</span>
+                    </div>
+                    <div class="clinical-progress-track">
+                      <div class="clinical-progress-bar" style="width:12%; background:#F59E0B;"></div>
+                    </div>
+                  </div>
+
+                  <div class="clinical-progress-item">
+                    <div class="clinical-progress-labels">
+                      <span>3+ Heavy Viscous Gelation (Acute)</span>
+                      <span>6% (1 Cow)</span>
+                    </div>
+                    <div class="clinical-progress-track">
+                      <div class="clinical-progress-bar" style="width:6%; background:#EF4444;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: Active Antibiotic Milk Withholding Shield & Clinical Etiology -->
+          <div class="clinical-dashboard-grid-2">
+            <!-- Active Withholding Guard -->
+            <div class="clinical-chart-card">
+              <div class="clinical-card-header">
+                <div>
+                  <h3 class="clinical-card-title">
+                    <span>🛡️</span> Food Safety Antibiotic Withholding Shield
+                  </h3>
+                  <div class="clinical-card-subtitle">Active milk discard countdown timers ensuring zero residue bulk milk</div>
+                </div>
+                <span class="status-pill-badge monitor" style="font-size:11px;">2 Active Holds</span>
+              </div>
+
+              <div class="withholding-guard-feed">
+                <!-- Hold 1: Radha #C004 -->
+                <div class="withholding-guard-card">
+                  <div class="withholding-guard-left">
+                    <div class="withholding-guard-icon">🥛</div>
+                    <div>
+                      <div class="withholding-guard-name">Radha (#C004) · Murrah Buffalo</div>
+                      <div class="withholding-guard-meta">Rx: Cefquinome 75mg Intramammary · 72h Total Hold</div>
+                    </div>
+                  </div>
+                  <div class="withholding-guard-timer">
+                    <div class="withholding-timer-val">36h Remaining</div>
+                    <div class="withholding-timer-label">Active Hold ⛔</div>
+                  </div>
+                </div>
+
+                <!-- Hold 2: Kaveri #C006 -->
+                <div class="withholding-guard-card">
+                  <div class="withholding-guard-left">
+                    <div class="withholding-guard-icon">🥛</div>
+                    <div>
+                      <div class="withholding-guard-name">Kaveri (#C006) · Jersey Cross</div>
+                      <div class="withholding-guard-meta">Rx: Amoxicillin-Clavulanic 200mg · 60h Total Hold</div>
+                    </div>
+                  </div>
+                  <div class="withholding-guard-timer">
+                    <div class="withholding-timer-val">14h Remaining</div>
+                    <div class="withholding-timer-label">Active Hold ⛔</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:12px; padding:12px 14px; font-size:12px; color:#065F46; display:flex; align-items:center; gap:10px;">
+                <span style="font-size:20px;">✓</span>
+                <div>
+                  <strong>Bulk Tank Protection Verified:</strong> All withheld milk is strictly isolated and diverted from commercial milk collection routes. Zero antimicrobial residue detected in tank testing.
+                </div>
+              </div>
+
+              <button type="button" class="btn-primary-action" onclick="openRemindersModal()" style="width:100%; justify-content:center; padding:10px; font-size:12.5px;">
+                <span>View Complete Withholding Schedule & Reminders</span>
+              </button>
+            </div>
+
+            <!-- Pathogen Etiology & Antimicrobial Stewardship Reference -->
+            <div class="clinical-chart-card">
+              <div class="clinical-card-header">
+                <div>
+                  <h3 class="clinical-card-title">
+                    <span>🔬</span> Mastitis Etiology & Pathogen Surveillance
+                  </h3>
+                  <div class="clinical-card-subtitle">Herd culture findings and evidence-based therapeutic protocols</div>
+                </div>
+                <span class="status-pill-badge healthy" style="font-size:11px;">VCI Protocol</span>
+              </div>
+
+              <div class="vet-formulary-table-wrap">
+                <table class="vet-formulary-table">
+                  <thead>
+                    <tr>
+                      <th>Pathogen Category</th>
+                      <th>Isolated Species</th>
+                      <th>Recommended First-Line Rx</th>
+                      <th>Control Strategy</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span style="color:#DC2626; font-weight:700;">Contagious</span></td>
+                      <td><strong>Staphylococcus aureus</strong></td>
+                      <td>Cefquinome (4th Gen) 75mg LC</td>
+                      <td>Cluster disinfection, post-milking barrier dip</td>
+                    </tr>
+                    <tr>
+                      <td><span style="color:#D97706; font-weight:700;">Environmental</span></td>
+                      <td><strong>Streptococcus uberis</strong></td>
+                      <td>Amoxicillin + Clavulanic 200mg</td>
+                      <td>Deep dry sawdust bedding, stall hygiene</td>
+                    </tr>
+                    <tr>
+                      <td><span style="color:#2563EB; font-weight:700;">Coliform Endotoxin</span></td>
+                      <td><strong>Escherichia coli</strong></td>
+                      <td>Parenteral Enrofloxacin + Ketoprofen NSAID</td>
+                      <td>Aggressive fluid support, frequent stripping</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="display:flex; gap:10px; margin-top:4px;">
+                <button type="button" class="btn-primary-action" onclick="switchTab(1)" style="flex:1; justify-content:center; padding:10px; font-size:12.5px;">
+                  <span>🩺 Open Clinical Triage Queue →</span>
+                </button>
+                <button type="button" class="btn-secondary" onclick="openAddTriageCaseModal()" style="padding:10px 14px; font-size:12.5px; border:1px solid #CBD5E1; color:#334155; background:#FFFFFF;">
+                  <span>+ Admit Patient</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+
+      </section>
+
+      <!-- ====================================================================
+           TAB 1: CLINICAL TRIAGE QUEUE
+           ==================================================================== -->
+      <section id="tabTriage" class="tab-view">
+        <div id="vetHomeFeed" class="triage-feed-container">
+          <!-- Clean Clinical Triage Header -->
+          <div class="tab-header" style="margin-bottom:16px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <h2 class="tab-page-title" style="margin:0;">🩺 Clinical Triage Queue</h2>
+                <span class="status-pill-badge monitor" style="font-size:11px;">
+                  <span id="vetKpiUrgent">1</span> Urgent · <span id="vetKpiHold">1</span> Holds Active
+                </span>
+              </div>
+              <div style="font-size:12.5px; color:var(--muted); margin-top:3px;">
+                Priority sorted bovine patient cases awaiting clinical diagnosis & prescription · Attending: Dr. Anjali Deshmukh (License: <strong id="vetHeroLicense">VCI-MAH-2024-8842</strong>)
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button type="button" class="btn-primary-action" onclick="openAddTriageCaseModal()" style="font-size:12px; padding:7px 14px; background:linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);">
+                <span>+ Add Triage Case</span>
+              </button>
+              <button type="button" class="btn-secondary" onclick="createSampleClinicalCase()" style="font-size:12px; padding:7px 14px; border:1px solid #CBD5E1; color:#334155; background:#FFFFFF;">
+                <span>⚡ Quick Simulate</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Clinical Triage Filter Controls -->
+          <div class="vet-filter-pill-row" id="vetFilterPillRow">
+            <button type="button" class="vet-filter-pill active" data-filter="all" onclick="setVetTriageFilter('all')">All Clinical Cases (5)</button>
+            <button type="button" class="vet-filter-pill" data-filter="urgent" onclick="setVetTriageFilter('urgent')">🚨 Critical Triage (3)</button>
+            <button type="button" class="vet-filter-pill" data-filter="open" onclick="setVetTriageFilter('open')">⏳ Awaiting Prescription (3)</button>
+            <button type="button" class="vet-filter-pill" data-filter="holds" onclick="setVetTriageFilter('holds')">🥛 Active Milk Holds (2)</button>
+          </div>
+
+          <!-- Main Vet Triage Queue Feed -->
+          <div class="vet-triage-feed" id="vetPortalCasesFeed">
+            <!-- Case 1: Laxmi #C002 (Acute Clinical Mastitis) -->
+            <div class="vet-case-card urgent">
+              <div class="vet-case-card-header">
+                <div class="vet-case-patient">
+                  <div class="vet-case-avatar" style="background:#FEE2E2;">🚨</div>
+                  <div>
+                    <div class="vet-case-name">Laxmi <span style="font-size:13px; font-weight:600; color:#64748B;">(#C002)</span></div>
+                    <div class="vet-case-sub">📍 Sahyadri Dairy Farm · Shed 2 · Case: <strong>CASE-2026-081</strong> · Today (06:30 AM Milking)</div>
+                  </div>
+                </div>
+                <span class="status-pill-badge monitor" style="font-size:12px; padding:4px 10px;">
+                  ⚠️ High Priority Urgent Triage
+                </span>
+              </div>
+              <div style="margin-top:4px;">
+                <div style="font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; margin-bottom:6px;">
+                  4-Quarter Udder Inflammation Status:
+                </div>
+                <div class="vet-quarter-grid">
+                  <div class="vet-quarter-cell clear">LF: ✓ Pliable</div>
+                  <div class="vet-quarter-cell affected">RF: ⛔ Firmness & Clots</div>
+                  <div class="vet-quarter-cell clear">LR: ✓ Pliable</div>
+                  <div class="vet-quarter-cell clear">RR: ✓ Pliable</div>
+                </div>
+              </div>
+              <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:12px 14px; font-size:12.5px;">
+                <div style="color:#0F172A; font-weight:700;">Clinical Indicators & Vitals:</div>
+                <div style="color:#475569; margin-top:3px; line-height:1.5;">
+                  Rectal Temp: <strong>39.5°C (High Fever)</strong> · 
+                  CMT Reaction: <strong>3+ (Heavy Gel Formation)</strong> · 
+                  Somatic Cells: <strong>520,000 / mL (High Alert)</strong>
+                </div>
+                <div style="color:#475569; font-style:italic; margin-top:6px; font-size:12px; background:#F1F5F9; padding:6px 10px; border-radius:8px;">Farmer note: "Farmer noted firmness in RF quarter during morning milking. Strip cup showed visible curds. Restless on cluster attachment."</div>
+              </div>
+              <button type="button" class="btn-primary-action" onclick="openVetReviewModal('CASE-2026-081')" style="width:100%; justify-content:center; padding:10px 16px; font-size:13px; background:linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);">
+                <span>📋 Perform Clinical Evaluation & Issue Prescription Plan</span>
+              </button>
+            </div>
+
+            <!-- Case 2: Gauri #C001 (Subclinical Mastitis) -->
+            <div class="vet-case-card urgent">
+              <div class="vet-case-card-header">
+                <div class="vet-case-patient">
+                  <div class="vet-case-avatar" style="background:#FEE2E2;">🚨</div>
+                  <div>
+                    <div class="vet-case-name">Gauri <span style="font-size:13px; font-weight:600; color:#64748B;">(#C001)</span></div>
+                    <div class="vet-case-sub">📍 Sahyadri Dairy Farm · Shed 1 · Case: <strong>CASE-2026-082</strong> · Today (08:15 AM)</div>
+                  </div>
+                </div>
+                <span class="status-pill-badge monitor" style="font-size:12px; padding:4px 10px;">
+                  ⚠️ High Priority Urgent Triage
+                </span>
+              </div>
+              <div style="margin-top:4px;">
+                <div style="font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; margin-bottom:6px;">
+                  4-Quarter Udder Inflammation Status:
+                </div>
+                <div class="vet-quarter-grid">
+                  <div class="vet-quarter-cell affected">LF: ⚠️ Swollen / CMT+</div>
+                  <div class="vet-quarter-cell clear">RF: ✓ Pliable</div>
+                  <div class="vet-quarter-cell clear">LR: ✓ Pliable</div>
+                  <div class="vet-quarter-cell clear">RR: ✓ Pliable</div>
+                </div>
+              </div>
+              <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:12px 14px; font-size:12.5px;">
+                <div style="color:#0F172A; font-weight:700;">Clinical Indicators & Vitals:</div>
+                <div style="color:#475569; margin-top:3px; line-height:1.5;">
+                  Rectal Temp: <strong>38.9°C (Normal)</strong> · 
+                  CMT Reaction: <strong>2+ (Distinct Gelation)</strong> · 
+                  Somatic Cells: <strong>460,000 / mL (Subclinical Alert)</strong>
+                </div>
+                <div style="color:#475569; font-style:italic; margin-top:6px; font-size:12px; background:#F1F5F9; padding:6px 10px; border-radius:8px;">Farmer note: "California Mastitis Test strongly positive with distinct gel thickening. Somatic Cell Count spike. Electrical conductivity 6.8 mS/cm."</div>
+              </div>
+              <button type="button" class="btn-primary-action" onclick="openVetReviewModal('CASE-2026-082')" style="width:100%; justify-content:center; padding:10px 16px; font-size:13px; background:linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);">
+                <span>📋 Perform Clinical Evaluation & Issue Prescription Plan</span>
+              </button>
+            </div>
+
+            <!-- Case 3: Nandini #C003 (Post-Calving Udder Edema) -->
+            <div class="vet-case-card urgent">
+              <div class="vet-case-card-header">
+                <div class="vet-case-patient">
+                  <div class="vet-case-avatar" style="background:#FEE2E2;">🚨</div>
+                  <div>
+                    <div class="vet-case-name">Nandini <span style="font-size:13px; font-weight:600; color:#64748B;">(#C003)</span></div>
+                    <div class="vet-case-sub">📍 Sahyadri Dairy Farm · Maternity Shed · Case: <strong>CASE-2026-083</strong> · Yesterday</div>
+                  </div>
+                </div>
+                <span class="status-pill-badge monitor" style="font-size:12px; padding:4px 10px;">
+                  ⚠️ High Priority Urgent Triage
+                </span>
+              </div>
+              <div style="margin-top:4px;">
+                <div style="font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; margin-bottom:6px;">
+                  4-Quarter Udder Inflammation Status:
+                </div>
+                <div class="vet-quarter-grid">
+                  <div class="vet-quarter-cell clear">LF: ✓ Pliable</div>
+                  <div class="vet-quarter-cell clear">RF: ✓ Pliable</div>
+                  <div class="vet-quarter-cell affected">LR: ⚠️ Swollen / CMT+</div>
+                  <div class="vet-quarter-cell affected">RR: ⚠️ Warm / Edematous</div>
+                </div>
+              </div>
+              <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:12px 14px; font-size:12.5px;">
+                <div style="color:#0F172A; font-weight:700;">Clinical Indicators & Vitals:</div>
+                <div style="color:#475569; margin-top:3px; line-height:1.5;">
+                  Rectal Temp: <strong>39.1°C (Low Grade Fever)</strong> · 
+                  CMT Reaction: <strong>1+ (Mild Precipitation)</strong> · 
+                  Somatic Cells: <strong>310,000 / mL (Elevated)</strong>
+                </div>
+                <div style="color:#475569; font-style:italic; margin-top:6px; font-size:12px; background:#F1F5F9; padding:6px 10px; border-radius:8px;">Farmer note: "Calved 5 days ago. Severe physiological edema extending from rear udder into ventral milk vein. Mild discomfort during cluster attachment."</div>
+              </div>
+              <button type="button" class="btn-primary-action" onclick="openVetReviewModal('CASE-2026-083')" style="width:100%; justify-content:center; padding:10px 16px; font-size:13px; background:linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);">
+                <span>📋 Perform Clinical Evaluation & Issue Prescription Plan</span>
+              </button>
+            </div>
+
+            <!-- Case 4: Radha #C004 (Active Prescription & Hold) -->
+            <div class="vet-case-card prescribed">
+              <div class="vet-case-card-header">
+                <div class="vet-case-patient">
+                  <div class="vet-case-avatar" style="background:#DCFCE7;">💊</div>
+                  <div>
+                    <div class="vet-case-name">Radha <span style="font-size:13px; font-weight:600; color:#64748B;">(#C004)</span></div>
+                    <div class="vet-case-sub">📍 Sahyadri Dairy Farm · Shed 3 · Case: <strong>CASE-2026-084</strong> · 2 Days Ago</div>
+                  </div>
+                </div>
+                <span class="status-pill-badge healthy" style="font-size:12px; padding:4px 10px;">
+                  ● Active Prescription & Hold
+                </span>
+              </div>
+              <div style="margin-top:4px;">
+                <div style="font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; margin-bottom:6px;">
+                  4-Quarter Udder Inflammation Status:
+                </div>
+                <div class="vet-quarter-grid">
+                  <div class="vet-quarter-cell clear">LF: ✓ Pliable</div>
+                  <div class="vet-quarter-cell clear">RF: ✓ Pliable</div>
+                  <div class="vet-quarter-cell clear">LR: ✓ Pliable</div>
+                  <div class="vet-quarter-cell affected">RR: ⚠️ Warm / Edematous</div>
+                </div>
+              </div>
+              <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:12px 14px; font-size:12.5px;">
+                <div style="color:#0F172A; font-weight:700;">Clinical Indicators & Vitals:</div>
+                <div style="color:#475569; margin-top:3px; line-height:1.5;">
+                  Rectal Temp: <strong>38.5°C (Stable)</strong> · 
+                  CMT Reaction: <strong>Trace</strong> · 
+                  Somatic Cells: <strong>195,000 / mL (Safe Range)</strong>
+                </div>
+                <div style="color:#475569; font-style:italic; margin-top:6px; font-size:12px; background:#F1F5F9; padding:6px 10px; border-radius:8px;">Farmer note: "Clinical evaluation completed. Intramammary 4th gen cephalosporin administered. 72h mandatory milk discard timer active."</div>
+                <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #CBD5E1; color:#15803D; font-weight:700;">
+                  💊 Prescribed Rx: Cobactan LC (Cefquinome 75mg) q12h intramammary x 3 days
+                  <span style="background:#FEF3C7; color:#92400E; padding:3px 9px; border-radius:6px; font-size:11.5px; margin-left:6px; display:inline-block; margin-top:3px;">
+                    🥛 Mandatory Withholding: 72h hold active
+                  </span>
+                </div>
+              </div>
+              <button type="button" class="btn-primary-action" onclick="openVetReviewModal('CASE-2026-084')" style="width:100%; justify-content:center; padding:10px 16px; font-size:13px; background:linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);">
+                <span>📋 Update Clinical Prescription & Withdrawal Duration</span>
+              </button>
+            </div>
+
+            <!-- Case 5: Kaveri #C006 (Active Prescription & Hold) -->
+            <div class="vet-case-card prescribed">
+              <div class="vet-case-card-header">
+                <div class="vet-case-patient">
+                  <div class="vet-case-avatar" style="background:#DCFCE7;">💊</div>
+                  <div>
+                    <div class="vet-case-name">Kaveri <span style="font-size:13px; font-weight:600; color:#64748B;">(#C006)</span></div>
+                    <div class="vet-case-sub">📍 Sahyadri Dairy Farm · Isolation Pen · Case: <strong>CASE-2026-085</strong> · 3 Days Ago</div>
+                  </div>
+                </div>
+                <span class="status-pill-badge healthy" style="font-size:12px; padding:4px 10px;">
+                  ● Active Prescription & Hold
+                </span>
+              </div>
+              <div style="margin-top:4px;">
+                <div style="font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; margin-bottom:6px;">
+                  4-Quarter Udder Inflammation Status:
+                </div>
+                <div class="vet-quarter-grid">
+                  <div class="vet-quarter-cell affected">LF: ⚠️ Swollen / CMT+</div>
+                  <div class="vet-quarter-cell affected">RF: ⛔ Firmness & Clots</div>
+                  <div class="vet-quarter-cell clear">LR: ✓ Pliable</div>
+                  <div class="vet-quarter-cell clear">RR: ✓ Pliable</div>
+                </div>
+              </div>
+              <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:12px 14px; font-size:12.5px;">
+                <div style="color:#0F172A; font-weight:700;">Clinical Indicators & Vitals:</div>
+                <div style="color:#475569; margin-top:3px; line-height:1.5;">
+                  Rectal Temp: <strong>38.6°C (Normal)</strong> · 
+                  CMT Reaction: <strong>Clear (Negative)</strong> · 
+                  Somatic Cells: <strong>185,000 / mL (Safe Range)</strong>
+                </div>
+                <div style="color:#475569; font-style:italic; margin-top:6px; font-size:12px; background:#F1F5F9; padding:6px 10px; border-radius:8px;">Farmer note: "Broad-spectrum beta-lactamase inhibitor administered. Isolation milking enforced. 60-hour milk withdrawal active."</div>
+                <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #CBD5E1; color:#15803D; font-weight:700;">
+                  💊 Prescribed Rx: Amoxicillin + Clavulanic Acid 200mg q12h x 3d
+                  <span style="background:#FEF3C7; color:#92400E; padding:3px 9px; border-radius:6px; font-size:11.5px; margin-left:6px; display:inline-block; margin-top:3px;">
+                    🥛 Mandatory Withholding: 60h hold active
+                  </span>
+                </div>
+              </div>
+              <button type="button" class="btn-primary-action" onclick="openVetReviewModal('CASE-2026-085')" style="width:100%; justify-content:center; padding:10px 16px; font-size:13px; background:linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);">
+                <span>📋 Update Clinical Prescription & Withdrawal Duration</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Antimicrobial Stewardship Table -->
+          <div class="vet-formulary-card">
+            <div class="vet-formulary-header">
+              <div>
+                <h4 style="font-size:15px; font-weight:800; color:var(--ink);">🛡️ Standard Bovine Mastitis Drug Formulary & Withholding Guidelines</h4>
+                <div style="font-size:12px; color:var(--muted); margin-top:2px;">Evidence-based dosing and mandatory food safety milk withdrawal standards</div>
+              </div>
+              <span class="status-pill-badge healthy">VCI Protocol Standards</span>
+            </div>
+            <div class="vet-formulary-table-wrap">
+              <table class="vet-formulary-table">
+                <thead>
+                  <tr>
+                    <th>Medication Protocol</th>
+                    <th>Class & Route</th>
+                    <th>Target Pathogens</th>
+                    <th>Milk Withdrawal Hold</th>
+                    <th>Clinical Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Cefquinome (Cobactan LC)</strong></td>
+                    <td>4th Gen Cephalosporin · Intramammary</td>
+                    <td>S. aureus, Strep. uberis, E. coli</td>
+                    <td><span class="badge-withdrawal">72 Hours</span></td>
+                    <td><button type="button" class="btn-formulary-apply" onclick="openVetReviewModal('CASE-2026-081', 'Cefquinome')">Apply in Triage</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Amoxicillin + Clavulanic Acid</strong></td>
+                    <td>Potentiated Penicillin · Intramammary</td>
+                    <td>Beta-lactamase producing Staph</td>
+                    <td><span class="badge-withdrawal">60 Hours</span></td>
+                    <td><button type="button" class="btn-formulary-apply" onclick="openVetReviewModal('CASE-2026-081', 'Amoxicillin')">Apply in Triage</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Penicillin + Dihydrostreptomycin</strong></td>
+                    <td>Synergistic Combination · Deep IM</td>
+                    <td>Systemic bacteremia & acute mastitis</td>
+                    <td><span class="badge-withdrawal red">96 Hours</span></td>
+                    <td><button type="button" class="btn-formulary-apply" onclick="openVetReviewModal('CASE-2026-081', 'Penicillin')">Apply in Triage</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ketoprofen (Supportive NSAID)</strong></td>
+                    <td>NSAID Antipyretic · Slow IV/IM</td>
+                    <td>Endotoxin shock & udder swelling</td>
+                    <td><span class="badge-withdrawal green">0 Hours (None)</span></td>
+                    <td><button type="button" class="btn-formulary-apply" onclick="openVetReviewModal('CASE-2026-081', 'Ketoprofen')">Apply in Triage</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 1: MY COWS (FULL-WIDTH CATALOG)
+           ==================================================================== -->
+      <section id="tabCows" class="tab-view">
+        <div class="tab-header">
+          <h2 class="tab-page-title" id="titleMyCowsTab">My Cows</h2>
+          <button type="button" class="btn-primary-action" onclick="openAddCowModal()">
+            <span>+ Add Cow to Herd</span>
+          </button>
+        </div>
+
+        <div class="filter-search-box">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="cowSearchInput" placeholder="Search by cow name, ear tag #, breed..." oninput="handleCowSearch(this.value)">
+        </div>
+
+        <!-- Cattle Health Status Filter Pills -->
+        <div class="filter-pills-row" id="cattleFilterPillsRow">
+          <button type="button" class="filter-pill-btn active" id="btnFilterAll" onclick="setCattleFilter('all')">
+            <span>All Cattle</span>
+            <span class="filter-pill-count" id="countFilterAll">3</span>
+          </button>
+          <button type="button" class="filter-pill-btn" id="btnFilterHealthy" onclick="setCattleFilter('healthy')">
+            <span class="status-indicator-dot healthy"></span>
+            <span>Healthy</span>
+            <span class="filter-pill-count" id="countFilterHealthy">2</span>
+          </button>
+          <button type="button" class="filter-pill-btn" id="btnFilterMonitor" onclick="setCattleFilter('monitor')">
+            <span class="status-indicator-dot monitor"></span>
+            <span>To Monitor</span>
+            <span class="filter-pill-count" id="countFilterMonitor">1</span>
+          </button>
+        </div>
+
+        <div class="cows-grid" id="fullCowsContainer">
+          <!-- Populated from Supabase cows table -->
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 2: ASSESS (MASTITIS CLINICAL WIZARD)
+           ==================================================================== -->
+      <section id="tabAssess" class="tab-view">
+        <div class="tab-header">
+          <h2 class="tab-page-title">Mastitis Health Assessment</h2>
+        </div>
+
+        <form onsubmit="submitAssessment(event)" style="background: var(--white); border-radius: 24px; border: 1px solid var(--border); padding: 32px 36px; max-width: 860px; margin: 0 auto 36px auto; box-shadow: 0 8px 30px rgba(32,53,42,0.06);">
+          <div class="form-group">
+            <label class="form-label" for="assessCowSelect">1. Select Cow from Herd</label>
+            <select id="assessCowSelect" class="form-select" required onchange="handleCowSelectChange(this)">
+              <option value="">Select cow...</option>
+            </select>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="assessBodyTemp">Rectal Body Temp (°C)</label>
+              <input type="number" id="assessBodyTemp" class="form-input" step="0.1" min="36.0" max="43.0" value="38.6" required>
+              <span style="font-size:11px; color:var(--muted); margin-top:3px; display:block;">Normal bovine range: 38.0°C – 39.2°C</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="assessUdderTemp">Udder Surface Temp (°C)</label>
+              <input type="number" id="assessUdderTemp" class="form-input" step="0.1" placeholder="Optional (e.g. 35.8)">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">2. Affected Quarters</label>
+            <div class="quarters-selector-grid">
+              <label class="quarter-pill-label"><input type="checkbox" name="quarter" value="LF"> <span>Left Front (LF)</span></label>
+              <label class="quarter-pill-label"><input type="checkbox" name="quarter" value="RF"> <span>Right Front (RF)</span></label>
+              <label class="quarter-pill-label"><input type="checkbox" name="quarter" value="LR"> <span>Left Rear (LR)</span></label>
+              <label class="quarter-pill-label"><input type="checkbox" name="quarter" value="RR"> <span>Right Rear (RR)</span></label>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="assessMilkAppearance">3. Fore-Milk Appearance (Strip Cup)</label>
+              <select id="assessMilkAppearance" class="form-select">
+                <option value="Normal">Normal (Clean, creamy white)</option>
+                <option value="Watery / Serous">Watery / Thin / Serous</option>
+                <option value="Clots / Flakes / Curds">Visible Clots / Flakes / Curds</option>
+                <option value="Discolored / Blood-tinged">Discolored (Yellowish / Blood-tinged)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="assessSwelling">Udder Swelling / Firmness</label>
+              <select id="assessSwelling" class="form-select">
+                <option value="None">None (Pliable, normal)</option>
+                <option value="Mild Firmness">Mild Hardness</option>
+                <option value="Moderate Swelling">Moderate Swelling</option>
+                <option value="Severe & Stone-Hard">Severe / Stone-Hard</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="assessCmtScore">California Mastitis Test (CMT)</label>
+              <select id="assessCmtScore" class="form-select">
+                <option value="Negative">Negative (0) — No gel</option>
+                <option value="Trace">Trace (T) — Slight slime</option>
+                <option value="1+">1+ (Mild gelation)</option>
+                <option value="2+">2+ (Moderate thickening)</option>
+                <option value="3+">3+ (Heavy gel formed)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="assessMilkingPain">Milking Discomfort</label>
+              <select id="assessMilkingPain" class="form-select">
+                <option value="None">None (Calm, normal let-down)</option>
+                <option value="Mild Discomfort">Mild Discomfort (Stepping/restlessness)</option>
+                <option value="Severe Pain">Severe Pain (Kicking, tail-swishing, refusal)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">4. Private Udder / Strip-Cup Photo</label>
+            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">Auto-compressed to 200–400 KB WebP (&lt; 1MB Free Tier Cap)</p>
+            <input type="file" id="assessImageInput" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="handleImageSelected(this)">
+            <button type="button" class="upload-dropzone-btn" onclick="document.getElementById('assessImageInput').click()">
+              <span class="upload-icon-circle">📸</span>
+              <span style="font-weight:700; font-size:14.5px; color:var(--forest);" id="assessUploadText">Click to capture / select photo</span>
+              <span style="font-size:12px; color:var(--muted); margin-top:3px;">Supports camera snap, JPEG, PNG, WebP</span>
+            </button>
+            <div id="assessImagePreviewContainer" style="display:none; margin-top:12px; text-align:center;">
+              <img id="assessImagePreview" src="" style="max-height:220px; border-radius:16px; max-width:100%; border:2px solid var(--forest); box-shadow:0 4px 14px rgba(0,0,0,0.1);">
+            </div>
+          </div>
+
+          <!-- Staged AI Notice -->
+          <div style="background: #F1F5F2; border: 1px solid var(--border); border-radius: 12px; padding: 14px; font-size: 12px; color: var(--ink); margin-bottom: 16px; line-height: 1.45;">
+            <strong>AI screening is not yet available. Please consult a veterinarian.</strong> Automated computer-vision screening inferences will be displayed in this panel once the pre-trained deep learning inference service is connected.
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="assessNotes">5. Field Observations & Milking Notes</label>
+            <textarea id="assessNotes" class="form-textarea" rows="3" placeholder="Describe any behavior changes, appetite, or milking yield drops..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary-action" id="btnSubmitAssess" style="width:100%; justify-content:center; padding:14px; font-size:14px;">
+            <span id="btnSubmitAssessText">Save Assessment & Transmit to Vet</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- ====================================================================
+           TAB 3: RECORDS (HEALTH TIMELINE)
+           ==================================================================== -->
+      <section id="tabRecords" class="tab-view">
+        <div class="tab-header">
+          <h2 class="tab-page-title">Health Records & Observations</h2>
+        </div>
+
+        <div class="cows-grid" id="recordsTimelineGroup">
+          <!-- Loaded from health_records table -->
+        </div>
+      </section>
+
+      
+
+
+      <!-- ====================================================================
+           TAB 6: PROFILE (FARMER & VETERINARIAN)
+           ==================================================================== -->
+      <section id="tabProfile" class="tab-view">
+        <div id="profileViewContainer">
+          <!-- Dynamically populated based on activeRole (Farmer vs Veterinarian) -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Mobile Sticky Bottom Navigation Bar (Hidden on Desktop >900px) -->
+    <nav class="bottom-nav-bar">
+      <!-- Farmer Home -->
+      <button type="button" class="nav-tab-item farmer-only active" data-tab="tabHome" onclick="switchTab('tabHome')">
+        <div class="nav-icon-indicator">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span class="nav-tab-label" id="lblNavHome">Home</span>
+      </button>
+
+      <!-- Vet Overview & Triage -->
+      <button type="button" class="nav-tab-item vet-only" data-tab="tabClinicalOverview" onclick="switchTab('tabClinicalOverview')">
+        <div class="nav-icon-indicator">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <span class="nav-tab-label" id="lblNavOverview">Overview</span>
+      </button>
+
+      <button type="button" class="nav-tab-item vet-only" data-tab="tabTriage" onclick="switchTab('tabTriage')">
+        <div class="nav-icon-indicator">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <span class="nav-tab-label" id="lblNavTriage">Triage</span>
+      </button>
+
+      <!-- Shared -->
+      <button type="button" class="nav-tab-item" data-tab="tabCows" onclick="switchTab('tabCows')">
+        <div class="nav-icon-indicator">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><path d="M7 12a5 5 0 0 1 10 0"/></svg>
+        </div>
+        <span class="nav-tab-label" id="lblNavCows">Herds</span>
+      </button>
+
+      <button type="button" class="nav-tab-item" data-tab="tabAssess" onclick="switchTab('tabAssess')">
+        <div class="nav-icon-indicator">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+        </div>
+        <span class="nav-tab-label" id="lblNavAssess">Assess</span>
+      </button>
+
+      <button type="button" class="nav-tab-item" data-tab="tabRecords" onclick="switchTab('tabRecords')">
+        <div class="nav-icon-indicator">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <span class="nav-tab-label" id="lblNavRecords">Records</span>
+      </button>
+
+      <button type="button" class="nav-tab-item" data-tab="tabProfile" onclick="switchTab('tabProfile')">
+        <div class="nav-icon-indicator">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <span class="nav-tab-label" id="lblNavProfile">Profile</span>
+      </button>
+    </nav>
+
+    <!-- Modal: Register New Cow -->
+    <div id="modalAddCow" class="modal-overlay" onclick="if(event.target===this)closeAddCowModal()">
+      <div class="modal-sheet">
+        <div class="modal-header-row">
+          <h3 class="modal-sheet-title">Register Cow or Buffalo</h3>
+          <button type="button" class="btn-close-modal" onclick="closeAddCowModal()">&times;</button>
+        </div>
+        <form onsubmit="submitNewCow(event)">
+          <div class="form-group">
+            <label class="form-label" for="cowTagInput">Ear Tag Number</label>
+            <input type="text" id="cowTagInput" class="form-input" placeholder="e.g. #C007" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cowNameInput">Animal Name</label>
+            <input type="text" id="cowNameInput" class="form-input" placeholder="e.g. Ganga" required>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="cowBreedInput">Breed / Species</label>
+              <input type="text" id="cowBreedInput" class="form-input" placeholder="e.g. Gir Cross" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cowYieldInput">Daily Milk Yield (L)</label>
+              <input type="number" id="cowYieldInput" class="form-input" step="0.5" value="18.0" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Animal Photo (Optional)</label>
+            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">Camera snap or gallery upload. Auto-compressed to WebP (&lt; 1MB).</p>
+            <input type="file" id="cowPhotoInput" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="handleCowPhotoSelected(this)">
+            <button type="button" class="upload-dropzone-btn" onclick="document.getElementById('cowPhotoInput').click()" style="padding:16px;">
+              <span class="upload-icon-circle">📸</span>
+              <span style="font-weight:700; font-size:13.5px; color:var(--forest);" id="cowPhotoUploadText">Click to capture / select cow photo</span>
+              <span style="font-size:11.5px; color:var(--muted); margin-top:2px;">Camera snapshot, JPEG, PNG, or WebP</span>
+            </button>
+            <div id="cowPhotoPreviewContainer" style="display:none; margin-top:12px; text-align:center;">
+              <img id="cowPhotoPreview" src="" alt="Selected cow photo" style="max-height:160px; border-radius:14px; max-width:100%; border:2px solid var(--forest); box-shadow:0 4px 14px rgba(0,0,0,0.1); object-fit:cover;">
+              <div style="margin-top:6px;">
+                <button type="button" onclick="removeCowPhoto()" style="display:inline-flex; align-items:center; gap:4px; font-size:12px; color:#DC2626; background:none; border:none; cursor:pointer; font-weight:600;">
+                  ✕ Remove photo
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary-action" style="width:100%; justify-content:center; padding:12px; margin-top:8px;">
+            Save Cow to Herd
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Veterinary Clinical Evaluation & Treatment Plan -->
+    <div id="modalVetReview" class="modal-overlay" onclick="if(event.target===this)closeVetReviewModal()">
+      <div class="modal-sheet">
+        <div class="modal-header-row">
+          <h3 class="modal-sheet-title" id="vetModalCaseTitle">Clinical Evaluation & Treatment Plan</h3>
+          <button type="button" class="btn-close-modal" onclick="closeVetReviewModal()" aria-label="Close veterinary review">&times;</button>
+        </div>
+        <div id="vetModalBody">
+          <!-- Populated from JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Bovine Mastitis Symptom Guide -->
+    <div id="modalSymptomGuide" class="modal-overlay" onclick="if(event.target===this)closeSymptomGuide()">
+      <div class="modal-sheet" style="max-width: 640px;">
+        <div class="modal-header-row">
+          <div>
+            <span class="profile-role-tag farmer" style="margin-bottom:6px;">CLINICAL FIELD GUIDE</span>
+            <h3 class="modal-sheet-title">Udder Health & Mastitis Clinical Guide</h3>
+          </div>
+          <button type="button" class="btn-close-modal" onclick="closeSymptomGuide()" aria-label="Close symptom guide">&times;</button>
+        </div>
+        <div class="symptom-guide-content" style="display:flex; flex-direction:column; gap:16px;">
+          <p style="font-size:13.5px; color:var(--ink); line-height:1.5;">
+            Early detection of bovine mastitis prevents irreversible glandular tissue fibrosis and safeguards milk quality. Check quarters twice daily before cluster attachment.
+          </p>
+
+          <!-- Stage 1: Subclinical -->
+          <div style="background:#F9FBF8; border:1px solid #E1EBE2; border-left:4px solid #16A34A; border-radius:14px; padding:14px 16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+              <strong style="color:#166534; font-size:14px;">1. Subclinical Mastitis (Silent / Hidden)</strong>
+              <span class="status-pill-badge healthy">Normal Appearance</span>
+            </div>
+            <div style="font-size:12.5px; color:var(--ink); line-height:1.45;">
+              • <strong>Udder & Milk:</strong> Appears visually normal, no clots, no visible heat or swelling.<br>
+              • <strong>Diagnostic Marker:</strong> Elevated Somatic Cell Count (SCC &gt; 200,000 cells/mL).<br>
+              • <strong>Detection Method:</strong> California Mastitis Test (CMT) creates a thick gel reaction with detergent reagent.
+            </div>
+          </div>
+
+          <!-- Stage 2: Clinical Mild to Moderate -->
+          <div style="background:#FFFDF7; border:1px solid #F6E5BD; border-left:4px solid #D97706; border-radius:14px; padding:14px 16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+              <strong style="color:#B45309; font-size:14px;">2. Clinical Mastitis (Mild to Moderate)</strong>
+              <span class="status-pill-badge monitor">Physical Signs</span>
+            </div>
+            <div style="font-size:12.5px; color:var(--ink); line-height:1.45;">
+              • <strong>Milk Changes:</strong> Watery, serous, or discolored milk with visible curds, flakes, or pus stringing.<br>
+              • <strong>Udder Palpation:</strong> Affected quarter is warm, firm to hard, swollen, with cow displaying kick-off sensitivity during pre-milking touch.<br>
+              • <strong>Action:</strong> Separate quarter milk into discard bucket. Isolate animal to milk last.
+            </div>
+          </div>
+
+          <!-- Stage 3: Severe Acute Clinical -->
+          <div style="background:#FEF8F8; border:1px solid #FCD4D4; border-left:4px solid #DC2626; border-radius:14px; padding:14px 16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+              <strong style="color:#991B1B; font-size:14px;">3. Severe / Toxic Acute Mastitis (Medical Emergency)</strong>
+              <span class="status-pill-badge" style="background:#FEE2E2; color:#991B1B;">⚠️ Emergency</span>
+            </div>
+            <div style="font-size:12.5px; color:var(--ink); line-height:1.45;">
+              • <strong>Systemic Vitals:</strong> High fever (&gt;39.5°C), cold ears, severe lethargy, complete loss of appetite, sunken eyes from dehydration.<br>
+              • <strong>Udder:</strong> Extremely painful, purple/blue discoloration (gangrenous), cold teat.<br>
+              • <strong>Action:</strong> Immediate urgent veterinary triage required for systemic fluid therapy and targeted parenteral antimicrobials.
+            </div>
+          </div>
+
+          <!-- CMT Quick Reference Matrix -->
+          <div style="background:#F4F8F4; border-radius:14px; padding:14px 16px; border:1px solid var(--border);">
+            <div style="font-size:13px; font-weight:700; color:var(--forest); margin-bottom:6px;">🔬 California Mastitis Test (CMT) Interpretation Matrix</div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:8px; font-size:11.5px; color:var(--ink);">
+              <div style="background:var(--white); padding:8px 10px; border-radius:8px;"><strong>Score 0 (Neg):</strong> No thickening. Healthy (SCC &lt; 200k).</div>
+              <div style="background:var(--white); padding:8px 10px; border-radius:8px;"><strong>Score 1 (Weak +):</strong> Slight slime dissolves with swirl.</div>
+              <div style="background:var(--white); padding:8px 10px; border-radius:8px;"><strong>Score 2 (Distinct +):</strong> Immediate gel, pulls to center.</div>
+              <div style="background:var(--white); padding:8px 10px; border-radius:8px;"><strong>Score 3 (Strong +):</strong> Egg-white peak forms. Severe.</div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:8px;">
+            <button type="button" class="btn-primary-action" style="flex:1; justify-content:center; padding:12px;" onclick="closeSymptomGuide(); switchTab(3);">
+              <span>🩺 Start Clinical Assessment for a Cow</span>
+            </button>
+            <button type="button" class="btn-secondary-action" onclick="closeSymptomGuide()">
+              <span>Close</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Milking Routine & Withdrawal Timers -->
+    <div id="modalReminders" class="modal-overlay" onclick="if(event.target===this)closeRemindersModal()">
+      <div class="modal-sheet" style="max-width: 600px;">
+        <div class="modal-header-row">
+          <div>
+            <span class="profile-role-tag farmer" style="margin-bottom:6px;">MILKING TIMERS & COMPLIANCE</span>
+            <h3 class="modal-sheet-title">Herd Milking Reminders & Safety</h3>
+          </div>
+          <button type="button" class="btn-close-modal" onclick="closeRemindersModal()" aria-label="Close reminders modal">&times;</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <!-- Daily Schedule -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div style="background:#F6FAF6; border:1px solid #D6EAD7; border-radius:14px; padding:14px;">
+              <div style="font-size:11px; font-weight:800; color:var(--forest); text-transform:uppercase;">🌅 Morning Milking</div>
+              <div style="font-size:22px; font-weight:800; color:var(--ink); margin-top:2px;">05:30 AM</div>
+              <div style="font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;">Pre-dip teats, wait 30s contact time, dry single-service cloth wipe. Attach within 90s.</div>
+            </div>
+            <div style="background:#F6FAF6; border:1px solid #D6EAD7; border-radius:14px; padding:14px;">
+              <div style="font-size:11px; font-weight:800; color:var(--forest); text-transform:uppercase;">🌇 Evening Milking</div>
+              <div style="font-size:22px; font-weight:800; color:var(--ink); margin-top:2px;">05:00 PM</div>
+              <div style="font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.4;">Strip cup examination, post-dip barrier iodine, 30 min standing feed to close sphincter.</div>
+            </div>
+          </div>
+
+          <!-- Active Milk Withdrawal Warnings Section -->
+          <div style="background:#FFFBF2; border:1px solid #F5E5C9; border-radius:14px; padding:14px 16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+              <div style="font-size:13px; font-weight:800; color:#B45309;">⚠️ Active Milk Withdrawal Protocols</div>
+              <span class="status-pill-badge monitor">Zero Tolerance Residues</span>
+            </div>
+            <div id="activeWithdrawalRemindersList" style="display:flex; flex-direction:column; gap:8px;">
+              <!-- Dynamically populated from active cases -->
+            </div>
+          </div>
+
+          <!-- Routine Hygiene Checklist -->
+          <div style="background:var(--white); border:1px solid var(--border); border-radius:14px; padding:14px 16px;">
+            <div style="font-size:13px; font-weight:800; color:var(--forest); margin-bottom:8px;">✅ Milking Hygiene Best Practices</div>
+            <div style="display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--ink);">
+              <div>✓ Always milk fresh, healthy cows first, and mastitis-treated cows <strong>last</strong>.</div>
+              <div>✓ Wear clean nitrile gloves during milking; disinfect between suspect cows.</div>
+              <div>✓ Check vacuum stability: pulsation rate 60/40 ratio, operating vacuum 42–48 kPa.</div>
+            </div>
+          </div>
+
+          <button type="button" class="btn-primary-action" style="width:100%; justify-content:center; padding:12px;" onclick="closeRemindersModal()">
+            <span>Acknowledge Reminders</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Cow Health Profile & History Details -->
+    <div id="modalCowDetails" class="modal-overlay" onclick="if(event.target===this)closeCowDetailsModal()">
+      <div class="modal-sheet" style="max-width: 600px;">
+        <div class="modal-header-row">
+          <h3 class="modal-sheet-title" id="cowDetailsTitle">Cow Health Profile</h3>
+          <button type="button" class="btn-close-modal" onclick="closeCowDetailsModal()" aria-label="Close cow details">&times;</button>
+        </div>
+        <div id="cowDetailsContent">
+          <!-- Populated from JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Admit / Add Patient Case to Clinical Triage -->
+    <div id="modalAddTriageCase" class="modal-overlay" onclick="if(event.target===this)closeAddTriageCaseModal()">
+      <div class="modal-sheet" style="max-width: 660px;">
+        <div class="modal-header-row">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:36px; height:36px; border-radius:10px; background:#EFF6FF; color:#1E40AF; display:flex; align-items:center; justify-content:center; font-size:18px;">🩺</div>
+            <div>
+              <h3 class="modal-sheet-title" style="margin:0;">Admit Patient to Clinical Triage</h3>
+              <div style="font-size:12px; color:var(--muted); margin-top:2px;">Register a bovine patient case for clinical evaluation</div>
+            </div>
+          </div>
+          <button type="button" class="btn-close-modal" onclick="closeAddTriageCaseModal()">&times;</button>
+        </div>
+
+        <form onsubmit="submitNewTriageCase(event)">
+          <!-- Select Cow or Custom Animal -->
+          <div class="form-group">
+            <label class="form-label" for="triageCowSelect">
+              <span>1. Patient Cattle Identification</span>
+              <span class="required-star">*</span>
+            </label>
+            <select id="triageCowSelect" class="form-select" required onchange="handleTriageCowSelectChange(this)">
+              <!-- Populated dynamically with cows from herd + custom option -->
+            </select>
+          </div>
+
+          <div id="triageCustomCowRow" class="form-row-2" style="display:none;">
+            <div class="form-group">
+              <label class="form-label" for="triageCustomName">Animal Name</label>
+              <input type="text" id="triageCustomName" class="form-input" placeholder="e.g. Shanti">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="triageCustomTag">Ear Tag Number</label>
+              <input type="text" id="triageCustomTag" class="form-input" placeholder="e.g. #C009">
+            </div>
+          </div>
+
+          <!-- Farm / Shed Location & Urgency -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="triageFarmSelect">Assigned Farm / Location</label>
+              <select id="triageFarmSelect" class="form-select">
+                <option value="Sahyadri Dairy Farm · Shed 2">Sahyadri Dairy Farm · Shed 2</option>
+                <option value="Sahyadri Dairy Farm · Shed 1">Sahyadri Dairy Farm · Shed 1</option>
+                <option value="Sahyadri Dairy Farm · Maternity Shed">Sahyadri Dairy Farm · Maternity Shed</option>
+                <option value="Sahyadri Dairy Farm · Isolation Pen">Sahyadri Dairy Farm · Isolation Pen</option>
+                <option value="Haveli Cooperative Dairy · Shed B">Haveli Cooperative Dairy · Shed B</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="triageUrgencySelect">Clinical Triage Urgency</label>
+              <select id="triageUrgencySelect" class="form-select" required>
+                <option value="urgent" selected>🚨 High Priority / Urgent Triage</option>
+                <option value="critical">⛔ Critical Emergency (Systemic Fever)</option>
+                <option value="routine">⏳ Routine Review (Subclinical / Checkup)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 4-Quarter Udder Localization -->
+          <div class="form-group">
+            <label class="form-label">
+              <span>2. 4-Quarter Udder Inflammation Status</span>
+              <span style="font-size:11px; color:var(--muted); font-weight:normal;">(Select all affected quarters)</span>
+            </label>
+            <div class="quarters-selector-grid">
+              <label class="quarter-pill-label"><input type="checkbox" name="triageQuarter" value="LF (Left Front)"> <span>Left Front (LF)</span></label>
+              <label class="quarter-pill-label"><input type="checkbox" name="triageQuarter" value="RF (Right Front)" checked> <span>Right Front (RF)</span></label>
+              <label class="quarter-pill-label"><input type="checkbox" name="triageQuarter" value="LR (Left Rear)"> <span>Left Rear (LR)</span></label>
+              <label class="quarter-pill-label"><input type="checkbox" name="triageQuarter" value="RR (Right Rear)"> <span>Right Rear (RR)</span></label>
+            </div>
+          </div>
+
+          <!-- Vitals: Body Temp & CMT Score -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="triageTempInput">Rectal Temperature (°C)</label>
+              <div style="display:flex; gap:8px;">
+                <input type="number" id="triageTempInput" class="form-input" step="0.1" min="36.0" max="43.0" value="39.4" required>
+                <button type="button" class="btn-demo-fill" style="padding:4px 8px; font-size:11px;" onclick="document.getElementById('triageTempInput').value='38.6'">Norm (38.6)</button>
+                <button type="button" class="btn-demo-fill" style="padding:4px 8px; font-size:11px;" onclick="document.getElementById('triageTempInput').value='39.6'">Fev (39.6)</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="triageCmtSelect">CMT Paddle Reaction</label>
+              <select id="triageCmtSelect" class="form-select">
+                <option value="3+ (Heavy Gel Formation)" selected>3+ (Heavy Gel Formation & Clots)</option>
+                <option value="2+ (Distinct Gelation)">2+ (Distinct Gelation & Thickening)</option>
+                <option value="1+ (Mild Precipitation)">1+ (Mild Precipitation)</option>
+                <option value="Trace">Trace (T) — Slight slime</option>
+                <option value="Negative (Clear)">Negative (0) — Clear</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Symptoms Observed -->
+          <div class="form-group">
+            <label class="form-label">3. Clinical Signs & Milk Appearance</label>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:8px; font-size:12.5px;">
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" name="triageSymptom" value="Udder Firmness & Heat" checked> <span>Udder Firmness & Heat</span></label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" name="triageSymptom" value="Visible Clots / Curds in Milk" checked> <span>Visible Clots / Flakes in Milk</span></label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" name="triageSymptom" value="Drop in Daily Milk Yield"> <span>Drop in Daily Milk Yield</span></label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" name="triageSymptom" value="Watery / Serous Secretion"> <span>Watery / Serous Secretion</span></label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" name="triageSymptom" value="Discomfort on Cluster Attachment"> <span>Discomfort on Milking</span></label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" name="triageSymptom" value="High Somatic Cell Count"> <span>Elevated Somatic Cells (SCC)</span></label>
+            </div>
+          </div>
+
+          <!-- Clinical Observations & Farmer Notes -->
+          <div class="form-group">
+            <label class="form-label" for="triageNotesInput">4. Clinical Observations / History</label>
+            <textarea id="triageNotesInput" class="form-input" rows="2" placeholder="e.g. Quarter indurated during morning milking. Teat canal sensitive."></textarea>
+          </div>
+
+          <!-- Photo Attachment (Optional) -->
+          <div class="form-group">
+            <label class="form-label">5. Udder / Strip Cup Photo (Optional)</label>
+            <input type="file" id="triagePhotoInput" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="handleTriagePhotoSelected(this)">
+            <button type="button" class="upload-dropzone-btn" onclick="document.getElementById('triagePhotoInput').click()" style="padding:12px;">
+              <span class="upload-icon-circle" style="font-size:18px;">📸</span>
+              <span style="font-weight:700; font-size:12.5px; color:var(--forest);" id="triagePhotoUploadText">Click to attach / capture udder photo</span>
+            </button>
+            <div id="triagePhotoPreviewContainer" style="display:none; margin-top:10px; text-align:center;">
+              <img id="triagePhotoPreview" src="" alt="Udder triage photo" style="max-height:140px; border-radius:10px; border:2px solid #2563EB; object-fit:cover;">
+              <div style="margin-top:4px;">
+                <button type="button" onclick="removeTriagePhoto()" style="color:#DC2626; font-size:11.5px; background:none; border:none; cursor:pointer; font-weight:600;">✕ Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display:flex; gap:10px; margin-top:16px;">
+            <button type="button" class="btn-cancel" onclick="closeAddTriageCaseModal()" style="flex:1; padding:12px;">Cancel</button>
+            <button type="submit" class="btn-primary-action" id="btnSubmitTriageCase" style="flex:2; justify-content:center; padding:12px; background:linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);">
+              <span id="btnSubmitTriageCaseText">Admit to Triage Queue →</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="toast-notice">Notice message</div>
+
+    </div> <!-- Close .app-main-col -->
+  </div> <!-- Close .app-body-layout -->
+</div> <!-- Close .app-wrapper -->
+
+  <script src="env-config.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

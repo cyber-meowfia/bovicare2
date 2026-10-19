@@ -1,0 +1,124 @@
+// Lightweight, zero-dependency local static server for BoviCare
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+const PORT = process.env.PORT || 3000;
+const PUBLIC_DIR = __dirname;
+
+// Simple zero-dependency .env loader for local development
+const envPath = path.join(PUBLIC_DIR, '.env');
+if (fs.existsSync(envPath)) {
+  try {
+    const envLines = fs.readFileSync(envPath, 'utf8').split('\n');
+    for (const line of envLines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const eqIdx = trimmed.indexOf('=');
+      if (eqIdx !== -1) {
+        const key = trimmed.slice(0, eqIdx).trim();
+        const val = trimmed.slice(eqIdx + 1).trim().replace(/^['"]|['"]$/g, '');
+        if (key && !process.env[key]) {
+          process.env[key] = val;
+        }
+      }
+    }
+  } catch (e) {
+    // Ignore .env read errors
+  }
+}
+
+const MIME_TYPES = {
+  '.html': 'text/html',
+  '.css': 'text/css',
+  '.js': 'text/javascript',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.svg': 'image/svg+xml'
+};
+
+const server = http.createServer((req, res) => {
+  const reqPath = decodeURI(req.url.split('?')[0]);
+
+  // Dynamic runtime configuration endpoint (Centralized publishable config)
+  if (reqPath === '/env-config.js') {
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.BOVICARE_SUPABASE_URL || '';
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.BOVICARE_SUPABASE_ANON_KEY || '';
+    const configJs = `// Auto-generated runtime environment configuration
+window.ENV_SUPABASE_URL = ${JSON.stringify(supabaseUrl)};
+window.ENV_SUPABASE_ANON_KEY = ${JSON.stringify(supabaseAnonKey)};
+`;
+    res.writeHead(200, {
+      'Content-Type': 'text/javascript',
+      'Cache-Control': 'no-store, no-cache, must-revalidate'
+    });
+    res.end(configJs, 'utf-8');
+    return;
+  }
+
+  // Local AI Mastitis Screening Endpoint (Protected, Local ONNX Runtime)
+  if (req.method === 'POST' && reqPath === '/api/ai-screen') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const imgPath = payload.image_path || path.join(PUBLIC_DIR, 'asset', 'images', 'cow_assessment_banner.jpeg');
+        const resolved = path.resolve(PUBLIC_DIR, imgPath);
+        if (!resolved.startsWith(PUBLIC_DIR)) {
+          res.writeHead(403, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Access denied: path outside project' }));
+        }
+        const { execFile } = require('child_process');
+        execFile('python3', [path.join(PUBLIC_DIR, 'ml_inference.py'), resolved], (err, stdout) => {
+          if (err) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ error: err.message }));
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(stdout);
+        });
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid JSON payload' }));
+      }
+    });
+    return;
+  }
+
+  let filePath = path.join(PUBLIC_DIR, reqPath);
+  if (reqPath === '/' || reqPath === '/landing') {
+    filePath = path.join(PUBLIC_DIR, 'landing.html');
+  } else if (reqPath === '/login' || reqPath === '/signin') {
+    filePath = path.join(PUBLIC_DIR, 'login.html');
+  } else if (reqPath === '/app') {
+    filePath = path.join(PUBLIC_DIR, 'index.html');
+  } else if (filePath === PUBLIC_DIR || filePath.endsWith('/')) {
+    filePath = path.join(filePath, 'landing.html');
+  }
+
+  const ext = path.extname(filePath).toLowerCase();
+  const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+
+  fs.readFile(filePath, (err, content) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('404 Not Found');
+      } else {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('500 Internal Server Error: ' + err.code);
+      }
+    } else {
+      res.writeHead(200, { 'Content-Type': contentType });
+      res.end(content, 'utf-8');
+    }
+  });
+});
+
+server.listen(PORT, () => {
+  console.log(`BoviCare prototype running at http://localhost:${PORT}`);
+});

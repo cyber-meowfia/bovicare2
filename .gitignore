@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Environment and secrets
+.env
+.env.local
+*.pem
+
+# Local build and test artifacts
+*.log
+scratch/
+ios_*.png
+WhatsApp Video*.mp4
+
+# Python virtual environment and caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
