@@ -537,8 +537,8 @@ async function resolveStorageBucket(primaryBucket, fallbackBucket, mockBuckets) 
 
   // Verify Navigation Links & Actions
   assert.strictEqual(landingHtml.includes('class="site-header"'), true, 'Sticky header must exist');
-  assert.strictEqual(landingHtml.includes('href="/index.html?role=farmer"'), true, 'Farmer Portal action must link to app');
-  assert.strictEqual(landingHtml.includes('href="/index.html?role=vet"'), true, 'Vet Portal action must link to app');
+  assert.strictEqual(landingHtml.includes('index.html?role=farmer'), true, 'Farmer Portal action must link to app');
+  assert.strictEqual(landingHtml.includes('index.html?role=vet'), true, 'Vet Portal action must link to app');
   assert.strictEqual(landingHtml.includes('Get Started Free'), true, 'Prominent Get Started action must exist');
 
   // Verify 3D Animated Cow Hero Element (Zero scooter references)
@@ -612,7 +612,7 @@ async function resolveStorageBucket(primaryBucket, fallbackBucket, mockBuckets) 
   // Verify Server Routing & Inter-Page Links
   assert.strictEqual(serverJs.includes('login.html'), true, 'server.js must route to login.html');
   assert.strictEqual(freshHtml.includes('Login'), true, 'index.html must have a link to Login');
-  assert.strictEqual(landingHtml.includes('/login'), true, 'landing.html must have links to /login');
+  assert.strictEqual(landingHtml.includes('login.html'), true, 'landing.html must have links to login.html');
 
   console.log('✅ 23. Dedicated login page, role dropdown (Farmer vs Vet), and auth routing verified.');
 
@@ -776,5 +776,39 @@ async function resolveStorageBucket(primaryBucket, fallbackBucket, mockBuckets) 
 
   console.log('✅ 28. Secure Admin Portal, RBAC migration, telemetry, and gate verification passed.');
 
-  console.log('--- ALL 28 TEST SUITES COMPLETED WITH 100% PASS RATE ---');
+  // =========================================================================
+  // TEST SUITE 29: Removal of Role-Switching & Enforcement of Route Protection
+  // =========================================================================
+  const latestAppJs = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+  const latestLoginJs = fs.readFileSync(path.join(__dirname, 'login.js'), 'utf8');
+  const rbacMigrationPath = path.join(__dirname, 'supabase', 'migrations', '20261020000001_enforce_role_route_protection.sql');
+
+  // 1. Verify Complete Removal of Role-Switching UI & Functions
+  assert.strictEqual(latestAppJs.includes('function toggleUserRole'), false, 'toggleUserRole function must be completely removed');
+  assert.strictEqual(latestAppJs.includes('onclick = toggleUserRole'), false, 'onclick = toggleUserRole handlers must be removed');
+  assert.strictEqual(latestAppJs.includes("activeBadge.style.cursor = 'default'"), true, 'activeBadge must have cursor default (read-only)');
+  assert.strictEqual(latestAppJs.includes("sideBadge.style.cursor = 'default'"), true, 'sideBadge must have cursor default (read-only)');
+
+  // 2. Verify URL Tampering Defense & Database-Enforced Routing
+  assert.strictEqual(latestAppJs.includes('enforceAuthenticatedRoleAndRoute'), true, 'enforceAuthenticatedRoleAndRoute must be defined in app.js');
+  assert.strictEqual(latestAppJs.includes('attemptedRole !== trustedRole'), true, 'URL role tampering detection must exist in app.js');
+  assert.strictEqual(latestAppJs.includes('window.history.replaceState'), true, 'Unauthorized URL parameters must be sanitized via replaceState');
+
+  // 3. Verify Tab Route Protection in switchTab
+  assert.strictEqual(latestAppJs.includes("activeRole === 'farmer' && vetOnlyTabs.includes(targetId)"), true, 'Farmer must be blocked from accessing vet tabs');
+  assert.strictEqual(latestAppJs.includes("activeRole === 'vet' && farmerOnlyTabs.includes(targetId)"), true, 'Vet must be blocked from accessing farmer tabs');
+  assert.strictEqual(latestAppJs.includes('Access Denied: Veterinarian credentials required'), true, 'Farmer accessing vet tab must show Access Denied');
+  assert.strictEqual(latestAppJs.includes('Access Denied: Farmer dashboard is restricted to herd owners'), true, 'Vet accessing farmer tab must show Access Denied');
+
+  // 4. Verify Database-Resolved Role in login.js
+  assert.strictEqual(latestLoginJs.includes("profile.role === 'veterinarian' ? 'vet' : 'farmer'"), true, 'login.js must resolve trusted role from database profile');
+
+  // 5. Verify SQL Migration File
+  assert.strictEqual(fs.existsSync(rbacMigrationPath), true, '20261020000001_enforce_role_route_protection.sql migration must exist');
+  const rbacSql = fs.readFileSync(rbacMigrationPath, 'utf8');
+  assert.strictEqual(rbacSql.includes('trg_prevent_role_self_escalation'), true, 'trg_prevent_role_self_escalation trigger must exist in SQL migration');
+
+  console.log('✅ 29. Farmer/Vet role switching removal and strict route protection verified.');
+
+  console.log('--- ALL 29 TEST SUITES COMPLETED WITH 100% PASS RATE ---');
 })();

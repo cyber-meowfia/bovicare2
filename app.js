@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderProfileView();
   populateAssessDropdown();
   initCloudBackend();
-  setRole(roleParam);
+  await enforceAuthenticatedRoleAndRoute();
   openSidebar();
 });
 
@@ -356,6 +356,22 @@ function switchTab(target) {
     targetId = target.startsWith('tab') ? target : `tab${target.charAt(0).toUpperCase() + target.slice(1)}`;
     const allTabs = ['tabHome', 'tabClinicalOverview', 'tabTriage', 'tabCows', 'tabAssess', 'tabRecords', 'tabProfile'];
     tabIndex = allTabs.indexOf(targetId);
+  }
+
+  // Role-Based Tab Route Protection Guard
+  const vetOnlyTabs = ['tabClinicalOverview', 'tabTriage'];
+  const farmerOnlyTabs = ['tabHome'];
+
+  if (activeRole === 'farmer' && vetOnlyTabs.includes(targetId)) {
+    console.warn(`Access Denied: Farmer account attempted to access ${targetId}`);
+    showToast('Access Denied: Veterinarian credentials required.');
+    targetId = 'tabHome';
+    tabIndex = 0;
+  } else if (activeRole === 'vet' && farmerOnlyTabs.includes(targetId)) {
+    console.warn(`Access Denied: Veterinarian account attempted to access ${targetId}`);
+    showToast('Access Denied: Farmer dashboard is restricted to herd owners.');
+    targetId = 'tabClinicalOverview';
+    tabIndex = 0;
   }
 
   currentTab = tabIndex;
@@ -1669,9 +1685,9 @@ function updateActiveRoleBadges() {
 
   const activeBadge = document.getElementById('activeRoleBadge');
   if (activeBadge) {
-    activeBadge.style.cursor = 'pointer';
-    activeBadge.title = isVet ? 'Click to switch to Farmer Portal' : 'Click to switch to Veterinarian Portal';
-    activeBadge.onclick = toggleUserRole;
+    activeBadge.style.cursor = 'default';
+    activeBadge.title = isVet ? 'Active Role: Licensed Veterinarian' : 'Active Role: Dairy Farmer';
+    activeBadge.onclick = null;
     if (isVet) {
       activeBadge.textContent = isMr ? '🩺 परवानाधारक पशुवैद्यक' : '🩺 Licensed Veterinarian';
       activeBadge.classList.add('vet');
@@ -1683,9 +1699,9 @@ function updateActiveRoleBadges() {
 
   const sideBadge = document.getElementById('sideActiveRoleBadge');
   if (sideBadge) {
-    sideBadge.style.cursor = 'pointer';
-    sideBadge.title = isVet ? 'Click to switch to Farmer Portal' : 'Click to switch to Veterinarian Portal';
-    sideBadge.onclick = toggleUserRole;
+    sideBadge.style.cursor = 'default';
+    sideBadge.title = isVet ? 'Active Role: Licensed Veterinarian' : 'Active Role: Dairy Farmer';
+    sideBadge.onclick = null;
     const icon = isVet ? '🩺' : '🌾';
     const label = isVet ? (isMr ? 'पशुवैद्यक' : 'Veterinarian') : (isMr ? 'शेतकरी' : 'Farmer');
     sideBadge.innerHTML = `<span class="role-icon">${icon}</span><span class="sidebar-nav-label role-text">${label}</span>`;
@@ -1697,8 +1713,55 @@ function updateActiveRoleBadges() {
   }
 }
 
-function toggleUserRole() {
-  setRole(activeRole === 'farmer' ? 'vet' : 'farmer');
+// 16. Enforce Authenticated Role & URL Route Protection
+async function enforceAuthenticatedRoleAndRoute() {
+  let trustedRole = localStorage.getItem('bovicare_active_role') || 'farmer';
+
+  // 1. Verify against authenticated Supabase session & database profile
+  let supabase = null;
+  if (typeof initSupabase === 'function') {
+    supabase = initSupabase();
+  } else if (typeof window.supabaseClient !== 'undefined') {
+    supabase = window.supabaseClient;
+  }
+
+  if (supabase && supabase.auth) {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (session && session.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id, role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profile) {
+          if (profile.role === 'admin') {
+            window.location.href = 'admin.html';
+            return;
+          }
+          trustedRole = profile.role === 'veterinarian' ? 'vet' : 'farmer';
+        }
+      }
+    } catch (e) {
+      console.warn('Session verification fallback:', e);
+    }
+  }
+
+  // 2. Strict URL Tampering Defense: Block manual ?role= modifications
+  const urlParams = new URLSearchParams(window.location.search);
+  const attemptedRole = urlParams.get('role');
+  if (attemptedRole && attemptedRole !== trustedRole) {
+    console.warn(`Unauthorized route attempt: user with role "${trustedRole}" attempted to access "?role=${attemptedRole}". Tampering blocked.`);
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+    setTimeout(() => {
+      showToast(`Access Restricted: Redirected to your authorized ${trustedRole === 'vet' ? 'Veterinary Portal' : 'Farmer Dashboard'}.`);
+    }, 350);
+  }
+
+  // Enforce the verified role
+  setRole(trustedRole);
 }
 
 function updateNavRoleLabels() {

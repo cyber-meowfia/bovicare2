@@ -125,31 +125,54 @@ function initFormHandler() {
         supabase = window.supabaseClient;
       }
 
+      let trustedRole = role;
+
       if (supabase && typeof supabase.auth?.signInWithPassword === 'function') {
         try {
           const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
           });
-          if (error) {
-            console.warn('Supabase auth warning, proceeding in demo mode:', error.message);
+          if (!error && data?.user) {
+            // Strictly resolve trusted role from database profile
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('id, role')
+              .eq('id', data.user.id)
+              .single();
+
+            if (profile) {
+              if (profile.role === 'admin') {
+                window.location.href = 'admin.html';
+                return;
+              }
+              trustedRole = profile.role === 'veterinarian' ? 'vet' : 'farmer';
+            }
           }
         } catch (authErr) {
           console.warn('Supabase connection error:', authErr);
         }
+      } else {
+        // Offline demo account verification
+        if (email.includes('vet') || email.includes('anjali')) {
+          trustedRole = 'vet';
+        } else if (email.includes('farmer') || email.includes('patil')) {
+          trustedRole = 'farmer';
+        }
       }
 
-      showLoginToast(`Welcome! Opening ${role === 'vet' ? 'Veterinary Portal' : 'Farmer Dashboard'}...`);
+      localStorage.setItem('bovicare_active_role', trustedRole);
+      showLoginToast(`Welcome! Opening ${trustedRole === 'vet' ? 'Veterinary Portal' : 'Farmer Dashboard'}...`);
 
-      // Smooth redirection to live application
+      // Clean redirection to protected route
       setTimeout(() => {
-        window.location.href = `/app?role=${encodeURIComponent(role)}`;
+        window.location.href = 'index.html';
       }, 750);
     } catch (err) {
       console.error('Login error:', err);
       showLoginToast('Login completed in offline mode.');
       setTimeout(() => {
-        window.location.href = `/app?role=${encodeURIComponent(role)}`;
+        window.location.href = 'index.html';
       }, 750);
     }
   });

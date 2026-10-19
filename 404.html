@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BoviCare — Page Not Found</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: radial-gradient(circle at 50% 20%, #165335 0%, #062817 70%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .not-found-card {
+      max-width: 500px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 24px;
+      padding: 40px 32px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .not-found-icon {
+      font-size: 54px;
+      margin-bottom: 12px;
+    }
+    .not-found-title {
+      font-size: 26px;
+      font-weight: 800;
+      margin: 0 0 8px 0;
+    }
+    .not-found-desc {
+      font-size: 14px;
+      color: #A7F3D0;
+      line-height: 1.6;
+      margin: 0 0 28px 0;
+    }
+    .nav-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .nav-btn-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 13px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.18s ease;
+    }
+    .nav-btn-link.primary {
+      background: #4ADE80;
+      color: #062817;
+      box-shadow: 0 4px 14px rgba(74, 222, 128, 0.35);
+    }
+    .nav-btn-link.primary:hover {
+      background: #86EFAC;
+      transform: translateY(-1px);
+    }
+    .nav-btn-link.secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .nav-btn-link.secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+  <script>
+    // GitHub Pages Smart SPA Route Resolver
+    // Detects extensionless path queries and redirects to the static HTML file
+    (function() {
+      var path = window.location.pathname;
+      var clean = path.replace(/\/$/, "");
+      var segment = clean.split('/').pop().toLowerCase();
+      var search = window.location.search || '';
+
+      if (segment === 'login' || segment === 'signin') {
+        window.location.replace('login.html' + search);
+      } else if (segment === 'landing' || segment === 'home') {
+        window.location.replace('landing.html' + search);
+      } else if (segment === 'app') {
+        window.location.replace('index.html' + search);
+      } else if (segment === 'admin') {
+        window.location.replace('admin.html' + search);
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="not-found-card">
+    <div class="not-found-icon">🐄</div>
+    <h1 class="not-found-title">Explore BoviCare</h1>
+    <p class="not-found-desc">
+      Looking for the BoviCare website or portal? Select a destination below to proceed:
+    </p>
+
+    <div class="nav-grid">
+      <a href="landing.html" class="nav-btn-link primary">
+        <span>✨ Main Website & Landing Page</span>
+      </a>
+      <a href="login.html" class="nav-btn-link secondary">
+        <span>🔑 Sign In & Role Portal</span>
+      </a>
+      <a href="index.html" class="nav-btn-link secondary">
+        <span>🌾 Farmer & Vet App Dashboard</span>
+      </a>
+      <a href="admin.html" class="nav-btn-link secondary" style="font-size:12px; color:#BAE6FD;">
+        <span>🔒 Secure Admin Console</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
