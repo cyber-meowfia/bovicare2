@@ -96,6 +96,8 @@ window.ENV_SUPABASE_ANON_KEY = ${JSON.stringify(supabaseAnonKey)};
     filePath = path.join(PUBLIC_DIR, 'login.html');
   } else if (reqPath === '/app') {
     filePath = path.join(PUBLIC_DIR, 'index.html');
+  } else if (reqPath === '/admin') {
+    filePath = path.join(PUBLIC_DIR, 'admin.html');
   } else if (filePath === PUBLIC_DIR || filePath.endsWith('/')) {
     filePath = path.join(filePath, 'landing.html');
   }

@@ -333,7 +333,7 @@ async function resolveStorageBucket(primaryBucket, fallbackBucket, mockBuckets) 
 
   // Verify Sidebar HTML elements & Icon Rail structure
   assert.strictEqual(freshHtml.includes('id="appSidebar"'), true, 'Sidebar element #appSidebar must exist');
-  assert.strictEqual(freshHtml.includes('class="app-sidebar collapsed"'), true, 'Sidebar must have collapsed icon rail class by default');
+  assert.strictEqual(freshHtml.includes('class="app-sidebar expanded"'), true, 'Sidebar must have expanded class by default on page refresh');
   assert.strictEqual(freshHtml.includes('id="btnRailToggle"'), true, 'Sidebar rail toggle #btnRailToggle must exist');
   assert.strictEqual(freshHtml.includes('id="btnSidebarToggle"'), false, 'Header toggle button #btnSidebarToggle must be removed');
   assert.strictEqual(freshHtml.includes('class="app-body-layout"'), true, 'Body layout wrapper .app-body-layout must exist');
@@ -470,7 +470,7 @@ async function resolveStorageBucket(primaryBucket, fallbackBucket, mockBuckets) 
   const migrationsDir = path.join(__dirname, 'supabase', 'migrations');
   const migrationFiles = fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql'));
 
-  assert.strictEqual(migrationFiles.length, 2, 'Exactly 2 consolidated SQL migration files must exist');
+  assert.strictEqual(migrationFiles.length >= 2, true, 'At least 2 consolidated SQL migration files must exist');
   assert.strictEqual(migrationFiles.includes('20261018000000_core_bovicare_schema.sql'), true);
   assert.strictEqual(migrationFiles.includes('20261018000001_storage_buckets_and_policies.sql'), true);
 
@@ -727,5 +727,54 @@ async function resolveStorageBucket(primaryBucket, fallbackBucket, mockBuckets) 
 
   console.log('✅ 27. Clinical Overview dashboard, 4-quarter heatmap, and navigation tabs verified.');
 
-  console.log('--- ALL 27 TEST SUITES COMPLETED WITH 100% PASS RATE ---');
+  // =========================================================================
+  // TEST SUITE 28: Secure Admin Portal & RBAC Extension Verification
+  // =========================================================================
+  const adminMigrationPath = path.join(__dirname, 'supabase', 'migrations', '20261020000000_admin_portal_rls.sql');
+  assert.strictEqual(fs.existsSync(adminMigrationPath), true, 'Admin migration file 20261020000000_admin_portal_rls.sql must exist');
+  const adminSql = fs.readFileSync(adminMigrationPath, 'utf8');
+
+  // Verify Security Definer Admin Functions & Policies in SQL
+  assert.strictEqual(adminSql.includes('CREATE OR REPLACE FUNCTION public.is_admin()'), true, 'public.is_admin() must be defined in SQL migration');
+  assert.strictEqual(adminSql.includes('CREATE OR REPLACE FUNCTION public.get_admin_dashboard_metrics()'), true, 'public.get_admin_dashboard_metrics() RPC must be defined');
+  assert.strictEqual(adminSql.includes('CREATE POLICY "admin_profiles_all"'), true, 'admin_profiles_all RLS policy must be created');
+  assert.strictEqual(adminSql.includes('CREATE POLICY "admin_cows_all"'), true, 'admin_cows_all RLS policy must be created');
+  assert.strictEqual(adminSql.includes('CREATE POLICY "admin_cases_all"'), true, 'admin_cases_all RLS policy must be created');
+
+  // Verify Admin HTML Layout & Auth Gate
+  const adminHtmlPath = path.join(__dirname, 'admin.html');
+  assert.strictEqual(fs.existsSync(adminHtmlPath), true, 'admin.html must exist');
+  const adminHtml = fs.readFileSync(adminHtmlPath, 'utf8');
+
+  assert.strictEqual(adminHtml.includes('id="adminAuthGate"'), true, '#adminAuthGate security gate must exist');
+  assert.strictEqual(adminHtml.includes('id="adminLoginForm"'), true, '#adminLoginForm form must exist');
+  assert.strictEqual(adminHtml.includes('id="adminAppContainer"'), true, '#adminAppContainer master container must exist');
+  assert.strictEqual(adminHtml.includes('id="adminStatFarmers"'), true, '#adminStatFarmers metric element must exist');
+  assert.strictEqual(adminHtml.includes('id="adminStatActiveVets"'), true, '#adminStatActiveVets metric element must exist');
+  assert.strictEqual(adminHtml.includes('id="adminStatLivestock"'), true, '#adminStatLivestock metric element must exist');
+  assert.strictEqual(adminHtml.includes('id="adminStatCows"'), true, '#adminStatCows metric element must exist');
+  assert.strictEqual(adminHtml.includes('id="adminStatBuffaloes"'), true, '#adminStatBuffaloes metric element must exist');
+  assert.strictEqual(adminHtml.includes('id="adminStatTotalUsers"'), true, '#adminStatTotalUsers metric element must exist');
+  assert.strictEqual(adminHtml.includes('id="farmersTableBody"'), true, '#farmersTableBody table must exist');
+  assert.strictEqual(adminHtml.includes('id="vetsTableBody"'), true, '#vetsTableBody table must exist');
+  assert.strictEqual(adminHtml.includes('id="livestockTableBody"'), true, '#livestockTableBody table must exist');
+  assert.strictEqual(adminHtml.includes('id="casesTableBody"'), true, '#casesTableBody table must exist');
+
+  // Verify Admin JS Logic
+  const adminJsPath = path.join(__dirname, 'admin.js');
+  assert.strictEqual(fs.existsSync(adminJsPath), true, 'admin.js must exist');
+  const adminJs = fs.readFileSync(adminJsPath, 'utf8');
+
+  assert.strictEqual(adminJs.includes('checkAdminSession'), true, 'checkAdminSession must exist in admin.js');
+  assert.strictEqual(adminJs.includes('grantAdminAccess'), true, 'grantAdminAccess must exist in admin.js');
+  assert.strictEqual(adminJs.includes('classifySpecies'), true, 'classifySpecies must exist in admin.js');
+  assert.strictEqual(adminJs.includes("profile.role !== 'admin'"), true, 'Strict role !== admin rejection must exist in admin.js');
+
+  // Verify Server Route Mapping
+  const currentServerJs = fs.readFileSync(path.join(__dirname, 'server.js'), 'utf8');
+  assert.strictEqual(currentServerJs.includes("reqPath === '/admin'"), true, "server.js must route '/admin' to admin.html");
+
+  console.log('✅ 28. Secure Admin Portal, RBAC migration, telemetry, and gate verification passed.');
+
+  console.log('--- ALL 28 TEST SUITES COMPLETED WITH 100% PASS RATE ---');
 })();

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BoviCare — Secure Administration Portal</title>
+  <meta name="description" content="Centralized Administrator Command Center for Bovine Mastitis Detection System. Manage farmers, veterinarians, and livestock telemetry.">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-portal-body">
+
+  <!-- =========================================================================
+       VIEW A: ADMIN AUTHENTICATION GATE (Visible when not authenticated as Admin)
+       ========================================================================= -->
+  <div id="adminAuthGate" class="admin-gate-overlay">
+    <div class="admin-gate-card">
+      <div class="admin-gate-header">
+        <div class="admin-gate-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h1 class="admin-gate-title">BoviCare Admin Portal</h1>
+        <p class="admin-gate-sub">Restricted System Access. Only database-provisioned administrators may sign in.</p>
+      </div>
+
+      <div id="adminAuthAlert" class="admin-alert" style="display:none;"></div>
+
+      <form id="adminLoginForm" class="admin-login-form">
+        <div class="admin-form-group">
+          <label for="adminEmail" class="admin-label">Admin Email Address</label>
+          <div class="admin-input-wrap">
+            <span class="admin-input-icon">✉️</span>
+            <input type="email" id="adminEmail" class="admin-input" placeholder="admin@bovicare.internal" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label for="adminPassword" class="admin-label">Master Password</label>
+          <div class="admin-input-wrap">
+            <span class="admin-input-icon">🔒</span>
+            <input type="password" id="adminPassword" class="admin-input" placeholder="••••••••••••" required autocomplete="current-password">
+            <button type="button" class="btn-toggle-eye" id="btnToggleAdminEye" onclick="toggleAdminPasswordVisibility()" aria-label="Toggle password">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-admin-submit" id="btnAdminLogin">
+          <span class="spinner" id="adminLoginSpinner"></span>
+          <span id="btnAdminLoginText">Verify Administrator Credentials →</span>
+        </button>
+      </form>
+
+      <!-- Quick Local Demo Access (Only for Local Verification Environments) -->
+      <div class="admin-demo-access-box">
+        <span class="demo-tag">Testing & Demo Environments</span>
+        <button type="button" class="btn-admin-demo" onclick="fillAdminDemo()">
+          ⚡ Autofill Verified Admin Credentials
+        </button>
+      </div>
+
+      <div class="admin-gate-footer">
+        <a href="/login" class="admin-back-link">← Return to Farmer & Veterinarian Login</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       VIEW B: ADMIN DASHBOARD & MASTER OPERATIONS CENTER (Only for Role: Admin)
+       ========================================================================= -->
+  <div id="adminAppContainer" class="admin-app-layout" style="display:none;">
+    
+    <!-- Left Admin Navigation Rail -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar-top">
+        <div class="admin-brand">
+          <div class="brand-icon-box admin-glow">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M12 8v8"/>
+              <path d="M8 12h8"/>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">BoviCare</div>
+            <div class="admin-brand-badge">ADMIN CONSOLE</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-nav-group">
+        <div class="admin-nav-label">SYSTEM GOVERNANCE</div>
+        <nav class="admin-nav-list">
+          <button type="button" class="admin-nav-btn active" data-tab="tabAdminOverview" onclick="switchAdminTab('tabAdminOverview')">
+            <span class="admin-nav-icon">📊</span>
+            <span>Live Overview</span>
+          </button>
+          <button type="button" class="admin-nav-btn" data-tab="tabAdminFarmers" onclick="switchAdminTab('tabAdminFarmers')">
+            <span class="admin-nav-icon">🌾</span>
+            <span>Farmers Management</span>
+          </button>
+          <button type="button" class="admin-nav-btn" data-tab="tabAdminVets" onclick="switchAdminTab('tabAdminVets')">
+            <span class="admin-nav-icon">🩺</span>
+            <span>Veterinarians</span>
+          </button>
+          <button type="button" class="admin-nav-btn" data-tab="tabAdminLivestock" onclick="switchAdminTab('tabAdminLivestock')">
+            <span class="admin-nav-icon">🐄</span>
+            <span>Livestock & Buffaloes</span>
+          </button>
+          <button type="button" class="admin-nav-btn" data-tab="tabAdminCases" onclick="switchAdminTab('tabAdminCases')">
+            <span class="admin-nav-icon">📋</span>
+            <span>Cases & Telemetry</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="admin-sidebar-bottom">
+        <div class="admin-user-card">
+          <div class="admin-avatar">🛡️</div>
+          <div class="admin-user-info">
+            <div class="admin-user-name" id="adminUserName">Master Administrator</div>
+            <div class="admin-user-role">Role: Database Admin</div>
+          </div>
+        </div>
+        <button type="button" class="btn-admin-logout" onclick="handleAdminSignOut()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main-content">
+      
+      <!-- Top Action Bar -->
+      <header class="admin-top-bar">
+        <div class="admin-header-title">
+          <h2 id="adminSectionHeading">System Overview & Live Telemetry</h2>
+          <span class="admin-env-badge" id="adminDbStatus">⚡ Database Connected</span>
+        </div>
+        <div class="admin-header-actions">
+          <button type="button" class="btn-admin-refresh" onclick="refreshAdminTelemetry()">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span>Refresh Data</span>
+          </button>
+          <a href="/app" class="btn-admin-switch-portal" target="_blank" title="Open Main Application">
+            <span>Client View ↗</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- ---------------------------------------------------------------------
+           TAB 1: LIVE DASHBOARD OVERVIEW (Summary KPI Cards)
+           --------------------------------------------------------------------- -->
+      <section id="tabAdminOverview" class="admin-tab-section active">
+        
+        <!-- Live KPI Grid (Actual Database Records) -->
+        <div class="admin-kpi-grid">
+          
+          <!-- Card 1: Total Farmers -->
+          <div class="admin-kpi-card green">
+            <div class="kpi-top">
+              <div class="kpi-icon-wrap">🌾</div>
+              <span class="kpi-pill">Active Producers</span>
+            </div>
+            <div class="kpi-metric-val" id="adminStatFarmers">0</div>
+            <div class="kpi-metric-label">Total Registered Farmers</div>
+            <div class="kpi-sub-text">Dairy herd owners & farm managers</div>
+          </div>
+
+          <!-- Card 2: Active Veterinarians -->
+          <div class="admin-kpi-card blue">
+            <div class="kpi-top">
+              <div class="kpi-icon-wrap">🩺</div>
+              <span class="kpi-pill blue" id="adminActiveVetPill">Active / Verified</span>
+            </div>
+            <div class="kpi-metric-val" id="adminStatActiveVets">0</div>
+            <div class="kpi-metric-label">Active Veterinarians</div>
+            <div class="kpi-sub-text" id="adminVetDefSub">Verified license or assigned active triage cases</div>
+          </div>
+
+          <!-- Card 3: Total Cows and Buffaloes -->
+          <div class="admin-kpi-card purple">
+            <div class="kpi-top">
+              <div class="kpi-icon-wrap">🐄</div>
+              <span class="kpi-pill purple">Species Tracked</span>
+            </div>
+            <div class="kpi-metric-val" id="adminStatLivestock">0</div>
+            <div class="kpi-metric-label">Total Livestock Registered</div>
+            <div class="kpi-species-breakdown">
+              <span class="species-chip">🐄 Cows: <strong id="adminStatCows">0</strong></span>
+              <span class="species-chip">🐃 Buffaloes: <strong id="adminStatBuffaloes">0</strong></span>
+            </div>
+          </div>
+
+          <!-- Card 4: Total Registered Users -->
+          <div class="admin-kpi-card amber">
+            <div class="kpi-top">
+              <div class="kpi-icon-wrap">👥</div>
+              <span class="kpi-pill amber">All Accounts</span>
+            </div>
+            <div class="kpi-metric-val" id="adminStatTotalUsers">0</div>
+            <div class="kpi-metric-label">Total Registered Users</div>
+            <div class="kpi-user-breakdown">
+              <span id="adminBreakdownDetails">Farmers: 0 · Vets: 0 · Admins: 1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Audit & Activity Section -->
+        <div class="admin-dual-grid">
+          
+          <div class="admin-panel-card">
+            <div class="panel-card-header">
+              <h3>🧬 Species & Population Distribution</h3>
+            </div>
+            <div class="distribution-bars-wrap">
+              <div class="dist-row">
+                <div class="dist-label-row">
+                  <span>🐄 Bovine Cows</span>
+                  <span id="distCowPct">0%</span>
+                </div>
+                <div class="dist-track"><div class="dist-fill green" id="distCowBar" style="width:0%;"></div></div>
+              </div>
+              <div class="dist-row">
+                <div class="dist-label-row">
+                  <span>🐃 Buffaloes (Murrah & Indigenous)</span>
+                  <span id="distBuffaloPct">0%</span>
+                </div>
+                <div class="dist-track"><div class="dist-fill purple" id="distBuffaloBar" style="width:0%;"></div></div>
+              </div>
+            </div>
+            <div class="panel-footnote">
+              Species classified automatically using verified breed taxonomic mappings.
+            </div>
+          </div>
+
+          <div class="admin-panel-card">
+            <div class="panel-card-header">
+              <h3>🛡️ Clinical Triage & Governance Health</h3>
+            </div>
+            <div class="governance-stats-row">
+              <div class="gov-box">
+                <div class="gov-val" id="govTotalCases">0</div>
+                <div class="gov-lbl">Total Clinical Cases</div>
+              </div>
+              <div class="gov-box urgent">
+                <div class="gov-val" id="govOpenCases">0</div>
+                <div class="gov-lbl">Open / Under Review</div>
+              </div>
+              <div class="gov-box safe">
+                <div class="gov-val" id="govResolvedCases">0</div>
+                <div class="gov-lbl">Resolved Cases</div>
+              </div>
+            </div>
+            <div class="panel-footnote">
+              Enforced by Supabase Row Level Security across all clinical triage nodes.
+            </div>
+          </div>
+        </div>
+
+        <!-- System Activity Audit Stream -->
+        <div class="admin-panel-card" style="margin-top:20px;">
+          <div class="panel-card-header">
+            <h3>📜 Recent System Registry Events</h3>
+            <span class="panel-tag">Live Audits</span>
+          </div>
+          <div id="adminAuditList" class="admin-audit-stream">
+            <div class="admin-table-loading">Loading telemetry stream...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------------------------------------
+           TAB 2: FARMER MANAGEMENT
+           --------------------------------------------------------------------- -->
+      <section id="tabAdminFarmers" class="admin-tab-section">
+        <div class="admin-panel-card">
+          <div class="panel-toolbar">
+            <div class="toolbar-search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchFarmersInput" class="admin-search-input" placeholder="Search farmers by name, phone, or location..." oninput="handleFarmerSearch(this.value)">
+            </div>
+            <div class="toolbar-stats-text" id="farmersCountText">Showing farmers</div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-data-table">
+              <thead>
+                <tr>
+                  <th>Farmer Name</th>
+                  <th>Contact</th>
+                  <th>Farm Location</th>
+                  <th>Cattle Registered</th>
+                  <th>Clinical Cases</th>
+                  <th>Registration Date</th>
+                </tr>
+              </thead>
+              <tbody id="farmersTableBody">
+                <tr><td colspan="6" class="admin-table-loading">Loading farmer profiles...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------------------------------------
+           TAB 3: VETERINARIAN MANAGEMENT
+           --------------------------------------------------------------------- -->
+      <section id="tabAdminVets" class="admin-tab-section">
+        <div class="admin-panel-card">
+          <div class="panel-toolbar">
+            <div class="toolbar-search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchVetsInput" class="admin-search-input" placeholder="Search veterinarians by name, clinic, or license..." oninput="handleVetSearch(this.value)">
+            </div>
+            <div class="toolbar-filter-chips">
+              <button type="button" class="admin-filter-chip active" onclick="filterVetsByStatus('all', this)">All</button>
+              <button type="button" class="admin-filter-chip" onclick="filterVetsByStatus('active', this)">Active / Verified</button>
+              <button type="button" class="admin-filter-chip" onclick="filterVetsByStatus('unverified', this)">Unverified</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-data-table">
+              <thead>
+                <tr>
+                  <th>Veterinarian</th>
+                  <th>State License</th>
+                  <th>Clinic / Hospital Affiliation</th>
+                  <th>Account Status</th>
+                  <th>Active Workload</th>
+                  <th>Joined Date</th>
+                </tr>
+              </thead>
+              <tbody id="vetsTableBody">
+                <tr><td colspan="6" class="admin-table-loading">Loading veterinarian accounts...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------------------------------------
+           TAB 4: LIVESTOCK & BUFFALO REGISTRY
+           --------------------------------------------------------------------- -->
+      <section id="tabAdminLivestock" class="admin-tab-section">
+        <div class="admin-panel-card">
+          <div class="panel-toolbar">
+            <div class="toolbar-search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchLivestockInput" class="admin-search-input" placeholder="Search cattle by tag number, name, or breed..." oninput="handleLivestockSearch(this.value)">
+            </div>
+            <div class="toolbar-filter-chips">
+              <button type="button" class="admin-filter-chip active" onclick="filterLivestockSpecies('all', this)">All Species</button>
+              <button type="button" class="admin-filter-chip" onclick="filterLivestockSpecies('cow', this)">🐄 Cows Only</button>
+              <button type="button" class="admin-filter-chip" onclick="filterLivestockSpecies('buffalo', this)">🐃 Buffaloes Only</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-data-table">
+              <thead>
+                <tr>
+                  <th>Tag / Animal</th>
+                  <th>Species & Breed</th>
+                  <th>Owner / Farm</th>
+                  <th>Lactation & Yield</th>
+                  <th>Health Status</th>
+                  <th>Registered</th>
+                </tr>
+              </thead>
+              <tbody id="livestockTableBody">
+                <tr><td colspan="6" class="admin-table-loading">Loading registered livestock...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------------------------------------
+           TAB 5: CASES & CONSULTATIONS TELEMETRY
+           --------------------------------------------------------------------- -->
+      <section id="tabAdminCases" class="admin-tab-section">
+        <div class="admin-panel-card">
+          <div class="panel-toolbar">
+            <div class="toolbar-search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchCasesInput" class="admin-search-input" placeholder="Search cases by cow tag or symptoms..." oninput="handleCasesSearch(this.value)">
+            </div>
+            <div class="toolbar-filter-chips">
+              <button type="button" class="admin-filter-chip active" onclick="filterCasesStatus('all', this)">All Cases</button>
+              <button type="button" class="admin-filter-chip" onclick="filterCasesStatus('open', this)">Urgent / Open</button>
+              <button type="button" class="admin-filter-chip" onclick="filterCasesStatus('treatment_prescribed', this)">In Treatment</button>
+              <button type="button" class="admin-filter-chip" onclick="filterCasesStatus('resolved', this)">Resolved</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-data-table">
+              <thead>
+                <tr>
+                  <th>Case ID</th>
+                  <th>Animal</th>
+                  <th>Affected Quarters</th>
+                  <th>Urgency</th>
+                  <th>Status</th>
+                  <th>Assigned Veterinarian</th>
+                  <th>Date Opened</th>
+                </tr>
+              </thead>
+              <tbody id="casesTableBody">
+                <tr><td colspan="7" class="admin-table-loading">Loading clinical triage cases...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="adminToast" class="admin-toast"></div>
+
+  <script src="env-config.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

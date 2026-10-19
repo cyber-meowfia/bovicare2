@@ -494,6 +494,12 @@ html, body {
   pointer-events: auto;
 }
 
+@media (min-width: 769px) {
+  .sidebar-backdrop {
+    display: none !important;
+  }
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .app-sidebar {
@@ -2677,6 +2683,16 @@ body.portal-vet-theme .farmer-only {
   pointer-events: none;
 }
 
+body.portal-vet-theme .clinical-overview-hero {
+  background: linear-gradient(135deg, #0B132B 0%, #1E3A8A 55%, #0284C7 100%);
+  box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.35);
+  border: 1px solid rgba(186, 230, 253, 0.16);
+}
+
+body.portal-vet-theme .clinical-overview-hero::after {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0) 70%);
+}
+
 .clinical-hero-top {
   display: flex;
   align-items: center;
@@ -2690,9 +2706,9 @@ body.portal-vet-theme .farmer-only {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(16, 185, 129, 0.2);
-  border: 1px solid rgba(52, 211, 153, 0.4);
-  color: #A7F3D0;
+  background: rgba(37, 99, 235, 0.22);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  color: #BAE6FD;
   padding: 5px 12px;
   border-radius: 20px;
   font-size: 11.5px;
@@ -2705,9 +2721,9 @@ body.portal-vet-theme .farmer-only {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 8px #10B981;
-  animation: pulse-dot 1.8s infinite;
+  background: #38BDF8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);
+  animation: vetPulse 2s infinite ease-in-out;
 }
 
 .clinical-hero-actions {

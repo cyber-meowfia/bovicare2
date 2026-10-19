@@ -279,6 +279,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   populateAssessDropdown();
   initCloudBackend();
   setRole(roleParam);
+  openSidebar();
 });
 
 // 5. Gemini-Style Sidebar Controls (Icon Rail <-> Expanded)
@@ -1956,7 +1957,7 @@ function renderProfileView() {
               <div class="profile-user-name" id="userProfileName">${farmerName}</div>
               <div class="profile-role-badge-wrap">
                 <span class="profile-role-tag farmer">🌾 Dairy Farmer & Herd Owner</span>
-                <span class="profile-verified-badge">✓ Registered Farm Member</span>
+                <span class="profile-verified-badge">✓ Registered BoviCare Farmer</span>
               </div>
             </div>
           </div>
@@ -1985,7 +1986,7 @@ function renderProfileView() {
             <div class="profile-detail-value">Twice daily (05:30 AM & 05:00 PM)</div>
           </div>
           <div class="profile-detail-box">
-            <div class="profile-detail-label">Assigned Vet Dispensary</div>
+            <div class="profile-detail-label">Nearest Vet Dispensary</div>
             <div class="profile-detail-value">Pune District Veterinary Hospital</div>
           </div>
         </div>
