@@ -26,15 +26,22 @@
             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
         </div>
-        <h1 class="admin-gate-title">BoviCare Admin Portal</h1>
-        <p class="admin-gate-sub">Restricted System Access. Only database-provisioned administrators may sign in.</p>
+        <h1 class="admin-gate-title" id="adminGateTitle">BoviCare Admin Portal</h1>
+        <p class="admin-gate-sub" id="adminGateSub">Restricted System Access. Only database-provisioned administrators may sign in.</p>
+        <div style="display:flex; justify-content:center; margin-top:14px;">
+          <div class="sidebar-lang-picker" style="margin:0; padding:3px; height:32px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);">
+            <button type="button" class="lang-choice-btn active" data-lang="en" onclick="setAdminLanguage('en')">EN</button>
+            <button type="button" class="lang-choice-btn" data-lang="mr" onclick="setAdminLanguage('mr')">मराठी</button>
+            <button type="button" class="lang-choice-btn" data-lang="hi" onclick="setAdminLanguage('hi')">हिन्दी</button>
+          </div>
+        </div>
       </div>
 
       <div id="adminAuthAlert" class="admin-alert" style="display:none;"></div>
 
       <form id="adminLoginForm" class="admin-login-form">
         <div class="admin-form-group">
-          <label for="adminEmail" class="admin-label">Admin Email Address</label>
+          <label for="adminEmail" class="admin-label" id="lblAdminEmail">Admin Email Address</label>
           <div class="admin-input-wrap">
             <span class="admin-input-icon">✉️</span>
             <input type="email" id="adminEmail" class="admin-input" placeholder="admin@bovicare.internal" required autocomplete="username">
@@ -42,7 +49,7 @@
         </div>
 
         <div class="admin-form-group">
-          <label for="adminPassword" class="admin-label">Master Password</label>
+          <label for="adminPassword" class="admin-label" id="lblAdminPassword">Master Password</label>
           <div class="admin-input-wrap">
             <span class="admin-input-icon">🔒</span>
             <input type="password" id="adminPassword" class="admin-input" placeholder="••••••••••••" required autocomplete="current-password">
@@ -58,14 +65,14 @@
 
       <!-- Quick Local Demo Access (Only for Local Verification Environments) -->
       <div class="admin-demo-access-box">
-        <span class="demo-tag">Testing & Demo Environments</span>
-        <button type="button" class="btn-admin-demo" onclick="fillAdminDemo()">
+        <span class="demo-tag" id="tagAdminDemo">Testing & Demo Environments</span>
+        <button type="button" class="btn-admin-demo" onclick="fillAdminDemo()" id="btnAdminDemo">
           ⚡ Autofill Verified Admin Credentials
         </button>
       </div>
 
       <div class="admin-gate-footer">
-        <a href="login.html" class="admin-back-link">← Return to Farmer & Veterinarian Login</a>
+        <a href="login.html" class="admin-back-link" id="linkAdminBack">← Return to Farmer & Veterinarian Login</a>
       </div>
     </div>
   </div>
@@ -88,33 +95,33 @@
           </div>
           <div>
             <div class="brand-title">BoviCare</div>
-            <div class="admin-brand-badge">ADMIN CONSOLE</div>
+            <div class="admin-brand-badge" id="lblAdminConsole">ADMIN CONSOLE</div>
           </div>
         </div>
       </div>
 
       <div class="admin-nav-group">
-        <div class="admin-nav-label">SYSTEM GOVERNANCE</div>
+        <div class="admin-nav-label" id="lblAdminGovernance">SYSTEM GOVERNANCE</div>
         <nav class="admin-nav-list">
           <button type="button" class="admin-nav-btn active" data-tab="tabAdminOverview" onclick="switchAdminTab('tabAdminOverview')">
             <span class="admin-nav-icon">📊</span>
-            <span>Live Overview</span>
+            <span id="lblNavAdminOverview">Live Overview</span>
           </button>
           <button type="button" class="admin-nav-btn" data-tab="tabAdminFarmers" onclick="switchAdminTab('tabAdminFarmers')">
             <span class="admin-nav-icon">🌾</span>
-            <span>Farmers Management</span>
+            <span id="lblNavAdminFarmers">Farmers Management</span>
           </button>
           <button type="button" class="admin-nav-btn" data-tab="tabAdminVets" onclick="switchAdminTab('tabAdminVets')">
             <span class="admin-nav-icon">🩺</span>
-            <span>Veterinarians</span>
+            <span id="lblNavAdminVets">Veterinarians</span>
           </button>
           <button type="button" class="admin-nav-btn" data-tab="tabAdminLivestock" onclick="switchAdminTab('tabAdminLivestock')">
             <span class="admin-nav-icon">🐄</span>
-            <span>Livestock & Buffaloes</span>
+            <span id="lblNavAdminLivestock">Livestock & Buffaloes</span>
           </button>
           <button type="button" class="admin-nav-btn" data-tab="tabAdminCases" onclick="switchAdminTab('tabAdminCases')">
             <span class="admin-nav-icon">📋</span>
-            <span>Cases & Telemetry</span>
+            <span id="lblNavAdminCases">Cases & Telemetry</span>
           </button>
         </nav>
       </div>
@@ -124,12 +131,12 @@
           <div class="admin-avatar">🛡️</div>
           <div class="admin-user-info">
             <div class="admin-user-name" id="adminUserName">Master Administrator</div>
-            <div class="admin-user-role">Role: Database Admin</div>
+            <div class="admin-user-role" id="adminUserRole">Role: Database Admin</div>
           </div>
         </div>
         <button type="button" class="btn-admin-logout" onclick="handleAdminSignOut()">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span>Sign Out</span>
+          <span id="btnAdminLogoutText">Sign Out</span>
         </button>
       </div>
     </aside>
@@ -144,12 +151,17 @@
           <span class="admin-env-badge" id="adminDbStatus">⚡ Database Connected</span>
         </div>
         <div class="admin-header-actions">
+          <div class="sidebar-lang-picker" style="margin:0; padding:3px; height:32px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);">
+            <button type="button" class="lang-choice-btn active" data-lang="en" onclick="setAdminLanguage('en')">EN</button>
+            <button type="button" class="lang-choice-btn" data-lang="mr" onclick="setAdminLanguage('mr')">मराठी</button>
+            <button type="button" class="lang-choice-btn" data-lang="hi" onclick="setAdminLanguage('hi')">हिन्दी</button>
+          </div>
           <button type="button" class="btn-admin-refresh" onclick="refreshAdminTelemetry()">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            <span>Refresh Data</span>
+            <span id="btnAdminRefreshText">Refresh Data</span>
           </button>
           <a href="index.html" class="btn-admin-switch-portal" target="_blank" title="Open Main Application">
-            <span>Client View ↗</span>
+            <span id="btnAdminClientViewText">Client View ↗</span>
           </a>
         </div>
       </header>

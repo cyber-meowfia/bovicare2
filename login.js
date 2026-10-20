@@ -34,20 +34,21 @@ function handleRoleSelectionChange(selectedRole) {
   const hintBox = document.getElementById('roleHintBox');
   const submitText = document.getElementById('submitText');
   const heroBadge = document.getElementById('heroRoleBadge');
+  const d = (typeof LOGIN_I18N !== 'undefined' && LOGIN_I18N[currentLoginLang]) ? LOGIN_I18N[currentLoginLang] : null;
 
   if (selectedRole === 'vet') {
     if (hintBox) {
       hintBox.className = 'role-hint-box vet';
-      hintBox.innerHTML = `🩺 <strong>Veterinarian Access:</strong> Priority clinical triage queue, quarter-specific udder localization (LF, RF, LR, RR), and digital prescription plans.`;
+      hintBox.innerHTML = d ? d.hintVet : `🩺 <strong>Veterinarian Access:</strong> Priority clinical triage queue, quarter-specific udder localization (LF, RF, LR, RR), and digital prescription plans.`;
     }
-    if (submitText) submitText.textContent = 'Sign In as Veterinarian →';
+    if (submitText) submitText.textContent = d ? d.btnVet : 'Sign In as Veterinarian →';
     if (heroBadge) heroBadge.textContent = '🩺 Veterinarian Portal Mode';
   } else {
     if (hintBox) {
       hintBox.className = 'role-hint-box';
-      hintBox.innerHTML = `🌾 <strong>Farmer Access:</strong> Cattle catalog, daily milk yield, udder photo logging, and withdrawal safety timers.`;
+      hintBox.innerHTML = d ? d.hintFarmer : `🌾 <strong>Farmer Access:</strong> Cattle catalog, daily milk yield, udder photo logging, and withdrawal safety timers.`;
     }
-    if (submitText) submitText.textContent = 'Sign In as Dairy Farmer →';
+    if (submitText) submitText.textContent = d ? d.btnFarmer : 'Sign In as Dairy Farmer →';
     if (heroBadge) heroBadge.textContent = '🌾 Dairy Farmer Mode';
   }
 }
@@ -200,3 +201,73 @@ function handleForgotPassword(e) {
   e.preventDefault();
   showLoginToast('In offline demo mode, use the quick demo login buttons below.');
 }
+
+// 7. Multi-Language Localization System for Login Page
+const LOGIN_I18N = {
+  en: {
+    back: "← Back to Website",
+    title: "Sign In to BoviCare",
+    sub: "Select your account role to enter your dedicated dashboard.",
+    lblRole: "Select Account Role",
+    optFarmer: "🌾 Dairy Farmer (Herd Owner & Manager)",
+    optVet: "🩺 Licensed Veterinarian (Clinical Triage & Rx)",
+    hintFarmer: "🌾 <strong>Farmer Access:</strong> Cattle catalog, daily milk yield, udder photo logging, and withdrawal safety timers.",
+    hintVet: "🩺 <strong>Veterinarian Access:</strong> Priority clinical triage queue, quarter-specific udder localization (LF, RF, LR, RR), and digital prescription plans.",
+    btnFarmer: "Sign In as Dairy Farmer →",
+    btnVet: "Sign In as Veterinarian →"
+  },
+  mr: {
+    back: "← मुख्य संकेतस्थळावर जा",
+    title: "बोविकेअर लॉगिन",
+    sub: "आपल्या खात्याची भूमिका निवडून डॅशबोर्डमध्ये प्रवेश करा.",
+    lblRole: "खात्याची भूमिका निवडा",
+    optFarmer: "🌾 दुग्ध उत्पादक शेतकरी (कळप मालक व व्यवस्थापक)",
+    optVet: "🩺 परवानाधारक पशुवैद्यक (क्लिनिकल ट्रायज व औषधोपचार)",
+    hintFarmer: "🌾 <strong>शेतकरी प्रवेश:</strong> गोवंश नोंदवही, दैनंदिन दूध उत्पादन, कासेचे फोटो आणि दूध विथहोल्डिंग टाइमर.",
+    hintVet: "🩺 <strong>पशुवैद्यक प्रवेश:</strong> प्राधान्य क्लिनिकल ट्रायज रांग, ४-क्वार्टर कास तपासणी आणि डिजिटल प्रिस्क्रिप्शन.",
+    btnFarmer: "शेतकरी म्हणून प्रवेश करा →",
+    btnVet: "पशुवैद्यक म्हणून प्रवेश करा →"
+  },
+  hi: {
+    back: "← मुख्य वेबसाइट पर जाएं",
+    title: "बोविकेयर लॉगिन",
+    sub: "अपने खाते की भूमिका चुनकर डैशबोर्ड में प्रवेश करें।",
+    lblRole: "खाते की भूमिका चुनें",
+    optFarmer: "🌾 डेयरी किसान (झुंड मालिक और प्रबंधक)",
+    optVet: "🩺 लाइसेंस प्राप्त पशु चिकित्सक (क्लिनिकल ट्राइएज व नुस्खे)",
+    hintFarmer: "🌾 <strong>किसान पहुंच:</strong> गोवंश सूची, दैनिक दूध उत्पादन, थन फोटो लॉगिंग और दूध रोक सुरक्षा टाइमर।",
+    hintVet: "🩺 <strong>पशु चिकित्सक पहुंच:</strong> प्राथमिकता क्लिनिकल ट्राइएज कतार, ४-क्वार्टर थन जांच और डिजिटल नुस्खे।",
+    btnFarmer: "डेयरी किसान के रूप में प्रवेश करें →",
+    btnVet: "पशु चिकित्सक के रूप में प्रवेश करें →"
+  }
+};
+
+let currentLoginLang = localStorage.getItem('bovicare_lang') || 'en';
+
+function setLoginLanguage(lang) {
+  if (!LOGIN_I18N[lang]) lang = 'en';
+  currentLoginLang = lang;
+  localStorage.setItem('bovicare_lang', lang);
+
+  document.querySelectorAll('.login-lang-picker .lang-pill-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+
+  const d = LOGIN_I18N[lang];
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setHtml = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+
+  setText('linkBackSite', d.back);
+  setText('loginFormTitle', d.title);
+  setText('loginFormSub', d.sub);
+  setText('optRoleFarmer', d.optFarmer);
+  setText('optRoleVet', d.optVet);
+
+  const roleSelect = document.getElementById('roleSelect');
+  const role = roleSelect ? roleSelect.value : 'farmer';
+  handleRoleSelectionChange(role);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setLoginLanguage(currentLoginLang);
+});

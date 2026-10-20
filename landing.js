@@ -368,3 +368,70 @@ function initVideoMotionFlow() {
   // Start initial auto-play
   startAutoPlay();
 }
+
+// 6. Landing Page Multi-Language Localization System (EN, MR, HI)
+const LANDING_I18N = {
+  en: {
+    navFarmer: "🌾 Farmer Login",
+    navVet: "🩺 Vet Login",
+    navSignIn: "Sign In / Start →",
+    badge: "Next-Gen Bovine Care · AI Mastitis Screening & Triage",
+    headline: "Healthier Herds Start with <span class=\"highlight\">Early Detection.</span>",
+    desc: "Support better udder health with early mastitis screening, non-invasive image records, and rapid veterinary follow-up — all united in one intelligent platform.",
+    getStarted: "Get Started Free →",
+    features: "Explore Features",
+    vetTriage: "🩺 Open Vet Triage"
+  },
+  mr: {
+    navFarmer: "🌾 शेतकरी लॉगिन",
+    navVet: "🩺 पशुवैद्यक लॉगिन",
+    navSignIn: "प्रवेश करा / सुरू करा →",
+    badge: "आधुनिक गोवंश आरोग्य · AI कासदाह तपासणी व ट्रायज",
+    headline: "निरोगी कळपाची सुरुवात होते <span class=\"highlight\">लवकर निदानापासून.</span>",
+    desc: "लवकर कासदाह चाचणी, बिनधास्त छायाचित्र नोंदी आणि तात्काळ पशुवैद्यकीय सहाय्यासह दुग्ध उत्पादनात भरभराट आणा — एकाच स्मार्ट प्लॅटफॉर्मवर.",
+    getStarted: "विनामूल्य सुरू करा →",
+    features: "वैशिष्ट्ये पहा",
+    vetTriage: "🩺 पशुवैद्यकीय ट्रायज उघडा"
+  },
+  hi: {
+    navFarmer: "🌾 किसान लॉगिन",
+    navVet: "🩺 पशु चिकित्सक लॉगिन",
+    navSignIn: "साइन इन / शुरू करें →",
+    badge: "अगली पीढ़ी का गोवंश स्वास्थ्य · AI थनैल जांच व ट्राइएज",
+    headline: "स्वस्थ झुंड की शुरुआत होती है <span class=\"highlight\">शीघ्र पहचान से।</span>",
+    desc: "प्रारंभिक थनैल जांच, सुरक्षित फोटो रिकॉर्ड और तत्काल पशु चिकित्सा सहायता के साथ अपने डेयरी फार्म को सशक्त बनाएं — एक ही मंच पर।",
+    getStarted: "निःशुल्क शुरू करें →",
+    features: "सुविधाएं देखें",
+    vetTriage: "🩺 पशु चिकित्सा ट्राइएज खोलें"
+  }
+};
+
+let currentLandingLang = localStorage.getItem('bovicare_lang') || 'en';
+
+function setLandingLanguage(lang) {
+  if (!LANDING_I18N[lang]) lang = 'en';
+  currentLandingLang = lang;
+  localStorage.setItem('bovicare_lang', lang);
+
+  document.querySelectorAll('.landing-lang-picker .lang-pill-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+
+  const d = LANDING_I18N[lang];
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setHtml = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+
+  setText('btnNavFarmerLogin', d.navFarmer);
+  setText('btnNavVetLogin', d.navVet);
+  setText('btnNavSignIn', d.navSignIn);
+  setText('heroPillBadgeText', d.badge);
+  setHtml('landingHeroHeadline', d.headline);
+  setText('landingHeroDesc', d.desc);
+  setText('btnHeroGetStarted', d.getStarted);
+  setText('btnHeroFeatures', d.features);
+  setText('btnHeroVetTriage', d.vetTriage);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setLandingLanguage(currentLandingLang);
+});

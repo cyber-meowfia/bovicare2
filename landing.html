@@ -44,14 +44,19 @@
 
       <!-- Action Buttons -->
       <div class="header-actions">
+        <div class="landing-lang-picker" style="display:inline-flex; align-items:center; gap:3px; background:#F1F5F2; padding:3px; border-radius:10px; border:1px solid #D1D5DB; margin-right:6px;">
+          <button type="button" class="lang-pill-btn active" data-lang="en" onclick="setLandingLanguage('en')" style="padding:4px 8px; font-size:11px; border:none; background:transparent; font-weight:700; cursor:pointer; border-radius:8px;">EN</button>
+          <button type="button" class="lang-pill-btn" data-lang="mr" onclick="setLandingLanguage('mr')" style="padding:4px 8px; font-size:11px; border:none; background:transparent; font-weight:700; cursor:pointer; border-radius:8px;">मराठी</button>
+          <button type="button" class="lang-pill-btn" data-lang="hi" onclick="setLandingLanguage('hi')" style="padding:4px 8px; font-size:11px; border:none; background:transparent; font-weight:700; cursor:pointer; border-radius:8px;">हिन्दी</button>
+        </div>
         <a href="login.html?role=farmer" class="btn-secondary" title="Open Farmer Operations">
-          <span>🌾 Farmer Login</span>
+          <span id="btnNavFarmerLogin">🌾 Farmer Login</span>
         </a>
         <a href="login.html?role=vet" class="btn-secondary" title="Open Veterinary Triage">
-          <span>🩺 Vet Login</span>
+          <span id="btnNavVetLogin">🩺 Vet Login</span>
         </a>
         <a href="login.html" class="btn-primary" title="Sign In to BoviCare">
-          <span>Sign In / Start →</span>
+          <span id="btnNavSignIn">Sign In / Start →</span>
         </a>
         <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">☰</button>
       </div>
@@ -66,26 +71,26 @@
         <div class="hero-copy">
           <div class="hero-pill-badge">
             <span class="hero-pill-dot"></span>
-            <span>Next-Gen Bovine Care · AI Mastitis Screening & Triage</span>
+            <span id="heroPillBadgeText">Next-Gen Bovine Care · AI Mastitis Screening & Triage</span>
           </div>
 
-          <h1 class="hero-headline">
+          <h1 class="hero-headline" id="landingHeroHeadline">
             Healthier Herds Start with <span class="highlight">Early Detection.</span>
           </h1>
 
-          <p class="hero-description">
+          <p class="hero-description" id="landingHeroDesc">
             Support better udder health with early mastitis screening, non-invasive image records, and rapid veterinary follow-up — all united in one intelligent platform.
           </p>
 
           <div class="hero-cta-group">
             <a href="index.html" class="btn-hero-primary">
-              <span>Get Started Free →</span>
+              <span id="btnHeroGetStarted">Get Started Free →</span>
             </a>
             <a href="#features" class="btn-hero-secondary">
-              <span>Explore Features</span>
+              <span id="btnHeroFeatures">Explore Features</span>
             </a>
             <a href="index.html?role=vet" class="btn-hero-secondary" style="border-color: #22C55E; color: #166534;">
-              <span>🩺 Open Vet Triage</span>
+              <span id="btnHeroVetTriage">🩺 Open Vet Triage</span>
             </a>
           </div>
 

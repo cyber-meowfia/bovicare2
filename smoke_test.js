@@ -173,15 +173,20 @@ assert.strictEqual(validateImageSizeCap(1048576), true, 'Exact 1 MB is within ca
 assert.strictEqual(validateImageSizeCap(1048577), false, '1 MB + 1 byte exceeds cap');
 console.log('✅ 9. Image size limit (1MB) validation passed.');
 
-// 10. Bilingual Marathi Translation Verification
+// 10. Multi-Language Marathi & Hindi Translation Verification
 const I18N_SAMPLE = {
-  en: { greeting: 'Good morning, Farmer 👋', herdHealth: 'HERD HEALTH' },
-  mr: { greeting: 'शुभ प्रभात, शेतकरी 👋', herdHealth: 'कळप आरोग्य' }
+  en: { greeting: 'Good morning, Farmer 👋', herdHealth: 'HERD HEALTH', assessTitle: 'Mastitis Health Assessment' },
+  mr: { greeting: 'शुभ प्रभात, शेतकरी 👋', herdHealth: 'कळप आरोग्य', assessTitle: 'मॅस्टायटिस (कासदाह) आरोग्य तपासणी' },
+  hi: { greeting: 'शुभ प्रभात, किसान 👋', herdHealth: 'झुंड स्वास्थ्य', assessTitle: 'मैस्टाइटिस (थनैल) स्वास्थ्य जांच' }
 };
 assert.strictEqual(I18N_SAMPLE.en.greeting.includes('Farmer'), true);
 assert.strictEqual(I18N_SAMPLE.mr.greeting.includes('शेतकरी'), true);
+assert.strictEqual(I18N_SAMPLE.hi.greeting.includes('किसान'), true);
 assert.strictEqual(I18N_SAMPLE.mr.herdHealth, 'कळप आरोग्य');
-console.log('✅ 10. Bilingual Marathi dictionary validation passed.');
+assert.strictEqual(I18N_SAMPLE.hi.herdHealth, 'झुंड स्वास्थ्य');
+assert.strictEqual(I18N_SAMPLE.mr.assessTitle.includes('कासदाह'), true);
+assert.strictEqual(I18N_SAMPLE.hi.assessTitle.includes('थनैल'), true);
+console.log('✅ 10. Multi-language Marathi & Hindi dictionary validation passed.');
 
 // 11. Dual-Bucket Storage Fallback Resolution
 async function resolveStorageBucket(primaryBucket, fallbackBucket, mockBuckets) {
@@ -349,9 +354,11 @@ async function resolveStorageBucket(primaryBucket, fallbackBucket, mockBuckets) 
   assert.strictEqual(freshHtml.includes('id="pillRoleFarmer"'), false, 'Header farmer role switch button must be removed');
   assert.strictEqual(freshHtml.includes('id="pillRoleVet"'), false, 'Header vet role switch button must be removed');
   assert.strictEqual(freshHtml.includes('onclick="setRole('), false, 'No role switching onclick handlers should exist on main dashboard');
-  assert.strictEqual(freshHtml.includes('id="activeRoleBadge"'), true, 'Read-only active role header badge #activeRoleBadge must exist');
-  assert.strictEqual(freshHtml.includes('id="sideActiveRoleBadge"'), true, 'Read-only active role sidebar badge #sideActiveRoleBadge must exist');
-  assert.strictEqual(stylesCss.includes('.active-role-indicator-badge'), true, '.active-role-indicator-badge styles must exist in styles.css');
+  assert.strictEqual(freshHtml.includes('id="activeRoleBadge"'), false, 'Active role header badge #activeRoleBadge must be completely removed');
+  assert.strictEqual(freshHtml.includes('id="sideActiveRoleBadge"'), false, 'Active role sidebar badge #sideActiveRoleBadge must be completely removed');
+  assert.strictEqual(freshHtml.includes('sidebar-role-cluster'), false, 'Sidebar active role cluster must be completely removed');
+  assert.strictEqual(freshHtml.includes('sidebar-lang-picker'), true, 'Sidebar 3-language picker must exist');
+  assert.strictEqual(stylesCss.includes('.assess-tab-view'), true, '.assess-tab-view scrolling CSS must exist');
 
   // Verify removal of "Supabase Cloud Sync" text & Header badge
   assert.strictEqual(freshHtml.includes('Supabase Cloud Sync'), false, 'Text "Supabase Cloud Sync" must be removed');

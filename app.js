@@ -198,13 +198,14 @@ const signedUrlCache = new Map(); // path -> { url, expiresAt }
 const BOVICARE_STORAGE_BUCKET = window.BOVICARE_STORAGE_BUCKET || 'bovicare-private-images';
 const FALLBACK_STORAGE_BUCKET = 'udder-images';
 
-// 3. Bilingual Dictionary (Matches bovicare-main/lib/main.dart)
+// 3. Centralized Multi-Language Dictionary (English, Marathi & Hindi)
 const I18N = {
   en: {
     greeting: "Good morning, Farmer 👋",
     greetingSubtitle: "Every cow matters. Let's check in on your herd.",
     tagline: "YOUR FARM, HEALTHIER",
     heroTag: "HERD HEALTH",
+    herdHealth: "HERD HEALTH",
     heroHeadline: "Healthy cows,<br>better tomorrow.",
     heroDesc: "Spot changes early. Record<br>observations. Care better.",
     heroCta: "Start check",
@@ -229,13 +230,96 @@ const I18N = {
     navTriage: "Clinical Triage",
     navOverview: "Clinical Overview",
     navProfile: "Profile",
-    langBtn: "मराठी"
+    langBtn: "मराठी",
+    sidebarLang: "LANGUAGE / भाषा",
+
+    // Assessment Form Localization
+    assessTitle: "Mastitis Health Assessment",
+    assessSubTitle: "Standardized California Mastitis Test (CMT), 4-quarter inspection, and clinical tele-triage.",
+    lblAssessCowSelect: "1. Select Cow from Herd",
+    optAssessSelectCow: "Select cow...",
+    lblAssessBodyTemp: "Rectal Body Temp (°C)",
+    hintAssessBodyTemp: "Normal bovine range: 38.0°C – 39.2°C",
+    lblAssessUdderTemp: "Udder Surface Temp (°C)",
+    phAssessUdderTemp: "Optional (e.g. 35.8)",
+    lblAssessQuarters: "2. Affected Quarters",
+    lblQuarterLF: "Left Front (LF)",
+    lblQuarterRF: "Right Front (RF)",
+    lblQuarterLR: "Left Rear (LR)",
+    lblQuarterRR: "Right Rear (RR)",
+    lblAssessMilkAppearance: "3. Fore-Milk Appearance (Strip Cup)",
+    optMilkNormal: "Normal (Clean, creamy white)",
+    optMilkWatery: "Watery / Thin / Serous",
+    optMilkClots: "Visible Clots / Flakes / Curds",
+    optMilkDiscolored: "Discolored (Yellowish / Blood-tinged)",
+    lblAssessSwelling: "Udder Swelling / Firmness",
+    optSwellingNone: "None (Pliable, normal)",
+    optSwellingMild: "Mild Hardness",
+    optSwellingMod: "Moderate Swelling",
+    optSwellingSevere: "Severe / Stone-Hard",
+    lblAssessCmtScore: "California Mastitis Test (CMT)",
+    optCmtNeg: "Negative (0) — No gel",
+    optCmtTrace: "Trace (T) — Slight slime",
+    optCmt1: "1+ (Mild gelation)",
+    optCmt2: "2+ (Moderate thickening)",
+    optCmt3: "3+ (Heavy gel formed)",
+    lblAssessMilkingPain: "Milking Discomfort",
+    optPainNone: "None (Calm, normal let-down)",
+    optPainMild: "Mild Discomfort (Stepping/restlessness)",
+    optPainSevere: "Severe Pain (Kicking, tail-swishing, refusal)",
+    lblAssessPhoto: "4. Private Udder / Strip-Cup Photo",
+    lblAssessPhotoSub: "Auto-compressed to 200–400 KB WebP (< 1MB Free Tier Cap)",
+    assessUploadText: "Click to capture / select photo",
+    lblAssessPhotoFormats: "Supports camera snap, JPEG, PNG, WebP",
+    assessAiNoticeBold: "AI screening is not yet available. Please consult a veterinarian.",
+    assessAiNoticeText: "Automated computer-vision screening inferences will be displayed in this panel once the pre-trained deep learning inference service is connected.",
+    lblAssessNotes: "5. Field Observations & Milking Notes",
+    phAssessNotes: "Describe any behavior changes, appetite, or milking yield drops...",
+    btnSubmitAssessText: "Save Assessment & Transmit to Vet",
+    lblVoiceBtnText: "Voice Input",
+    lblAssessVoiceRead: "Listen Guide",
+
+    // Clinical Overview
+    clinicalHeroTitle: "Herd Clinical Health & Udder Epidemiology",
+    clinicalHeroDesc: "Continuous multi-quarter inflammatory surveillance, California Mastitis Test (CMT) tracking, Somatic Cell Count (SCC) benchmarking, and automated food safety milk withholding governance.",
+    lblClinicalLivePill: "Real-Time Clinical Herd Surveillance Active",
+    btnExportReportText: "Export Report",
+    btnRefreshTelemetryText: "Refresh Telemetry",
+    lblKpiMastitis: "Herd Mastitis Incidence Rate",
+    subKpiMastitis: "3 of 12 active lactating cows under watch",
+    lblKpiTriage: "Cases in Clinical Triage",
+    subKpiTriage: "2 Acute Clinical · 1 Subclinical SCC Spike",
+    lblKpiQuarters: "Inflamed Udder Quarters",
+    subKpiQuarters: "Right Front: 45% of total herd lesions",
+    lblKpiShield: "Safely Withheld Milk",
+    subKpiShield: "2 cows on active antibiotic withhold",
+    lblHeatmapTitle: "4-Quarter Udder Inflammation Heatmap",
+    lblHeatmapSubtitle: "Anatomical distribution across affected bovine quarters",
+    lblSccTitle: "Somatic Cell Count (SCC) Herd Benchmark",
+    lblSccSubtitle: "Immune reaction profiling & dairy grade quality tiers",
+    lblWithholdingTitle: "Food Safety Antibiotic Withholding Shield",
+    lblWithholdingSubtitle: "Active milk discard countdown timers ensuring zero residue bulk milk",
+    lblPathogenTitle: "Mastitis Etiology & Pathogen Surveillance",
+    lblPathogenSubtitle: "Herd culture findings and evidence-based therapeutic protocols",
+    btnOpenTriageQueueText: "🩺 Open Clinical Triage Queue →",
+    btnAdmitPatientText: "+ Admit Patient",
+    btnViewWithholdingSchedule: "View Complete Withholding Schedule & Reminders",
+
+    // Statuses
+    statusHealthy: "Healthy",
+    statusMonitor: "To monitor",
+    statusUrgent: "Urgent",
+    statusPending: "Pending Review",
+    statusUnderReview: "Under Review",
+    statusFollowUp: "Follow-up Required",
+    statusClosed: "Closed"
   },
   mr: {
     greeting: "शुभ प्रभात, शेतकरी 👋",
     greetingSubtitle: "प्रत्येक गाय महत्त्वाची आहे. चला आपल्या कळपाची पाहणी करूया.",
     tagline: "तुमचे शेत, अधिक निरोगी",
     heroTag: "कळप आरोग्य",
+    herdHealth: "कळप आरोग्य",
     heroHeadline: "निरोगी गाई,<br>उद्याचे सुख.",
     heroDesc: "बदल लवकर ओळखा. नोंदी<br>ठेवा. चांगली काळजी घ्या.",
     heroCta: "तपासणी सुरू करा",
@@ -260,7 +344,203 @@ const I18N = {
     navTriage: "क्लिनिकल ट्रायज",
     navOverview: "क्लिनिकल आढावा",
     navProfile: "प्रोफाईल",
-    langBtn: "English"
+    langBtn: "हिन्दी",
+    sidebarLang: "भाषा निवडा",
+
+    // Assessment Form Localization (Marathi)
+    assessTitle: "मॅस्टायटिस (कासदाह) आरोग्य तपासणी",
+    assessSubTitle: "प्रमाणित CMT चाचणी, ४-क्वार्टर तपासणी आणि क्लिनिकल टेलि-ट्रायज.",
+    lblAssessCowSelect: "१. कळपातील गाय निवडा",
+    optAssessSelectCow: "गाय निवडा...",
+    lblAssessBodyTemp: "गुदा शरीराचे तापमान (°C)",
+    hintAssessBodyTemp: "सामान्य गोवंश तापमान मर्यादा: ३८.०°C – ३९.२°C",
+    lblAssessUdderTemp: "कासेचे पृष्ठभाग तापमान (°C)",
+    phAssessUdderTemp: "ऐच्छिक (उदा. ३५.८)",
+    lblAssessQuarters: "२. बाधित कासेचे भाग (क्वार्टर)",
+    lblQuarterLF: "डावा पुढचा (LF)",
+    lblQuarterRF: "उजवा पुढचा (RF)",
+    lblQuarterLR: "डावा मागचा (LR)",
+    lblQuarterRR: "उजवा मागचा (RR)",
+    lblAssessMilkAppearance: "३. सुरुवातीच्या दुधाचे स्वरूप (स्ट्रिप कप)",
+    optMilkNormal: "सामान्य (स्वच्छ, पांढरे, मऊ)",
+    optMilkWatery: "पाणचट / पातळ / फिकट",
+    optMilkClots: "दुधात गाठी / चोथा / गुठळ्या",
+    optMilkDiscolored: "रंग बदललेला (पिवळसर / रक्तामिश्रित)",
+    lblAssessSwelling: "कासेची सूज / कडकपणा",
+    optSwellingNone: "काही नाही (मऊ, लवचिक, सामान्य)",
+    optSwellingMild: "किंचित कडकपणा (सुरुवातीची सूज)",
+    optSwellingMod: "मध्यम सूज व उष्णता",
+    optSwellingSevere: "तीव्र / दगडासारखी कडक कास",
+    lblAssessCmtScore: "कॅलिफोर्निया मॅस्टायटिस चाचणी (CMT)",
+    optCmtNeg: "निगेटिव्ह (०) — जेल नाही",
+    optCmtTrace: "ट्रेस (T) — किंचित चिकट थर",
+    optCmt1: "१+ (हलकी जेल तयार होते)",
+    optCmt2: "२+ (मध्यम घट्ट थर)",
+    optCmt3: "३+ (जाड घट्ट जेल / तीव्र कासदाह)",
+    lblAssessMilkingPain: "दूध काढताना त्रास / वेदना",
+    optPainNone: "काही नाही (शांत, सामान्य)",
+    optPainMild: "किंचित त्रास (पावले हलवणे / अस्वस्थता)",
+    optPainSevere: "तीव्र वेदना (लाथ मारणे / नकार)",
+    lblAssessPhoto: "४. कासेचे / स्ट्रिप-कप दुधाचे छायाचित्र",
+    lblAssessPhotoSub: "२००-४०० KB WebP मध्ये स्वयंचलित संकुचित (< १MB मर्यादा)",
+    assessUploadText: "छायाचित्र घेण्यासाठी किंवा निवडण्यासाठी येथे क्लिक करा",
+    lblAssessPhotoFormats: "कॅमेरा, JPEG, PNG, WebP समर्थित",
+    assessAiNoticeBold: "कृत्रिम बुद्धिमत्ता (AI) तपासणी सध्या उपलब्ध नाही. कृपया पशुवैद्यकाचा सल्ला घ्या.",
+    assessAiNoticeText: "पूर्व-प्रशिक्षित डीप लर्निंग मॉडेल जोडल्यानंतर स्वयंचलित तपासणी निष्कर्ष येथे दर्शविले जातील.",
+    lblAssessNotes: "५. शेतातील निरीक्षणे व दूध काढणी नोंदी",
+    phAssessNotes: "गाईच्या वागणुकीतील बदल, भूक किंवा दूध उत्पादनातील घट येथे नोंदवा...",
+    btnSubmitAssessText: "तपासणी जतन करा आणि पशुवैद्यांना पाठवा",
+    lblVoiceBtnText: "बोलून लिहा",
+    lblAssessVoiceRead: "मार्गदर्शन ऐका",
+
+    // Clinical Overview (Marathi)
+    clinicalHeroTitle: "कळप क्लिनिकल आरोग्य आणि कास रोगनिदान",
+    clinicalHeroDesc: "सलग ४-क्वार्टर दाहकता निरीक्षण, CMT चाचणी मागोवा, SCC बेंचमार्किंग आणि अन्न सुरक्षा दूध विथहोल्डिंग व्यवस्थापन.",
+    lblClinicalLivePill: "रिअल-टाइम क्लिनिकल कळप निरीक्षण सक्रिय",
+    btnExportReportText: "अहवाल डाउनलोड करा",
+    btnRefreshTelemetryText: "माहिती ताजी करा",
+    lblKpiMastitis: "कळप कासदाह प्रादुर्भाव दर",
+    subKpiMastitis: "१२ पैकी ३ दुभत्या गायी निरीक्षणाखाली",
+    lblKpiTriage: "क्लिनिकल ट्रायजमधील रुग्ण",
+    subKpiTriage: "२ तीव्र रुग्ण · १ सबक्लिनिकल SCC वाढ",
+    lblKpiQuarters: "दाहक कासेचे भाग (क्वार्टर)",
+    subKpiQuarters: "उजवा पुढचा: एकूण जखमांपैकी ४५% भाग",
+    lblKpiShield: "सुरक्षितपणे बाजूला ठेवलेले दूध",
+    subKpiShield: "२ गायींवर सक्रिय औषध विथहोल्डिंग लागू",
+    lblHeatmapTitle: "४-क्वार्टर कास दाहकता नकाशा (हीटमॅप)",
+    lblHeatmapSubtitle: "बाधित गोवंश भागांमधील शारीरिक प्रमाण वितरण",
+    lblSccTitle: "सोमॅटिक सेल काउंट (SCC) कळप बेंचमार्क",
+    lblSccSubtitle: "प्रतिकारशक्ती विश्लेषण आणि दुधाचे गुणवत्ता स्तर",
+    lblWithholdingTitle: "अन्न सुरक्षा अँटीबायोटिक विथहोल्डिंग सुरक्षा",
+    lblWithholdingSubtitle: "दूध न मिसळण्याचे सक्रिय टाइमर (शून्य रासायनिक अवशेष खात्री)",
+    lblPathogenTitle: "कासदाह कारणे आणि जिवाणू निरीक्षण",
+    lblPathogenSubtitle: "जिवाणू संवर्धन निष्कर्ष आणि प्रमाणित उपचार पद्धती",
+    btnOpenTriageQueueText: "🩺 क्लिनिकल ट्रायज रांग उघडा →",
+    btnAdmitPatientText: "+ रुग्ण दाखल करा",
+    btnViewWithholdingSchedule: "संपूर्ण विथहोल्डिंग वेळापत्रक व स्मरणपत्रे पहा",
+
+    // Statuses (Marathi)
+    statusHealthy: "निरोगी",
+    statusMonitor: "निरीक्षणाखाली",
+    statusUrgent: "तातडीचे",
+    statusPending: "पुनरावलोकन प्रलंबित",
+    statusUnderReview: "तपासणी चालू",
+    statusFollowUp: "पुढील तपासणी आवश्यक",
+    statusClosed: "बंद"
+  },
+  hi: {
+    greeting: "शुभ प्रभात, किसान 👋",
+    greetingSubtitle: "हर गाय महत्वपूर्ण है। आइए अपने झुंड की जांच करें।",
+    tagline: "आपका खेत, अधिक स्वस्थ",
+    heroTag: "झुंड स्वास्थ्य",
+    herdHealth: "झुंड स्वास्थ्य",
+    heroHeadline: "स्वस्थ गायें,<br>बेहतर कल।",
+    heroDesc: "बदलाव जल्दी पहचानें। अवलोकन<br>दर्ज करें। बेहतर देखभाल करें।",
+    heroCta: "जांच शुरू करें",
+    explore: "खोजें",
+    seeAll: "सभी देखें",
+    viewAll: "सभी देखें",
+    tileCows: "मेरी गायें",
+    tileSymptoms: "लक्षण",
+    tileUdder: "थन स्वास्थ्य",
+    tileRecords: "स्वास्थ्य रिकॉर्ड",
+    tileReminders: "अनुस्मारक",
+    herdGlance: "एक नज़र में आपका झुंड",
+    statTotal: "कुल गायें",
+    statHealthy: "स्वस्थ",
+    statMonitor: "निगरानी में",
+    yourCows: "आपकी गायें",
+    activityTitle: "हाल की स्वास्थ्य गतिविधि",
+    navHome: "होम",
+    navCows: "मेरी गायें",
+    navAssess: "जांच",
+    navRecords: "रिकॉर्ड",
+    navTriage: "क्लिनिकल ट्राइएज",
+    navOverview: "क्लिनिकल अवलोकन",
+    navProfile: "प्रोफ़ाइल",
+    langBtn: "English",
+    sidebarLang: "भाषा चुनें",
+
+    // Assessment Form Localization (Hindi)
+    assessTitle: "मैस्टाइटिस (थनैल) स्वास्थ्य जांच",
+    assessSubTitle: "मानकीकृत CMT जांच, ४-क्वार्टर निरीक्षण और क्लिनिकल टेली-ट्राइएज।",
+    lblAssessCowSelect: "१. झुंड से गाय चुनें",
+    optAssessSelectCow: "गाय चुनें...",
+    lblAssessBodyTemp: "गुदा शरीर का तापमान (°C)",
+    hintAssessBodyTemp: "सामान्य गोवंश तापमान सीमा: ३८.०°C – ३९.२°C",
+    lblAssessUdderTemp: "थन की सतह का तापमान (°C)",
+    phAssessUdderTemp: "वैकल्पिक (उदा. ३५.८)",
+    lblAssessQuarters: "२. प्रभावित थन के हिस्से (क्वार्टर)",
+    lblQuarterLF: "बायां अगला (LF)",
+    lblQuarterRF: "दायां अगला (RF)",
+    lblQuarterLR: "बायां पिछला (LR)",
+    lblQuarterRR: "दायां पिछला (RR)",
+    lblAssessMilkAppearance: "३. प्रारंभिक दूध का स्वरूप (स्ट्रिप कप)",
+    optMilkNormal: "सामान्य (साफ, मलाईदार सफेद)",
+    optMilkWatery: "पानी जैसा / पतला / पारदर्शी",
+    optMilkClots: "दूध में थक्के / छींटे / गुठलियां",
+    optMilkDiscolored: "रंग बदला हुआ (पीला / खून मिला)",
+    lblAssessSwelling: "थन की सूजन / कठोरता",
+    optSwellingNone: "कोई नहीं (मुलायम, सामान्य)",
+    optSwellingMild: "हल्का कड़ापन (प्रारंभिक सूजन)",
+    optSwellingMod: "मध्यम सूजन व गर्माहट",
+    optSwellingSevere: "गंभीर / पत्थर जैसी सख्त सूजन",
+    lblAssessCmtScore: "कैलिफ़ोर्निया मैस्टाइटिस जांच (CMT)",
+    optCmtNeg: "नेगेटिव (०) — कोई जेल नहीं",
+    optCmtTrace: "ट्रेस (T) — हल्का चिपचिपापन",
+    optCmt1: "१+ (हल्का जेल जमाव)",
+    optCmt2: "२+ (मध्यम गाढ़ापन)",
+    optCmt3: "३+ (अत्यधिक गाढ़ा जेल / गंभीर थनैल)",
+    lblAssessMilkingPain: "दूध दुहते समय असुविधा / दर्द",
+    optPainNone: "कोई नहीं (शांत, सामान्य)",
+    optPainMild: "हल्की असुविधा (पैर पटकना / बेचैनी)",
+    optPainSevere: "तीव्र दर्द (लात मारना / दूध न देना)",
+    lblAssessPhoto: "४. थन / स्ट्रिप-कप दूध का फोटो",
+    lblAssessPhotoSub: "२००-४०० KB WebP में स्वचालित कंप्रेस (< १MB सीमा)",
+    assessUploadText: "फोटो खींचने या चुनने के लिए यहां क्लिक करें",
+    lblAssessPhotoFormats: "कैमरा, JPEG, PNG, WebP समर्थित",
+    assessAiNoticeBold: "कृत्रिम बुद्धिमत्ता (AI) जांच अभी उपलब्ध नहीं है। कृपया पशु चिकित्सक से परामर्श करें।",
+    assessAiNoticeText: "प्री-ट्रेंड डीप लर्निंग मॉडल कनेक्ट होने पर स्वचालित जांच निष्कर्ष यहां प्रदर्शित होंगे।",
+    lblAssessNotes: "५. खेत के अवलोकन और दुग्ध दोहन नोट्स",
+    phAssessNotes: "गाय के व्यवहार में बदलाव, भूख या दूध उत्पादन में गिरावट दर्ज करें...",
+    btnSubmitAssessText: "जांच सहेजें और पशु चिकित्सक को भेजें",
+    lblVoiceBtnText: "बोलकर लिखें",
+    lblAssessVoiceRead: "निर्देश सुनें",
+
+    // Clinical Overview (Hindi)
+    clinicalHeroTitle: "झुंड क्लिनिकल स्वास्थ्य और थन महामारी विज्ञान",
+    clinicalHeroDesc: "लगातार ४-क्वार्टर सूजन निगरानी, CMT जांच ट्रैकिंग, SCC बेंचमार्किंग और खाद्य सुरक्षा दूध रोक प्रबंधन।",
+    lblClinicalLivePill: "रीयल-टाइम क्लिनिकल झुंड निगरानी सक्रिय",
+    btnExportReportText: "रिपोर्ट डाउनलोड करें",
+    btnRefreshTelemetryText: "डेटा ताज़ा करें",
+    lblKpiMastitis: "झुंड थनैल घटना दर",
+    subKpiMastitis: "१२ में से ३ दुधारू गायें निगरानी में",
+    lblKpiTriage: "क्लिनिकल ट्राइएज में मामले",
+    subKpiTriage: "२ गंभीर मामले · १ सबक्लिनिकल SCC उछाल",
+    lblKpiQuarters: "सूजन वाले थन क्वार्टर",
+    subKpiQuarters: "दायां अगला: कुल घावों का ४५% भाग",
+    lblKpiShield: "सुरक्षित रूप से रोका गया दूध",
+    subKpiShield: "२ गायों पर सक्रिय दवा विथहोल्डिंग लागू",
+    lblHeatmapTitle: "४-क्वार्टर थन सूजन हीटमैप",
+    lblHeatmapSubtitle: "प्रभावित गोवंश अंगों में शारीरिक वितरण",
+    lblSccTitle: "सोमैटिक सेल काउंट (SCC) झुंड बेंचमार्क",
+    lblSccSubtitle: "प्रतिरक्षा विश्लेषण और दूध गुणवत्ता स्तर",
+    lblWithholdingTitle: "खाद्य सुरक्षा एंटीबायोटिक विथहोल्डिंग सुरक्षा",
+    lblWithholdingSubtitle: "दूध न मिलाने का सक्रिय टाइमर (शून्य रासायनिक अवशेष)",
+    lblPathogenTitle: "थनैल कारण और रोगाणु निगरानी",
+    lblPathogenSubtitle: "जीवाणु संवर्धन निष्कर्ष और प्रमाणित उपचार पद्धति",
+    btnOpenTriageQueueText: "🩺 क्लिनिकल ट्राइएज कतार खोलें →",
+    btnAdmitPatientText: "+ मरीज भर्ती करें",
+    btnViewWithholdingSchedule: "संपूर्ण विथहोल्डिंग अनुसूची व अनुस्मारक देखें",
+
+    // Statuses (Hindi)
+    statusHealthy: "स्वस्थ",
+    statusMonitor: "निगरानी में",
+    statusUrgent: "आपातकालीन",
+    statusPending: "समीक्षा लंबित",
+    statusUnderReview: "समीक्षा जारी",
+    statusFollowUp: "फॉलो-अप आवश्यक",
+    statusClosed: "बंद"
   }
 };
 
@@ -429,16 +709,25 @@ function switchTab(target) {
   if (tabIndex === 5) renderProfileView();
 }
 
-// 6. Language Translation Logic
+// 6. Language Translation Logic & Bhashini Voice Integration
 function applyLanguage(lang) {
+  if (!['en', 'mr', 'hi'].includes(lang)) lang = 'en';
   currentLanguage = lang;
   localStorage.setItem('bovicare_lang', lang);
   const dict = I18N[lang] || I18N.en;
 
-  const setHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-  const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+  const setHtml = (id, html) => { const el = document.getElementById(id); if (el && html !== undefined) el.innerHTML = html; };
+  const setText = (id, text) => { const el = document.getElementById(id); if (el && text !== undefined) el.textContent = text; };
+  const setPlaceholder = (id, ph) => { const el = document.getElementById(id); if (el && ph !== undefined) el.placeholder = ph; };
 
-  const CLINICAL_PORTAL_TITLE = 'CLINICAL VETERINARY PORTAL'; // Standard clinical portal token
+  // Sync Language Selector state in UI
+  document.querySelectorAll('.lang-choice-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+  const selectDropdown = document.getElementById('selectLangDropdown');
+  if (selectDropdown) selectDropdown.value = lang;
+
+  setText('lblSidebarLang', dict.sidebarLang);
   setText('txtTagline', dict.tagline);
   setHtml('greetingTitle', dict.greeting);
   setText('greetingSubtitle', dict.greetingSubtitle);
@@ -464,8 +753,8 @@ function applyLanguage(lang) {
   setText('lblNavCows', dict.navCows);
   setText('lblNavAssess', dict.navAssess);
   setText('lblNavRecords', dict.navRecords);
-  setText('lblNavTriage', dict.navTriage || 'Triage');
-  setText('lblNavOverview', dict.navOverview || 'Overview');
+  setText('lblNavTriage', dict.navTriage || 'Clinical Triage');
+  setText('lblNavOverview', dict.navOverview || 'Clinical Overview');
   setText('lblNavProfile', dict.navProfile || 'Profile');
   setText('navLinkHome', dict.navHome);
   setText('navLinkCows', dict.navCows);
@@ -479,15 +768,210 @@ function applyLanguage(lang) {
   setText('sideLinkRecords', dict.navRecords);
   setText('sideLinkTriage', dict.navTriage || 'Clinical Triage');
   setText('sideLinkOverview', dict.navOverview || 'Clinical Overview');
+
+  // Translate Assessment Form completely (Preserves entered inputs!)
+  setText('assessTitle', dict.assessTitle);
+  setText('assessSubTitle', dict.assessSubTitle);
+  setText('lblAssessCowSelect', dict.lblAssessCowSelect);
+  setText('optAssessSelectCow', dict.optAssessSelectCow);
+  setText('lblAssessBodyTemp', dict.lblAssessBodyTemp);
+  setText('hintAssessBodyTemp', dict.hintAssessBodyTemp);
+  setText('lblAssessUdderTemp', dict.lblAssessUdderTemp);
+  setPlaceholder('assessUdderTemp', dict.phAssessUdderTemp);
+  setText('lblAssessQuarters', dict.lblAssessQuarters);
+  setText('lblQuarterLF', dict.lblQuarterLF);
+  setText('lblQuarterRF', dict.lblQuarterRF);
+  setText('lblQuarterLR', dict.lblQuarterLR);
+  setText('lblQuarterRR', dict.lblQuarterRR);
+  setText('lblAssessMilkAppearance', dict.lblAssessMilkAppearance);
+  setText('optMilkNormal', dict.optMilkNormal);
+  setText('optMilkWatery', dict.optMilkWatery);
+  setText('optMilkClots', dict.optMilkClots);
+  setText('optMilkDiscolored', dict.optMilkDiscolored);
+  setText('lblAssessSwelling', dict.lblAssessSwelling);
+  setText('optSwellingNone', dict.optSwellingNone);
+  setText('optSwellingMild', dict.optSwellingMild);
+  setText('optSwellingMod', dict.optSwellingMod);
+  setText('optSwellingSevere', dict.optSwellingSevere);
+  setText('lblAssessCmtScore', dict.lblAssessCmtScore);
+  setText('optCmtNeg', dict.optCmtNeg);
+  setText('optCmtTrace', dict.optCmtTrace);
+  setText('optCmt1', dict.optCmt1);
+  setText('optCmt2', dict.optCmt2);
+  setText('optCmt3', dict.optCmt3);
+  setText('lblAssessMilkingPain', dict.lblAssessMilkingPain);
+  setText('optPainNone', dict.optPainNone);
+  setText('optPainMild', dict.optPainMild);
+  setText('optPainSevere', dict.optPainSevere);
+  setText('lblAssessPhoto', dict.lblAssessPhoto);
+  setText('lblAssessPhotoSub', dict.lblAssessPhotoSub);
+  setText('assessUploadText', dict.assessUploadText);
+  setText('lblAssessPhotoFormats', dict.lblAssessPhotoFormats);
+  setText('assessAiNoticeBold', dict.assessAiNoticeBold);
+  setText('assessAiNoticeText', dict.assessAiNoticeText);
+  setText('lblAssessNotes', dict.lblAssessNotes);
+  setPlaceholder('assessNotes', dict.phAssessNotes);
+  setText('btnSubmitAssessText', dict.btnSubmitAssessText);
+  setText('lblVoiceBtnText', dict.lblVoiceBtnText);
+  setText('lblAssessVoiceRead', dict.lblAssessVoiceRead);
+
+  // Translate Clinical Overview
+  setText('clinicalHeroTitle', dict.clinicalHeroTitle);
+  setText('clinicalHeroDesc', dict.clinicalHeroDesc);
+  setText('lblClinicalLivePill', dict.lblClinicalLivePill);
+  setText('btnExportReportText', dict.btnExportReportText);
+  setText('btnRefreshTelemetryText', dict.btnRefreshTelemetryText);
+  setText('lblKpiMastitis', dict.lblKpiMastitis);
+  setText('subKpiMastitis', dict.subKpiMastitis);
+  setText('lblKpiTriage', dict.lblKpiTriage);
+  setText('subKpiTriage', dict.subKpiTriage);
+  setText('lblKpiQuarters', dict.lblKpiQuarters);
+  setText('subKpiQuarters', dict.subKpiQuarters);
+  setText('lblKpiShield', dict.lblKpiShield);
+  setText('subKpiShield', dict.subKpiShield);
+  setText('lblHeatmapTitle', dict.lblHeatmapTitle);
+  setText('lblHeatmapSubtitle', dict.lblHeatmapSubtitle);
+  setText('lblSccTitle', dict.lblSccTitle);
+  setText('lblSccSubtitle', dict.lblSccSubtitle);
+  setText('lblWithholdingTitle', dict.lblWithholdingTitle);
+  setText('lblWithholdingSubtitle', dict.lblWithholdingSubtitle);
+  setText('lblPathogenTitle', dict.lblPathogenTitle);
+  setText('lblPathogenSubtitle', dict.lblPathogenSubtitle);
+  setText('btnOpenTriageQueueText', dict.btnOpenTriageQueueText);
+  setText('btnAdmitPatientText', dict.btnAdmitPatientText);
+  setText('btnViewWithholdingSchedule', dict.btnViewWithholdingSchedule);
+
   updateNavRoleLabels();
-  updateActiveRoleBadges();
+
+  // Legacy compatibility tokens
   setText('langToggleText', dict.langBtn);
   const sideLangToggleText = document.getElementById('sideLangToggleText');
   if (sideLangToggleText) sideLangToggleText.textContent = dict.langBtn;
 }
 
+function setAppLanguage(lang) {
+  applyLanguage(lang);
+}
+
+function cycleLanguage() {
+  const sequence = ['en', 'mr', 'hi'];
+  const nextIdx = (sequence.indexOf(currentLanguage) + 1) % sequence.length;
+  applyLanguage(sequence[nextIdx]);
+}
+
 function toggleLanguage() {
-  applyLanguage(currentLanguage === 'en' ? 'mr' : 'en');
+  cycleLanguage();
+}
+
+// Bhashini / Speech Synthesis Assistant for Farmers
+function readAssessmentGuideAloud() {
+  let textToSpeak = '';
+  let langCode = 'en-IN';
+
+  if (currentLanguage === 'mr') {
+    textToSpeak = "मॅस्टायटिस कासदाह आरोग्य तपासणी मार्गदर्शक. पायरी १: कळपातील गाय निवडा. गुदा शरीराचे तापमान तपासा. पायरी २: बाधित कासेचे भाग निवडा. पायरी ३: सुरुवातीच्या दुधाचे स्वरूप, कासेचा कडकपणा आणि CMT चाचणी नोंदवा. छायाचित्र जोडा आणि तपासणी जतन करा.";
+    langCode = 'mr-IN';
+  } else if (currentLanguage === 'hi') {
+    textToSpeak = "मैस्टाइटिस थनैल स्वास्थ्य जांच निर्देश. चरण १: झुंड से गाय चुनें. गुदा शरीर का तापमान मापें. चरण २: प्रभावित थन के क्वार्टर चुनें. चरण ३: दूध का स्वरूप, थन का कड़ापन और CMT जांच दर्ज करें. फोटो जोड़ें और जांच सहेजें.";
+    langCode = 'hi-IN';
+  } else {
+    textToSpeak = "Mastitis Health Assessment guide. Step 1: Select cow and record rectal temperature. Step 2: Check affected quarters. Step 3: Record strip cup milk appearance, swelling, and CMT score. Upload photo and submit.";
+    langCode = 'en-US';
+  }
+
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = langCode;
+    utterance.rate = 0.95;
+    window.speechSynthesis.speak(utterance);
+    showToast(currentLanguage === 'mr' ? 'सूचना वाचून दाखवत आहे...' : (currentLanguage === 'hi' ? 'निर्देश पढ़े जा रहे हैं...' : 'Reading instructions aloud...'));
+  } else {
+    showToast('Speech audio is not supported in this browser.');
+  }
+}
+
+// Bhashini / Web Speech Recognition Voice-to-Text Input
+let speechRecognitionInstance = null;
+let isListeningForNotes = false;
+
+function toggleSpeechRecognitionFor(fieldId) {
+  const targetField = document.getElementById(fieldId);
+  const statusNotice = document.getElementById('voiceStatusNotice');
+  const micIcon = document.getElementById('voiceMicIcon');
+  const voiceBtnText = document.getElementById('lblVoiceBtnText');
+  const dict = I18N[currentLanguage] || I18N.en;
+
+  if (isListeningForNotes && speechRecognitionInstance) {
+    speechRecognitionInstance.stop();
+    isListeningForNotes = false;
+    if (micIcon) micIcon.textContent = '🎤';
+    if (voiceBtnText) voiceBtnText.textContent = dict.lblVoiceBtnText || 'Voice Input';
+    if (statusNotice) {
+      statusNotice.style.display = 'none';
+    }
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    showToast(currentLanguage === 'mr' ? 'मायक्रोफोन आवाज ओळख या ब्राउझरमध्ये उपलब्ध नाही.' : (currentLanguage === 'hi' ? 'माइक्रोफ़ोन भाषण पहचान इस ब्राउज़र में अनुपलब्ध है।' : 'Voice recognition is not supported in this browser. Please type.'));
+    return;
+  }
+
+  try {
+    speechRecognitionInstance = new SpeechRecognition();
+    const langMap = { en: 'en-IN', mr: 'mr-IN', hi: 'hi-IN' };
+    speechRecognitionInstance.lang = langMap[currentLanguage] || 'mr-IN';
+    speechRecognitionInstance.continuous = false;
+    speechRecognitionInstance.interimResults = false;
+
+    speechRecognitionInstance.onstart = () => {
+      isListeningForNotes = true;
+      if (micIcon) micIcon.textContent = '⏹️';
+      if (voiceBtnText) voiceBtnText.textContent = currentLanguage === 'mr' ? 'थांबवा' : (currentLanguage === 'hi' ? 'रोकें' : 'Stop');
+      if (statusNotice) {
+        statusNotice.style.display = 'block';
+        statusNotice.style.background = '#FEF3C7';
+        statusNotice.style.color = '#92400E';
+        statusNotice.textContent = currentLanguage === 'mr' ? '● ऐकत आहे... आता बोला' : (currentLanguage === 'hi' ? '● सुन रहा है... अब बोलें' : '● Listening... speak now');
+      }
+    };
+
+    speechRecognitionInstance.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      if (transcript && targetField) {
+        const existing = targetField.value ? targetField.value + ' ' : '';
+        targetField.value = existing + transcript;
+        showToast(currentLanguage === 'mr' ? 'आवाज यशस्वीरित्या नोंदवला!' : (currentLanguage === 'hi' ? 'आवाज सफलतापूर्वक दर्ज किया गया!' : 'Voice transcript added!'));
+      }
+    };
+
+    speechRecognitionInstance.onerror = (event) => {
+      isListeningForNotes = false;
+      if (micIcon) micIcon.textContent = '🎤';
+      if (voiceBtnText) voiceBtnText.textContent = dict.lblVoiceBtnText || 'Voice Input';
+      if (statusNotice) {
+        statusNotice.style.display = 'block';
+        statusNotice.style.background = '#FEE2E2';
+        statusNotice.style.color = '#991B1B';
+        statusNotice.textContent = currentLanguage === 'mr' ? 'मायक्रोफोन त्रुटी किंवा परवानगी नाकारली.' : (currentLanguage === 'hi' ? 'माइक्रोफ़ोन त्रुटि या अनुमति अस्वीकृत।' : 'Microphone error or permission denied.');
+      }
+    };
+
+    speechRecognitionInstance.onend = () => {
+      isListeningForNotes = false;
+      if (micIcon) micIcon.textContent = '🎤';
+      if (voiceBtnText) voiceBtnText.textContent = dict.lblVoiceBtnText || 'Voice Input';
+      setTimeout(() => {
+        if (statusNotice) statusNotice.style.display = 'none';
+      }, 2500);
+    };
+
+    speechRecognitionInstance.start();
+  } catch (err) {
+    showToast('Voice service initialization error.');
+  }
 }
 
 // 7. Render Home View Components
@@ -1634,7 +2118,11 @@ function setRole(role) {
   // Update brand tagline
   const tagline = document.getElementById('txtTagline');
   if (tagline) {
-    tagline.textContent = currentLanguage === 'mr' ? 'तुमचे शेत, अधिक निरोगी' : 'YOUR FARM, HEALTHIER';
+    if (isVet) {
+      tagline.textContent = currentLanguage === 'mr' ? 'क्लिनिकल पशुवैद्यकीय पोर्टल' : (currentLanguage === 'hi' ? 'क्लिनिकल पशुचिकित्सा पोर्टल' : 'CLINICAL VETERINARY PORTAL');
+    } else {
+      tagline.textContent = currentLanguage === 'mr' ? 'तुमचे शेत, अधिक निरोगी' : (currentLanguage === 'hi' ? 'आपका फार्म, अधिक स्वस्थ' : 'YOUR FARM, HEALTHIER');
+    }
   }
 
   // Update brand icon

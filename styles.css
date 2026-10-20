@@ -442,36 +442,69 @@ html, body {
   border-radius: 14px;
 }
 
-.app-sidebar.collapsed .sidebar-role-pill .role-pill-btn {
-  width: 36px;
-  height: 36px;
-  padding: 0;
+/* Sidebar Language Cluster (Clean 3-Language Segmented Controls) */
+.sidebar-lang-cluster {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-lang-picker {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-}
-
-.app-sidebar.collapsed .sidebar-lang-btn {
-  width: 44px;
-  height: 44px;
-  margin: 0 auto;
-  padding: 0;
-  justify-content: center;
+  gap: 4px;
+  background: #F4F6F4;
+  border: 1px solid var(--border);
   border-radius: 12px;
-}
-
-.app-sidebar:not(.collapsed) .sidebar-role-pill,
-.app-sidebar.expanded .sidebar-role-pill {
-  display: flex;
+  padding: 3px;
   width: 100%;
 }
 
-.app-sidebar:not(.collapsed) .sidebar-lang-btn,
-.app-sidebar.expanded .sidebar-lang-btn {
+.lang-choice-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  padding: 6px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.16s ease;
+  font-family: inherit;
+}
+
+.lang-choice-btn:hover {
+  color: var(--forest);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.lang-choice-btn.active {
+  background: var(--white);
+  color: var(--forest);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-lang-select {
+  display: none;
   width: 100%;
-  justify-content: center;
-  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--forest);
+  background: var(--white);
+  margin-top: 6px;
+}
+
+.app-sidebar.collapsed .sidebar-lang-picker {
+  display: none;
+}
+
+.app-sidebar.collapsed .sidebar-lang-select {
+  display: block;
 }
 
 /* Backdrop Overlay */
@@ -680,78 +713,9 @@ html, body {
   align-items: center;
   gap: 12px;
 }
-
-/* Active Role Indicator Badge (Read-only, non-switchable) */
-.active-role-indicator-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background-color: var(--mint-bg);
-  color: var(--forest);
-  border: 1px solid rgba(23, 107, 69, 0.25);
-  padding: 6px 14px;
-  border-radius: var(--radius-pill);
-  font-size: 13px;
-  font-weight: 700;
-  user-select: none;
-  cursor: default;
-  box-shadow: 0 1px 3px rgba(23, 107, 69, 0.08);
-  transition: all 0.2s ease;
 }
 
-.active-role-indicator-badge.vet {
-  background-color: #E0F2FE;
-  color: #0369A1;
-  border-color: rgba(3, 105, 161, 0.28);
-  box-shadow: 0 1px 3px rgba(3, 105, 161, 0.08);
-}
 
-.sidebar-role-badge {
-  padding: 8px 12px;
-  border-radius: 12px;
-  font-size: 12.5px;
-  width: 100%;
-  justify-content: flex-start;
-}
-
-.app-sidebar.collapsed .sidebar-role-badge {
-  width: 44px;
-  height: 44px;
-  margin: 0 auto;
-  padding: 0;
-  justify-content: center;
-  border-radius: 12px;
-}
-
-.role-switch-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background-color: var(--cream);
-  border: 1px solid var(--border);
-  padding: 4px 5px;
-  border-radius: var(--radius-pill);
-}
-
-.role-pill-btn {
-  border: none;
-  background: transparent;
-  padding: 6px 13px;
-  border-radius: var(--radius-pill);
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--muted);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: inherit;
-}
-
-.role-pill-btn.active {
-  background-color: var(--white);
-  color: var(--forest);
-  font-weight: 700;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-}
 
 .lang-toggle-btn {
   background: var(--white);
@@ -1828,6 +1792,100 @@ html, body {
 .upload-icon-circle {
   font-size: 28px;
   margin-bottom: 6px;
+}
+
+/* ==========================================================================
+   MASTITIS HEALTH ASSESSMENT FORM - SCROLLING & ACCESSIBILITY
+   ========================================================================== */
+.assess-tab-view {
+  min-height: 100%;
+  overflow-y: visible !important;
+  max-height: none !important;
+  padding-bottom: 120px !important;
+}
+
+.assess-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.assess-voice-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-audio-guide {
+  background: var(--mint-bg);
+  border: 1px solid rgba(23, 107, 69, 0.25);
+  color: var(--forest);
+  border-radius: var(--radius-pill);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.16s ease;
+  font-family: inherit;
+}
+
+.btn-audio-guide:hover {
+  background: #E0F2E4;
+  border-color: var(--forest);
+  transform: translateY(-1px);
+}
+
+.btn-voice-input {
+  background: #FEF3C7;
+  border: 1px solid #F59E0B;
+  color: #92400E;
+  border-radius: var(--radius-pill);
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.16s ease;
+  font-family: inherit;
+}
+
+.btn-voice-input:hover {
+  background: #FDE68A;
+}
+
+.assess-form-wrapper {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.assess-form-card {
+  background: var(--white);
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  padding: 32px 36px;
+  box-shadow: 0 8px 30px rgba(32, 53, 42, 0.06);
+  margin-bottom: 40px;
+  overflow: visible;
+}
+
+@media (max-width: 640px) {
+  .assess-form-card {
+    padding: 22px 18px;
+    border-radius: 18px;
+  }
+  .form-row-2 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
 /* ==========================================================================

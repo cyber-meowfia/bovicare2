@@ -70,28 +70,32 @@
       <!-- Right Form & Role Dropdown Side -->
       <div class="login-card-side">
         <div class="login-top-bar">
-          <a href="landing.html" class="back-to-site-link">
+          <a href="landing.html" class="back-to-site-link" id="linkBackSite">
             <span>← Back to Website</span>
           </a>
-          <span style="font-size:12px; font-weight:700; color:var(--muted);">Secure Access</span>
+          <div class="login-lang-picker" style="display:inline-flex; align-items:center; gap:4px; background:#F1F5F2; padding:2px; border-radius:10px; border:1px solid var(--border);">
+            <button type="button" class="lang-pill-btn active" data-lang="en" onclick="setLoginLanguage('en')" style="padding:4px 8px; font-size:11px; border:none; background:transparent; font-weight:700; cursor:pointer; border-radius:8px;">EN</button>
+            <button type="button" class="lang-pill-btn" data-lang="mr" onclick="setLoginLanguage('mr')" style="padding:4px 8px; font-size:11px; border:none; background:transparent; font-weight:700; cursor:pointer; border-radius:8px;">मराठी</button>
+            <button type="button" class="lang-pill-btn" data-lang="hi" onclick="setLoginLanguage('hi')" style="padding:4px 8px; font-size:11px; border:none; background:transparent; font-weight:700; cursor:pointer; border-radius:8px;">हिन्दी</button>
+          </div>
         </div>
 
         <div class="form-header">
-          <h1 class="form-title">Sign In to BoviCare</h1>
-          <p class="form-sub">Select your account role to enter your dedicated dashboard.</p>
+          <h1 class="form-title" id="loginFormTitle">Sign In to BoviCare</h1>
+          <p class="form-sub" id="loginFormSub">Select your account role to enter your dedicated dashboard.</p>
         </div>
 
         <form class="login-form" id="loginForm">
           <!-- Role Selection Dropdown -->
           <div class="form-group">
-            <label class="form-label" for="roleSelect">
+            <label class="form-label" for="roleSelect" id="lblRoleSelect">
               <span>Select Account Role / भूमिका निवडा</span>
               <span class="required-star">*</span>
             </label>
             <div class="select-wrapper">
               <select id="roleSelect" class="form-select" onchange="handleRoleSelectionChange(this.value)">
-                <option value="farmer" selected>🌾 Dairy Farmer (Herd Owner & Manager)</option>
-                <option value="vet">🩺 Licensed Veterinarian (Clinical Triage & Rx)</option>
+                <option value="farmer" selected id="optRoleFarmer">🌾 Dairy Farmer (Herd Owner & Manager)</option>
+                <option value="vet" id="optRoleVet">🩺 Licensed Veterinarian (Clinical Triage & Rx)</option>
               </select>
               <span class="select-arrow">▼</span>
             </div>

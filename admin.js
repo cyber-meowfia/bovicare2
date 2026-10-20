@@ -22,6 +22,7 @@ function classifySpecies(breed) {
 
 document.addEventListener('DOMContentLoaded', async () => {
   initAdminAuthForm();
+  applyAdminLanguage(localStorage.getItem('bovicare_lang') || 'en');
   await checkAdminSession();
 });
 
@@ -635,3 +636,110 @@ function showAdminToast(msg) {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2600);
 }
+
+// 19. Admin Multi-Language Localization System (EN, MR, HI)
+const ADMIN_I18N = {
+  en: {
+    gateTitle: "BoviCare Admin Portal",
+    gateSub: "Restricted System Access. Only database-provisioned administrators may sign in.",
+    lblEmail: "Admin Email Address",
+    lblPass: "Master Password",
+    btnLogin: "Verify Administrator Credentials →",
+    tagDemo: "Testing & Demo Environments",
+    btnDemo: "⚡ Autofill Verified Admin Credentials",
+    linkBack: "← Return to Farmer & Veterinarian Login",
+    navConsole: "ADMIN CONSOLE",
+    navGovernance: "SYSTEM GOVERNANCE",
+    navOverview: "Live Overview",
+    navFarmers: "Farmers Management",
+    navVets: "Veterinarians",
+    navLivestock: "Livestock & Buffaloes",
+    navCases: "Cases & Telemetry",
+    roleAdmin: "Role: Database Admin",
+    btnLogout: "Sign Out",
+    btnRefresh: "Refresh Data",
+    btnClientView: "Client View ↗"
+  },
+  mr: {
+    gateTitle: "बोविकेअर ॲडमिन पोर्टल",
+    gateSub: "प्रतिबंधित प्रणाली प्रवेश. केवळ अधिकृत प्रशासक लॉगिन करू शकतात.",
+    lblEmail: "प्रशासक ईमेल पत्ता",
+    lblPass: "मुख्य पासवर्ड",
+    btnLogin: "प्रशासक ओळख तपासा →",
+    tagDemo: "चाचणी व डेमो वातावरण",
+    btnDemo: "⚡ अधिकृत ॲडमिन माहिती भरा",
+    linkBack: "← शेतकरी आणि पशुवैद्यक लॉगिनकडे परत जा",
+    navConsole: "प्रशासकीय कन्सोल",
+    navGovernance: "प्रणाली प्रशासन",
+    navOverview: "थेट आढावा",
+    navFarmers: "शेतकरी व्यवस्थापन",
+    navVets: "पशुवैद्यक",
+    navLivestock: "गोवंश व म्हशी",
+    navCases: "तपासण्या व माहिती",
+    roleAdmin: "भूमिका: डेटाबेस प्रशासक",
+    btnLogout: "लॉगआउट",
+    btnRefresh: "डेटा ताजा करा",
+    btnClientView: "वापरकर्ता दृश्य ↗"
+  },
+  hi: {
+    gateTitle: "बोविकेयर एडमिन पोर्टल",
+    gateSub: "प्रतिबंधित सिस्टम पहुंच। केवल अधिकृत व्यवस्थापक ही लॉगिन कर सकते हैं।",
+    lblEmail: "एडमिन ईमेल पता",
+    lblPass: "मास्टर पासवर्ड",
+    btnLogin: "व्यवस्थापक क्रेडेंशियल सत्यापित करें →",
+    tagDemo: "परीक्षण व डेमो वातावरण",
+    btnDemo: "⚡ अधिकृत एडमिन विवरण भरें",
+    linkBack: "← किसान और पशु चिकित्सक लॉगिन पर लौटें",
+    navConsole: "प्रशासनिक कंसोल",
+    navGovernance: "सिस्टम प्रशासन",
+    navOverview: "लाइव अवलोकन",
+    navFarmers: "किसान प्रबंधन",
+    navVets: "पशु चिकित्सक",
+    navLivestock: "पशुधन व भैंस",
+    navCases: "मामले व टेलीमेट्री",
+    roleAdmin: "भूमिका: डेटाबेस व्यवस्थापक",
+    btnLogout: "लॉगआउट",
+    btnRefresh: "डेटा ताज़ा करें",
+    btnClientView: "उपयोगकर्ता दृश्य ↗"
+  }
+};
+
+let currentAdminLang = localStorage.getItem('bovicare_lang') || 'en';
+
+function setAdminLanguage(lang) {
+  applyAdminLanguage(lang);
+}
+
+function applyAdminLanguage(lang) {
+  if (!ADMIN_I18N[lang]) lang = 'en';
+  currentAdminLang = lang;
+  localStorage.setItem('bovicare_lang', lang);
+
+  document.querySelectorAll('.sidebar-lang-picker .lang-choice-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+
+  const d = ADMIN_I18N[lang];
+  const setText = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.textContent = val; };
+
+  setText('adminGateTitle', d.gateTitle);
+  setText('adminGateSub', d.gateSub);
+  setText('lblAdminEmail', d.lblEmail);
+  setText('lblAdminPassword', d.lblPass);
+  setText('btnAdminLoginText', d.btnLogin);
+  setText('tagAdminDemo', d.tagDemo);
+  setText('btnAdminDemo', d.btnDemo);
+  setText('linkAdminBack', d.linkBack);
+  setText('lblAdminConsole', d.navConsole);
+  setText('lblAdminGovernance', d.navGovernance);
+  setText('lblNavAdminOverview', d.navOverview);
+  setText('lblNavAdminFarmers', d.navFarmers);
+  setText('lblNavAdminVets', d.navVets);
+  setText('lblNavAdminLivestock', d.navLivestock);
+  setText('lblNavAdminCases', d.navCases);
+  setText('adminUserRole', d.roleAdmin);
+  setText('btnAdminLogoutText', d.btnLogout);
+  setText('btnAdminRefreshText', d.btnRefresh);
+  setText('btnAdminClientViewText', d.btnClientView);
+}
+
