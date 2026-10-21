@@ -40,14 +40,7 @@ function toggleAdminPasswordVisibility() {
   }
 }
 
-// 2. Demo Autofill for Testing & Local Development
-function fillAdminDemo() {
-  const emailInput = document.getElementById('adminEmail');
-  const passInput = document.getElementById('adminPassword');
-  if (emailInput) emailInput.value = 'admin@bovicare.internal';
-  if (passInput) passInput.value = 'AdminMaster@2026';
-  showAdminToast('Autofilled demo administrator credentials.');
-}
+// 2. Demo Autofill removed for real authentication enforcement
 
 // 3. Supabase Helper
 function getSupabase() {
@@ -67,17 +60,6 @@ async function checkAdminSession() {
   const alertBox = document.getElementById('adminAuthAlert');
   const supabase = getSupabase();
 
-  // If running in local demo / mock mode without live cloud session
-  const localSavedRole = localStorage.getItem('bovicare_admin_verified_session');
-  if (localSavedRole === 'admin') {
-    grantAdminAccess({
-      id: 'admin-local-master',
-      full_name: 'Database Administrator',
-      email: 'admin@bovicare.internal',
-      role: 'admin'
-    });
-    return;
-  }
 
   if (!supabase || !supabase.auth) {
     // Show login gate
@@ -166,17 +148,6 @@ function initAdminAuthForm() {
         });
 
         if (authErr) {
-          // If auth failed, check if demo credentials were used in offline mode
-          if (email === 'admin@bovicare.internal' && password === 'AdminMaster@2026') {
-            localStorage.setItem('bovicare_admin_verified_session', 'admin');
-            grantAdminAccess({
-              id: 'admin-master-demo',
-              full_name: 'Database Administrator (Audit Mode)',
-              email,
-              role: 'admin'
-            });
-            return;
-          }
           throw authErr;
         }
 
@@ -284,19 +255,19 @@ async function loadAdminData() {
         dbStatus.style.color = '#15803D';
       }
     } else {
-      populateMockTelemetry();
       if (dbStatus) {
-        dbStatus.textContent = '🛡️ Local Verification Sandbox';
+        dbStatus.textContent = '🔒 Database Session Required';
+        dbStatus.style.background = '#FEF2F2';
+        dbStatus.style.color = '#991B1B';
       }
     }
   } catch (e) {
-    console.warn('Supabase fetch failed, fallback to local state:', e);
-    populateMockTelemetry();
-  }
-
-  // If empty, populate reasonable default telemetry
-  if (!adminTelemetry.farmers.length && !adminTelemetry.veterinarians.length) {
-    populateMockTelemetry();
+    console.warn('Supabase fetch failed:', e);
+    if (dbStatus) {
+      dbStatus.textContent = '⚠️ Database Query Error';
+      dbStatus.style.background = '#FEF2F2';
+      dbStatus.style.color = '#991B1B';
+    }
   }
 
   renderAdminOverviewMetrics();
@@ -305,35 +276,6 @@ async function loadAdminData() {
   renderLivestockTable();
   renderCasesTable();
   renderAuditStream();
-}
-
-// Mock fallback for offline verification
-function populateMockTelemetry() {
-  adminTelemetry.farmers = [
-    { id: 'f-1', full_name: 'Ramesh Patil', phone_number: '+91 98220 12345', location: 'Haveli, Pune', cows_count: 5, created_at: '2026-09-12' },
-    { id: 'f-2', full_name: 'Balasaheb Shinde', phone_number: '+91 98221 54321', location: 'Baramati, Pune', cows_count: 8, created_at: '2026-09-18' },
-    { id: 'f-3', full_name: 'Sunita Gaikwad', phone_number: '+91 98222 67890', location: 'Shirur, Pune', cows_count: 4, created_at: '2026-10-02' }
-  ];
-
-  adminTelemetry.veterinarians = [
-    { id: 'v-1', full_name: 'Dr. Anjali Deshmukh', vet_license_number: 'MH-VET-2018-8472', vet_clinic_affiliation: 'Pune District Veterinary Dispensary', is_verified_vet: true, active_cases: 3, created_at: '2026-08-15' },
-    { id: 'v-2', full_name: 'Dr. Vikram More', vet_license_number: 'MH-VET-2021-9921', vet_clinic_affiliation: 'Baramati Taluka Polyclinic', is_verified_vet: true, active_cases: 1, created_at: '2026-09-01' },
-    { id: 'v-3', full_name: 'Dr. Sameer Joshi', vet_license_number: 'MH-VET-2025-0104', vet_clinic_affiliation: 'Khed Veterinary Hospital', is_verified_vet: false, active_cases: 0, created_at: '2026-10-15' }
-  ];
-
-  adminTelemetry.livestock = [
-    { id: 'c-1', tag_number: '#C001', name: 'Lakshmi', breed: 'Gir (Bos indicus)', status: 'healthy', yield: '16.5 L', farmer: 'Ramesh Patil', created_at: '2026-09-12' },
-    { id: 'c-2', tag_number: '#C002', name: 'Gauri', breed: 'Holstein Friesian Cross', status: 'healthy', yield: '24.0 L', farmer: 'Ramesh Patil', created_at: '2026-09-12' },
-    { id: 'c-3', tag_number: '#C003', name: 'Ganga', breed: 'Jersey Cross', status: 'to_monitor', yield: '19.2 L', farmer: 'Balasaheb Shinde', created_at: '2026-09-18' },
-    { id: 'c-4', tag_number: '#C004', name: 'Radha', breed: 'Murrah Buffalo', status: 'quarantined', yield: '14.0 L', farmer: 'Sunita Gaikwad', created_at: '2026-10-02' },
-    { id: 'c-5', tag_number: '#C005', name: 'Kalyani', breed: 'Murrah Buffalo', status: 'healthy', yield: '15.5 L', farmer: 'Balasaheb Shinde', created_at: '2026-10-05' }
-  ];
-
-  adminTelemetry.cases = [
-    { id: 'CASE-001', tag: '#C004', quarters: ['RF', 'RR'], urgency: 'urgent', status: 'open', vet: 'Dr. Anjali Deshmukh', created_at: '2026-10-19' },
-    { id: 'CASE-002', tag: '#C003', quarters: ['LF'], urgency: 'monitor', status: 'under_review', vet: 'Dr. Anjali Deshmukh', created_at: '2026-10-18' },
-    { id: 'CASE-003', tag: '#C001', quarters: ['ALL'], urgency: 'routine', status: 'resolved', vet: 'Dr. Vikram More', created_at: '2026-10-10' }
-  ];
 }
 
 // 9. Render Summary KPIs

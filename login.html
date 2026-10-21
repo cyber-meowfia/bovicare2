@@ -85,6 +85,15 @@
           <p class="form-sub" id="loginFormSub">Select your account role to enter your dedicated dashboard.</p>
         </div>
 
+        <div class="auth-mode-tabs" id="authModeTabs">
+          <button type="button" class="auth-tab-btn active" id="authTabSignIn" data-id="btnModeSignIn" onclick="setAuthMode('signin')">
+            <span>🔑</span> <span id="lblModeSignIn">Sign In / प्रवेश करा</span>
+          </button>
+          <button type="button" class="auth-tab-btn" id="authTabSignUp" data-id="btnModeSignUp" onclick="setAuthMode('signup')">
+            <span>📝</span> <span id="lblModeSignUp">Create Account / नोंदणी</span>
+          </button>
+        </div>
+
         <form class="login-form" id="loginForm">
           <!-- Role Selection Dropdown -->
           <div class="form-group">
@@ -104,33 +113,51 @@
             </div>
           </div>
 
+          <!-- Full Name Field (Registration Mode Only) -->
+          <div class="form-group" id="groupFullName" style="display:none;">
+            <label class="form-label" for="loginFullName" id="lblFullName">
+              <span>Full Name / पूर्ण नाव</span>
+              <span class="required-star">*</span>
+            </label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">👤</span>
+              <input 
+                type="text" 
+                id="loginFullName" 
+                class="form-input" 
+                placeholder="e.g. Ramesh Patil" 
+                autocomplete="name"
+              >
+            </div>
+          </div>
+
           <!-- Email or Phone Input -->
           <div class="form-group">
             <label class="form-label" for="loginEmail">
-              <span>Email Address or Phone Number</span>
+              <span>Email Address</span>
               <span class="required-star">*</span>
             </label>
             <div class="input-icon-wrap">
               <span class="input-icon">✉️</span>
               <input 
-                type="text" 
+                type="email" 
                 id="loginEmail" 
                 class="form-input" 
-                placeholder="e.g. farmer@sahyadridairy.com" 
-                value="farmer@sahyadridairy.com"
+                placeholder="you@example.com" 
                 required
+                autocomplete="email"
               >
             </div>
           </div>
 
-          <!-- Password / Secret PIN Input -->
+          <!-- Password Input -->
           <div class="form-group">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <label class="form-label" for="loginPassword">
-                <span>Password / Secret PIN</span>
+                <span>Password</span>
                 <span class="required-star">*</span>
               </label>
-              <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">Forgot PIN?</a>
+              <a href="#" class="forgot-link" id="linkForgotPassword" onclick="handleForgotPassword(event)">Forgot Password?</a>
             </div>
             <div class="input-icon-wrap">
               <span class="input-icon">🔒</span>
@@ -139,15 +166,15 @@
                 id="loginPassword" 
                 class="form-input" 
                 placeholder="Enter your password" 
-                value="Sahyadri@2026"
                 required
+                autocomplete="current-password"
               >
               <button type="button" class="btn-toggle-eye" id="btnToggleEye" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">👁️</button>
             </div>
           </div>
 
           <!-- Remember Me Checkbox -->
-          <div class="form-check-row">
+          <div class="form-check-row" id="rowRememberMe">
             <label class="checkbox-label">
               <input type="checkbox" id="rememberMe" checked>
               <span>Keep me signed in on this device</span>
@@ -160,34 +187,9 @@
             <span class="submit-text" id="submitText">Sign In as Dairy Farmer →</span>
           </button>
 
-          <!-- Quick One-Click Demo Autofill -->
-          <div class="demo-autofill-section">
-            <span class="demo-title">⚡ Quick 1-Click Demo Login:</span>
-            <div class="demo-buttons-row">
-              <button type="button" class="btn-demo-fill" onclick="autofillDemo('farmer')">
-                <span>🌾 Ramesh Patil (Farmer)</span>
-              </button>
-              <button type="button" class="btn-demo-fill" onclick="autofillDemo('vet')">
-                <span>🩺 Dr. Anjali Deshmukh (Vet)</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Social Divider -->
-          <div class="social-divider">Or continue with</div>
-
-          <div class="social-buttons-row">
-            <button type="button" class="btn-social" onclick="showLoginToast('Google authentication ready in cloud mode.')">
-              <span>🌐</span> Google
-            </button>
-            <button type="button" class="btn-social" onclick="showLoginToast('Apple Sign In ready in iOS / mobile mode.')">
-              <span>🍎</span> Apple ID
-            </button>
-          </div>
-
           <div class="switch-auth-mode">
-            Need to register a new herd? 
-            <a href="index.html" class="switch-auth-link">Open Herd Setup</a>
+            <span id="txtSwitchPrompt">Need a new account?</span>
+            <a href="#" class="switch-auth-link" id="linkSwitchMode" onclick="toggleAuthMode(event)">Register Here</a>
             <span style="margin: 0 8px; color: var(--border);">·</span>
             <a href="admin.html" class="switch-auth-link" style="color:var(--muted); font-size:11px;">Admin Console 🔒</a>
           </div>
@@ -198,6 +200,7 @@
 
   <div id="loginToast" class="login-toast"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="env-config.js"></script>
   <script src="supabase-config.js"></script>
   <script src="login.js"></script>

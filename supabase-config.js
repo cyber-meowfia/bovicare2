@@ -56,7 +56,7 @@ async function ensureActiveFarm(userId) {
     // 1. Check if user is already a member of a farm
     const { data: membership, error: memberErr } = await supabaseClient
       .from('farm_members')
-      .select('farm_id, member_role, farms:farm_id (id, name, registration_code)')
+      .select('farm_id, member_role, farms:farm_id (*)')
       .eq('user_id', userId)
       .limit(1)
       .maybeSingle();
@@ -75,7 +75,7 @@ async function ensureActiveFarm(userId) {
         registration_code: defaultRegCode,
         created_by: userId
       })
-      .select('id, name, registration_code')
+      .select('*')
       .single();
 
     if (farmErr) throw farmErr;

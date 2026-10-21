@@ -1,0 +1,9 @@
+{
+  "depth": "standard",
+  "commit_docs": false,
+  "workflow": {
+    "research": false,
+    "plan_check": true,
+    "verifier": true
+  }
+}

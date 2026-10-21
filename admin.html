@@ -63,14 +63,6 @@
         </button>
       </form>
 
-      <!-- Quick Local Demo Access (Only for Local Verification Environments) -->
-      <div class="admin-demo-access-box">
-        <span class="demo-tag" id="tagAdminDemo">Testing & Demo Environments</span>
-        <button type="button" class="btn-admin-demo" onclick="fillAdminDemo()" id="btnAdminDemo">
-          ⚡ Autofill Verified Admin Credentials
-        </button>
-      </div>
-
       <div class="admin-gate-footer">
         <a href="login.html" class="admin-back-link" id="linkAdminBack">← Return to Farmer & Veterinarian Login</a>
       </div>
@@ -439,6 +431,7 @@
 
   <div id="adminToast" class="admin-toast"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="env-config.js"></script>
   <script src="supabase-config.js"></script>
   <script src="admin.js"></script>

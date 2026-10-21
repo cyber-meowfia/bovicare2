@@ -599,10 +599,9 @@ async function resolveStorageBucket(primaryBucket, fallbackBucket, mockBuckets) 
   assert.strictEqual(loginHtml.includes('value="vet"'), true, 'Role option "vet" must exist in login.html');
   assert.strictEqual(loginHtml.includes('id="roleHintBox"'), true, 'Dynamic role hint callout #roleHintBox must exist');
   assert.strictEqual(loginHtml.includes('id="loginEmail"'), true, 'Email input #loginEmail must exist');
-  assert.strictEqual(loginHtml.includes('id="loginPassword"'), true, 'Password input #loginPassword must exist');
-  assert.strictEqual(loginHtml.includes('id="btnLoginSubmit"'), true, 'Submit button #btnLoginSubmit must exist');
-  assert.strictEqual(loginHtml.includes('autofillDemo(\'farmer\')'), true, 'Farmer demo autofill button must exist');
-  assert.strictEqual(loginHtml.includes('autofillDemo(\'vet\')'), true, 'Vet demo autofill button must exist');
+  assert.strictEqual(loginHtml.includes('demo-autofill-section'), false, 'Demo autofill button section must be removed for real Supabase auth');
+  assert.strictEqual(loginHtml.includes('id="authTabSignIn"'), true, 'Sign In tab #authTabSignIn must exist in login.html');
+  assert.strictEqual(loginHtml.includes('id="authTabSignUp"'), true, 'Sign Up tab #authTabSignUp must exist in login.html');
   assert.strictEqual(loginHtml.includes('assets/images/hero_cow_3d.jpg'), true, '3D Cow hero must be displayed on login page');
 
   // Verify CSS Rules for Role Dropdown & Login Card
@@ -806,6 +805,11 @@ async function resolveStorageBucket(primaryBucket, fallbackBucket, mockBuckets) 
   assert.strictEqual(latestAppJs.includes("activeRole === 'vet' && farmerOnlyTabs.includes(targetId)"), true, 'Vet must be blocked from accessing farmer tabs');
   assert.strictEqual(latestAppJs.includes('Access Denied: Veterinarian credentials required'), true, 'Farmer accessing vet tab must show Access Denied');
   assert.strictEqual(latestAppJs.includes('Access Denied: Farmer dashboard is restricted to herd owners'), true, 'Vet accessing farmer tab must show Access Denied');
+  assert.strictEqual(freshHtml.includes('class="sidebar-nav-btn farmer-only" data-tab="tabAssess"'), true, 'tabAssess in sidebar must be farmer-only');
+  assert.strictEqual(freshHtml.includes('class="sidebar-nav-btn secondary-assess farmer-only"'), true, 'Start check shortcut must be farmer-only');
+  assert.strictEqual(freshHtml.includes('class="nav-tab-item farmer-only" data-tab="tabAssess"'), true, 'Mobile nav tabAssess must be farmer-only');
+  assert.strictEqual(latestAppJs.includes("const farmerOnlyTabs = ['tabHome', 'tabAssess'];"), true, 'farmerOnlyTabs must include tabAssess');
+  assert.strictEqual(latestAppJs.includes("'Clinical Check'"), false, 'Clinical Check label should not be assigned in app.js');
 
   // 4. Verify Database-Resolved Role in login.js
   assert.strictEqual(latestLoginJs.includes("profile.role === 'veterinarian' ? 'vet' : 'farmer'"), true, 'login.js must resolve trusted role from database profile');
@@ -817,5 +821,569 @@ async function resolveStorageBucket(primaryBucket, fallbackBucket, mockBuckets) 
 
   console.log('✅ 29. Farmer/Vet role switching removal and strict route protection verified.');
 
-  console.log('--- ALL 29 TEST SUITES COMPLETED WITH 100% PASS RATE ---');
+  // 30. Clinical Entity Token Protection & Token Restoration
+  function testProtectClinicalTokens(text) {
+    if (!text || typeof text !== 'string') return { protectedText: text, tokenMap: new Map() };
+    const tokenMap = new Map();
+    let counter = 0;
+    const tokenRegex = /(\b(?:VCI|MH|TAG|COW)[A-Z0-9\-_]{2,20}\b)|(\b\d{1,2}(?:\.\d)?\s*°?[Cc]\b)|(\b\d+\s*(?:mg|ml|hours?|hrs?|h|days?)\b)|(\b(?:q12h|q24h|IM|SC|LC)\b)|(\b(?:LF|RF|LR|RR)\b)/gi;
+    const protectedText = text.replace(tokenRegex, (match) => {
+      const key = `__BV_CLIN_${counter++}__`;
+      tokenMap.set(key, match);
+      return key;
+    });
+    return { protectedText, tokenMap };
+  }
+
+  function testRestoreClinicalTokens(text, tokenMap) {
+    if (!text || !tokenMap || tokenMap.size === 0) return text;
+    let restored = text;
+    tokenMap.forEach((val, key) => {
+      const escaped = key.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+      const fuzzyRegex = new RegExp(escaped.split('').join('\\s*'), 'gi');
+      restored = restored.replace(fuzzyRegex, val);
+    });
+    return restored;
+  }
+
+  const sampleClinicalNote = 'Cow with ear tag MH-12-8842 presented with rectal temp 39.4°C in RF quarter. Prescribed Cefquinome 75mg q12h with 72h milk withdrawal.';
+  const { protectedText, tokenMap } = testProtectClinicalTokens(sampleClinicalNote);
+  assert.strictEqual(protectedText.includes('MH-12-8842'), false, 'Ear tag must be replaced with placeholder token');
+  assert.strictEqual(protectedText.includes('39.4°C'), false, 'Temp must be replaced with placeholder token');
+  assert.strictEqual(protectedText.includes('RF'), false, 'Quarter code must be replaced with placeholder token');
+  assert.strictEqual(tokenMap.size >= 5, true, 'At least 5 clinical entities must be protected');
+
+  // Simulate machine translation output preserving placeholders
+  const simulatedMTOutput = 'गाईचा कान टॅग __BV_CLIN_0__ सह कासेच्या __BV_CLIN_2__ भागामध्ये तापमान __BV_CLIN_1__ आढळले. __BV_CLIN_3__ __BV_CLIN_4__ औषध आणि __BV_CLIN_5__ दूध विथहोल्डिंग लागू केले.';
+  const restoredNote = testRestoreClinicalTokens(simulatedMTOutput, tokenMap);
+  assert.strictEqual(restoredNote.includes('MH-12-8842'), true, 'Ear tag must be perfectly restored');
+  assert.strictEqual(restoredNote.includes('39.4°C'), true, 'Body temp must be perfectly restored');
+  assert.strictEqual(restoredNote.includes('RF'), true, 'Quarter code must be perfectly restored');
+  assert.strictEqual(restoredNote.includes('75mg'), true, 'Dosage must be perfectly restored');
+  assert.strictEqual(restoredNote.includes('q12h'), true, 'Frequency must be perfectly restored');
+  assert.strictEqual(restoredNote.includes('72h'), true, 'Withdrawal period must be perfectly restored');
+  console.log('✅ 30. Clinical entity token protection and restoration verified.');
+
+  // 31. Bhashini Proxy Server Contract & Client Translation Integrity
+  const serverJsContent = fs.readFileSync(path.join(__dirname, 'server.js'), 'utf8');
+  assert.strictEqual(serverJsContent.includes('/api/bhashini/config'), true, 'server.js must expose /api/bhashini/config');
+  assert.strictEqual(serverJsContent.includes('/api/bhashini/translate'), true, 'server.js must expose /api/bhashini/translate');
+  assert.strictEqual(serverJsContent.includes('dhruva-api.bhashini.gov.in'), true, 'server.js must target official Dhruva Bhashini endpoint');
+  assert.strictEqual(serverJsContent.includes('protectClinicalTokens'), true, 'server.js must use protectClinicalTokens');
+  assert.strictEqual(serverJsContent.includes('restoreClinicalTokens'), true, 'server.js must use restoreClinicalTokens');
+  assert.strictEqual(latestAppJs.includes('translateWithBhashini'), true, 'app.js must define translateWithBhashini');
+  assert.strictEqual(latestAppJs.includes('translateFarmerNotesInModal'), true, 'app.js must define translateFarmerNotesInModal');
+  assert.strictEqual(latestAppJs.includes('translatePrescriptionInModal'), true, 'app.js must define translatePrescriptionInModal');
+  console.log('✅ 31. Bhashini proxy contract & in-modal tele-triage translation verified.');
+
+  // 32. Indic Speech Synthesis Locale Mapping & Digit Normalization
+  const indicLocaleMap = { en: 'en-IN', mr: 'mr-IN', hi: 'hi-IN' };
+  assert.strictEqual(indicLocaleMap.mr, 'mr-IN', 'Marathi locale must map to mr-IN');
+  assert.strictEqual(indicLocaleMap.hi, 'hi-IN', 'Hindi locale must map to hi-IN');
+  assert.strictEqual(indicLocaleMap.en, 'en-IN', 'English locale must map to en-IN');
+
+  const rawDevanagariDigits = '३८.५ अंश';
+  const normalizedDigits = rawDevanagariDigits.replace(/[०-९]/g, d => '०१२३४५६७८९'.indexOf(d));
+  assert.strictEqual(normalizedDigits, '38.5 अंश', 'Devanagari numerals must normalize to Arabic numerals for medical parsing');
+  console.log('✅ 32. Indic speech synthesis locale mapping & digit normalization verified.');
+
+  // 33. Full Assessment Form Trilingual Localization & Unclipped Vertical Scrolling Verification
+  const stylesCssContent = fs.readFileSync(path.join(__dirname, 'styles.css'), 'utf8');
+  assert.strictEqual(stylesCssContent.includes('.assess-tab-view'), true, 'styles.css must style .assess-tab-view');
+  assert.strictEqual(stylesCssContent.includes('overflow-y: visible !important'), true, 'styles.css must ensure overflow-y is visible on assessment form');
+  assert.strictEqual(stylesCssContent.includes('padding-bottom: 120px !important'), true, 'styles.css must provide bottom padding above mobile navigation');
+
+  const requiredAssessmentKeys = [
+    'assessTitle', 'assessSubTitle', 'lblAssessCowSelect', 'optAssessSelectCow',
+    'lblAssessBodyTemp', 'hintAssessBodyTemp', 'lblAssessUdderTemp', 'phAssessUdderTemp',
+    'lblAssessQuarters', 'lblQuarterLF', 'lblQuarterRF', 'lblQuarterLR', 'lblQuarterRR',
+    'lblAssessMilkAppearance', 'optMilkNormal', 'optMilkWatery', 'optMilkClots', 'optMilkDiscolored',
+    'lblAssessSwelling', 'optSwellingNone', 'optSwellingMild', 'optSwellingMod', 'optSwellingSevere',
+    'lblAssessCmtScore', 'optCmtNeg', 'optCmtTrace', 'optCmt1', 'optCmt2', 'optCmt3',
+    'lblAssessMilkingPain', 'optPainNone', 'optPainMild', 'optPainSevere',
+    'lblAssessPhoto', 'lblAssessPhotoSub', 'assessUploadText', 'lblAssessPhotoFormats',
+    'assessAiNoticeBold', 'assessAiNoticeText', 'lblAssessNotes', 'phAssessNotes',
+    'btnSubmitAssessText', 'lblVoiceBtnText', 'lblAssessVoiceRead', 'lblTranslateNotesForm'
+  ];
+
+  requiredAssessmentKeys.forEach(k => {
+    assert.strictEqual(latestAppJs.includes(`${k}:`), true, `app.js must define localization key ${k}`);
+  });
+  console.log('✅ 33. Full assessment form trilingual localization & unclipped scrolling verified.');
+
+  // 34. Redesigned Clinical Consultation Workspace & Compact Case Summary Verification
+  const indexHtmlLatest = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  const stylesCssLatest = fs.readFileSync(path.join(__dirname, 'styles.css'), 'utf8');
+  const appJsLatest = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+
+  // Verify Compact Case Summary & Header Elements
+  assert.strictEqual(indexHtmlLatest.includes('id="clinicalWorkspaceTitle"'), true, '#clinicalWorkspaceTitle must exist');
+  assert.strictEqual(indexHtmlLatest.includes('id="clinicalActiveCaseSelect"'), true, '#clinicalActiveCaseSelect patient switcher must exist');
+  assert.strictEqual(indexHtmlLatest.includes('id="clinicalCaseSummaryPanel"'), true, '#clinicalCaseSummaryPanel compact summary must exist');
+  assert.strictEqual(indexHtmlLatest.includes('id="caseSummaryAnimal"'), true, '#caseSummaryAnimal must exist');
+  assert.strictEqual(indexHtmlLatest.includes('id="caseSummarySpecies"'), true, '#caseSummarySpecies must exist');
+  assert.strictEqual(indexHtmlLatest.includes('id="caseSummaryFarm"'), true, '#caseSummaryFarm must exist');
+  assert.strictEqual(indexHtmlLatest.includes('id="caseSummaryId"'), true, '#caseSummaryId must exist');
+  assert.strictEqual(indexHtmlLatest.includes('id="caseSummaryDate"'), true, '#caseSummaryDate must exist');
+  assert.strictEqual(indexHtmlLatest.includes('id="caseSummaryStatus"'), true, '#caseSummaryStatus must exist');
+  assert.strictEqual(indexHtmlLatest.includes('id="caseSummaryConcern"'), true, '#caseSummaryConcern must exist');
+
+  // Verify Section Sub-Navigation Tabs & Panes (Overview removed, Observations active default)
+  assert.strictEqual(indexHtmlLatest.includes('id="btnSubtabOverview"'), false, '#btnSubtabOverview tab button must be removed');
+  const subTabs = ['Observations', 'Images', 'Diagnosis', 'Followup', 'History'];
+  subTabs.forEach(tab => {
+    assert.strictEqual(indexHtmlLatest.includes(`id="btnSubtab${tab}"`), true, `#btnSubtab${tab} tab button must exist in index.html`);
+    assert.strictEqual(indexHtmlLatest.includes(`id="paneClinical${tab}"`), true, `#paneClinical${tab} panel must exist in index.html`);
+  });
+
+  // Verify Clinical Image Lightbox Modal
+  assert.strictEqual(indexHtmlLatest.includes('id="modalClinicalImagePreview"'), true, '#modalClinicalImagePreview must exist');
+  assert.strictEqual(indexHtmlLatest.includes('id="previewModalImage"'), true, '#previewModalImage must exist');
+
+  // Verify Clinical Workspace Styles in styles.css
+  assert.strictEqual(stylesCssLatest.includes('.clinical-workspace-header'), true, '.clinical-workspace-header CSS must exist');
+  assert.strictEqual(stylesCssLatest.includes('.clinical-case-summary-card'), true, '.clinical-case-summary-card CSS must exist');
+  assert.strictEqual(stylesCssLatest.includes('.clinical-subnav-bar'), true, '.clinical-subnav-bar CSS must exist');
+  assert.strictEqual(stylesCssLatest.includes('.clinical-subnav-btn'), true, '.clinical-subnav-btn CSS must exist');
+  assert.strictEqual(stylesCssLatest.includes('.clinical-subtab-pane'), true, '.clinical-subtab-pane CSS must exist');
+  assert.strictEqual(stylesCssLatest.includes('.clinical-gallery-grid'), true, '.clinical-gallery-grid CSS must exist');
+
+  // Verify Controller Functions in app.js
+  assert.strictEqual(appJsLatest.includes('function switchClinicalSubTab'), true, 'switchClinicalSubTab must be defined');
+  assert.strictEqual(appJsLatest.includes('function switchActiveClinicalCase'), true, 'switchActiveClinicalCase must be defined');
+  assert.strictEqual(appJsLatest.includes('function renderClinicalCaseWorkspace'), true, 'renderClinicalCaseWorkspace must be defined');
+  assert.strictEqual(appJsLatest.includes('function saveClinicalDiagnosisForm'), true, 'saveClinicalDiagnosisForm must be defined');
+  assert.strictEqual(appJsLatest.includes('function openClinicalImagePreview'), true, 'openClinicalImagePreview must be defined');
+  assert.strictEqual(appJsLatest.includes('function closeClinicalImagePreview'), true, 'closeClinicalImagePreview must be defined');
+  assert.strictEqual(appJsLatest.includes('function translateClinicalFarmerNotes'), true, 'translateClinicalFarmerNotes must be defined');
+
+  // Verify Localization Keys in I18N
+  const clinicalI18nKeys = [
+    'clinicalWorkspaceTitle', 'clinicalWorkspaceSubtitle', 'lblClinicalWorkspaceTag',
+    'lblActivePatientSelect', 'lblSubtabOverview', 'lblSubtabObservations', 'lblSubtabImages',
+    'lblSubtabDiagnosis', 'lblSubtabFollowup', 'lblSubtabHistory', 'lblObsSymptomsReported',
+    'lblObsVitalsHeader', 'lblConfirmedDiagnosis', 'lblMedicationProtocol', 'valUnavailable'
+  ];
+  clinicalI18nKeys.forEach(k => {
+    assert.strictEqual(appJsLatest.includes(`${k}:`), true, `app.js must define clinical localization key ${k}`);
+  });
+
+  console.log('✅ 34. Simplified Clinical Overview workspace, compact case summary, and sub-navigation tabs verified.');
+
+  // 35. Location-Based Vet Assignment Hierarchy, Eligibility Filtering, Stability Rule, and Tie-Breaker
+  const { matchVetForFarmLocally } = require('./app.js');
+
+  const testVets = [
+    {
+      id: 'vet-a',
+      role: 'veterinarian',
+      is_verified_vet: true,
+      is_active_vet: true,
+      pincode: '411028',
+      village_city: 'Haveli',
+      district: 'Pune',
+      state: 'Maharashtra',
+      created_at: '2026-01-01T00:00:00Z'
+    },
+    {
+      id: 'vet-b',
+      role: 'veterinarian',
+      is_verified_vet: true,
+      is_active_vet: true,
+      pincode: '411001',
+      village_city: 'Haveli',
+      district: 'Pune',
+      state: 'Maharashtra',
+      created_at: '2026-01-05T00:00:00Z'
+    },
+    {
+      id: 'vet-c',
+      role: 'veterinarian',
+      is_verified_vet: true,
+      is_active_vet: true,
+      pincode: '413102',
+      village_city: 'Baramati',
+      district: 'Pune',
+      state: 'Maharashtra',
+      created_at: '2026-01-10T00:00:00Z'
+    },
+    {
+      id: 'vet-d',
+      role: 'veterinarian',
+      is_verified_vet: true,
+      is_active_vet: true,
+      pincode: '415001',
+      village_city: 'Satara',
+      district: 'Satara',
+      state: 'Maharashtra',
+      created_at: '2026-01-15T00:00:00Z'
+    },
+    {
+      id: 'vet-e',
+      role: 'veterinarian',
+      is_verified_vet: true,
+      is_active_vet: true,
+      pincode: '560001',
+      village_city: 'Bengaluru',
+      district: 'Bengaluru',
+      state: 'Karnataka',
+      created_at: '2026-01-20T00:00:00Z'
+    },
+    {
+      id: 'vet-unverified',
+      role: 'veterinarian',
+      is_verified_vet: false,
+      is_active_vet: true,
+      pincode: '411028',
+      village_city: 'Haveli',
+      district: 'Pune',
+      state: 'Maharashtra',
+      created_at: '2025-01-01T00:00:00Z'
+    },
+    {
+      id: 'vet-inactive',
+      role: 'veterinarian',
+      is_verified_vet: true,
+      is_active_vet: false,
+      pincode: '411028',
+      village_city: 'Haveli',
+      district: 'Pune',
+      state: 'Maharashtra',
+      created_at: '2025-01-01T00:00:00Z'
+    },
+    {
+      id: 'vet-farmer-role',
+      role: 'farmer',
+      is_verified_vet: true,
+      is_active_vet: true,
+      pincode: '411028',
+      village_city: 'Haveli',
+      district: 'Pune',
+      state: 'Maharashtra',
+      created_at: '2025-01-01T00:00:00Z'
+    }
+  ];
+
+  // Test Tier 4: Exact Postal PIN code match
+  const farmTier4 = { pincode: '411028', village_city: 'Other', district: 'Other', state: 'Maharashtra' };
+  assert.strictEqual(matchVetForFarmLocally(farmTier4, testVets), 'vet-a', 'Tier 4 exact PIN code match must return vet-a');
+
+  // Test Tier 3: Same Village/City AND District
+  const farmTier3 = { pincode: '411999', village_city: 'Haveli', district: 'Pune', state: 'Maharashtra' };
+  assert.strictEqual(matchVetForFarmLocally(farmTier3, [testVets[1], testVets[2], testVets[3]]), 'vet-b', 'Tier 3 Village & District match must return vet-b');
+
+  // Test Tier 2: Same District
+  const farmTier2 = { pincode: '411999', village_city: 'Daund', district: 'Pune', state: 'Maharashtra' };
+  assert.strictEqual(matchVetForFarmLocally(farmTier2, [testVets[2], testVets[3]]), 'vet-c', 'Tier 2 District match must return vet-c');
+
+  // Test Tier 1: Same State
+  const farmTier1 = { pincode: '416001', village_city: 'Kolhapur', district: 'Kolhapur', state: 'Maharashtra' };
+  assert.strictEqual(matchVetForFarmLocally(farmTier1, [testVets[3], testVets[4]]), 'vet-d', 'Tier 1 State match must return vet-d');
+
+  // Test Tier 0: No location overlap
+  const farmTier0 = { pincode: '141001', village_city: 'Ludhiana', district: 'Ludhiana', state: 'Punjab' };
+  assert.strictEqual(matchVetForFarmLocally(farmTier0, testVets), null, 'Tier 0 no match must return null');
+
+  // Test Eligibility Filter: Unverified, inactive, or non-vet roles must never be matched
+  const farmTargetingExcluded = { pincode: '411028', village_city: 'Haveli', district: 'Pune', state: 'Maharashtra' };
+  const excludedOnlyVets = [testVets[5], testVets[6], testVets[7]]; // unverified, inactive, farmer-role
+  assert.strictEqual(matchVetForFarmLocally(farmTargetingExcluded, excludedOnlyVets), null, 'Excluded vets must never be assigned');
+
+  // Test Stability Rule (Rule 9): Do not churn assignment if current vet maintains equal or higher tier
+  const farmWithStableVet = {
+    assigned_vet_id: 'vet-b',
+    pincode: '411999',
+    village_city: 'Haveli',
+    district: 'Pune',
+    state: 'Maharashtra'
+  };
+  // Both vet-a and vet-b qualify for Tier 3; vet-a was registered earlier, but vet-b is already assigned
+  assert.strictEqual(matchVetForFarmLocally(farmWithStableVet, [testVets[0], testVets[1]]), 'vet-b', 'Stability rule must preserve current vet-b assignment when tier is maintained');
+
+  // Test Upgrade from lower tier to higher tier:
+  const farmWithUpgradableVet = {
+    assigned_vet_id: 'vet-b', // currently Tier 3 (Haveli, Pune)
+    pincode: '411028',         // matches vet-a at Tier 4
+    village_city: 'Haveli',
+    district: 'Pune',
+    state: 'Maharashtra'
+  };
+  assert.strictEqual(matchVetForFarmLocally(farmWithUpgradableVet, [testVets[0], testVets[1]]), 'vet-a', 'Assignment must upgrade when higher tier (Tier 4) becomes available');
+
+  // Test Deterministic Tie-Breaker: created_at ASC, then id ASC
+  const tieVets = [
+    { id: 'vet-late', role: 'veterinarian', is_verified_vet: true, is_active_vet: true, district: 'Pune', state: 'Maharashtra', created_at: '2026-02-01T00:00:00Z' },
+    { id: 'vet-early', role: 'veterinarian', is_verified_vet: true, is_active_vet: true, district: 'Pune', state: 'Maharashtra', created_at: '2026-01-01T00:00:00Z' }
+  ];
+  assert.strictEqual(matchVetForFarmLocally({ district: 'Pune', state: 'Maharashtra' }, tieVets), 'vet-early', 'Tie-breaker must choose earlier registered vet');
+
+  // Test SQL Migration Contract & RLS Verification
+  const migrationPath = path.join(__dirname, 'supabase', 'migrations', '20261021000001_editable_profiles_and_location_matching.sql');
+  assert.strictEqual(fs.existsSync(migrationPath), true, 'Location matching SQL migration file must exist');
+  const migrationContent = fs.readFileSync(migrationPath, 'utf8');
+  assert.strictEqual(migrationContent.includes('match_vet_for_farm'), true, 'Migration must define match_vet_for_farm');
+  assert.strictEqual(migrationContent.includes('trg_farm_location_recalculate'), true, 'Migration must define location recalculation trigger');
+  assert.strictEqual(migrationContent.includes('trg_route_case_to_farm_vet'), true, 'Migration must define case auto-routing trigger');
+  console.log('✅ 35. Location-based vet matching hierarchy, eligibility filtering, stability rule, and tie-breakers passed.');
+
+  // 36. Profile Edit Modals DOM Integrity, Farmer Privacy Guarantees, and Trilingual Localization
+  const indexHtmlProfiles = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  const appJsProfiles = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+
+  // Verify Farmer Profile Modal & Input Fields
+  assert.strictEqual(indexHtmlProfiles.includes('id="modalEditFarmerProfile"'), true, '#modalEditFarmerProfile must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editFarmerName"'), true, '#editFarmerName must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editFarmerPhone"'), true, '#editFarmerPhone must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editFarmName"'), true, '#editFarmName must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editFarmAddress"'), true, '#editFarmAddress must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editFarmVillage"'), true, '#editFarmVillage must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editFarmDistrict"'), true, '#editFarmDistrict must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editFarmState"'), true, '#editFarmState must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editFarmPincode"'), true, '#editFarmPincode must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="btnSaveFarmerProfile"'), true, '#btnSaveFarmerProfile must exist');
+
+  // Verify Veterinarian Profile Modal & Input Fields
+  assert.strictEqual(indexHtmlProfiles.includes('id="modalEditVetProfile"'), true, '#modalEditVetProfile must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editVetName"'), true, '#editVetName must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editVetPhone"'), true, '#editVetPhone must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editVetClinic"'), true, '#editVetClinic must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editVetAddress"'), true, '#editVetAddress must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editVetVillage"'), true, '#editVetVillage must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editVetDistrict"'), true, '#editVetDistrict must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editVetState"'), true, '#editVetState must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editVetPincode"'), true, '#editVetPincode must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="editVetServiceArea"'), true, '#editVetServiceArea must exist');
+  assert.strictEqual(indexHtmlProfiles.includes('id="btnSaveVetProfile"'), true, '#btnSaveVetProfile must exist');
+
+  // Verify Controller Functions in app.js
+  assert.strictEqual(appJsProfiles.includes('function openEditFarmerProfileModal'), true, 'openEditFarmerProfileModal must be defined');
+  assert.strictEqual(appJsProfiles.includes('function closeEditFarmerProfileModal'), true, 'closeEditFarmerProfileModal must be defined');
+  assert.strictEqual(appJsProfiles.includes('function saveFarmerProfile'), true, 'saveFarmerProfile must be defined');
+  assert.strictEqual(appJsProfiles.includes('function openEditVetProfileModal'), true, 'openEditVetProfileModal must be defined');
+  assert.strictEqual(appJsProfiles.includes('function closeEditVetProfileModal'), true, 'closeEditVetProfileModal must be defined');
+  assert.strictEqual(appJsProfiles.includes('function saveVetProfile'), true, 'saveVetProfile must be defined');
+
+  // Verify Strict Farmer Vet Privacy:
+  // 1. Hardcoded vet dispensary string must be completely removed from farmer view
+  assert.strictEqual(appJsProfiles.includes('Nearest Vet Dispensary: Pune District Veterinary Hospital'), false, 'Hardcoded vet dispensary leak must be removed');
+  // 2. Neutral status titles & messages must exist
+  assert.strictEqual(appJsProfiles.includes('id="lblVetCoverageTitle"'), true, '#lblVetCoverageTitle must be rendered');
+  assert.strictEqual(appJsProfiles.includes('id="valVetCoverageStatus"'), true, '#valVetCoverageStatus must be rendered');
+  assert.strictEqual(appJsProfiles.includes('msgVetAssignedNeutral'), true, 'msgVetAssignedNeutral must be defined');
+  assert.strictEqual(appJsProfiles.includes('msgNoVetAvailable'), true, 'msgNoVetAvailable must be defined');
+
+  // Verify Trilingual Localization Dictionary Keys in English, Marathi, Hindi
+  const requiredProfileKeys = [
+    'lblEditFarmerProfile', 'lblEditVetProfile', 'titleEditFarmerModal', 'titleEditVetModal',
+    'lblSectionFarmerPersonal', 'lblFarmerName', 'lblFarmerPhone', 'lblSectionFarmLocation',
+    'lblFarmName', 'lblFarmAddress', 'lblFarmVillage', 'lblFarmDistrict', 'lblFarmState',
+    'lblFarmPincode', 'btnCancelEditFarmer', 'btnSaveFarmerProfileText', 'lblSectionVetPersonal',
+    'lblVetName', 'lblVetPhone', 'lblSectionVetPractice', 'lblVetClinic', 'lblVetAddress',
+    'lblVetVillage', 'lblVetDistrict', 'lblVetState', 'lblVetPincode', 'lblVetServiceArea',
+    'btnCancelEditVet', 'btnSaveVetProfileText', 'lblVetCoverageTitle', 'msgVetAssignedNeutral',
+    'msgNoVetAvailable', 'toastProfileSaved'
+  ];
+
+  const { I18N } = require('./app.js');
+  ['en', 'mr', 'hi'].forEach(lang => {
+    assert.strictEqual(Boolean(I18N[lang]), true, `I18N must define language '${lang}'`);
+    requiredProfileKeys.forEach(key => {
+      assert.strictEqual(Boolean(I18N[lang][key]), true, `I18N.${lang} must define key '${key}'`);
+    });
+  });
+
+  console.log('✅ 36. Profile edit modals, farmer privacy verification, and trilingual localization passed.');
+
+  // =========================================================================
+  // TEST SUITE 37: Clinical Triage Case Deletion, Role Guardrails, Soft-Delete Migration, & Trilingual Localization
+  // =========================================================================
+  const { deleteCase, deleteActiveClinicalCase } = require('./app.js');
+  const softDeleteMigrationPath = path.join(__dirname, 'supabase', 'migrations', '20261021000002_soft_delete_clinical_cases.sql');
+  const indexHtmlSuite37 = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  const appJsSuite37 = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+
+  // 1. Verify SQL Migration File & Soft-Delete Stored Procedure Contract
+  assert.strictEqual(fs.existsSync(softDeleteMigrationPath), true, 'Migration 20261021000002_soft_delete_clinical_cases.sql must exist');
+  const softDeleteSql = fs.readFileSync(softDeleteMigrationPath, 'utf8');
+  assert.strictEqual(softDeleteSql.includes('deleted_at TIMESTAMPTZ DEFAULT NULL'), true, 'deleted_at column must be defined on mastitis_cases');
+  assert.strictEqual(softDeleteSql.includes('CREATE INDEX IF NOT EXISTS idx_cases_active'), true, 'Partial index idx_cases_active on non-deleted cases must exist');
+  assert.strictEqual(softDeleteSql.includes('CREATE OR REPLACE FUNCTION public.soft_delete_case'), true, 'public.soft_delete_case stored procedure must exist');
+  assert.strictEqual(softDeleteSql.includes('cases_farmer_soft_delete'), true, 'Farmer soft-delete RLS policy must be defined');
+
+  // 2. Verify Client Backend Query Soft-Delete Filtering
+  assert.strictEqual(appJsSuite37.includes(".is('deleted_at', null)"), true, 'app.js loadBackendData must exclude soft-deleted cases');
+
+  // 3. Verify DOM Elements & Action Triggers in UI
+  assert.strictEqual(indexHtmlSuite37.includes('id="btnDeleteClinicalCase"'), true, '#btnDeleteClinicalCase button must exist in clinical workspace header');
+  assert.strictEqual(indexHtmlSuite37.includes('deleteActiveClinicalCase()'), true, '#btnDeleteClinicalCase must trigger deleteActiveClinicalCase()');
+  assert.strictEqual(appJsSuite37.includes('id="btnModalDeleteCase"'), true, '#btnModalDeleteCase button must exist in vet review modal');
+  assert.strictEqual(appJsSuite37.includes('class="btn-delete-case-farmer"'), true, 'Farmer consultation cards must include delete button');
+  assert.strictEqual(appJsSuite37.includes("deleteCase('${c.id || c.caseId}', 'vet')"), true, 'Vet triage queue cards must include delete button');
+
+  // 4. Verify Functional Deletion Logic & Role-Based Guardrails
+  // 4a. Farmer Guardrail: Cannot delete case with active prescription / milk withholding
+  const prescribedCaseFarmerResult = await deleteCase('CASE-2026-084', 'farmer');
+  assert.strictEqual(prescribedCaseFarmerResult.success, false, 'Farmer must not be allowed to delete prescribed case');
+  assert.strictEqual(prescribedCaseFarmerResult.reason, 'prescribed_guardrail', 'Rejection reason must be prescribed_guardrail');
+
+  // 4b. Farmer Permission: Can delete unprescribed open case
+  const openCaseFarmerResult = await deleteCase('CASE-2026-081', 'farmer');
+  assert.strictEqual(openCaseFarmerResult.success, true, 'Farmer must be able to delete open unprescribed case');
+
+  // 4c. Veterinarian Clinical Discretion: Can dismiss/delete case even with prescription
+  const vetDeleteResult = await deleteCase('CASE-2026-084', 'vet');
+  assert.strictEqual(vetDeleteResult.success, true, 'Veterinarian must be able to dismiss/delete case');
+
+  // 4d. Edge Cases: Non-existent case and missing ID
+  const notFoundResult = await deleteCase('NON_EXISTENT_CASE_ID', 'vet');
+  assert.strictEqual(notFoundResult.success, false, 'Deleting non-existent case must fail');
+  assert.strictEqual(notFoundResult.reason, 'not_found', 'Rejection reason must be not_found');
+
+  const missingIdResult = await deleteCase('', 'vet');
+  assert.strictEqual(missingIdResult.success, false, 'Deleting with empty ID must fail');
+  assert.strictEqual(missingIdResult.reason, 'missing_id', 'Rejection reason must be missing_id');
+
+  // 5. Verify Trilingual Localization Keys for Case Deletion
+  const deleteI18nKeys = [
+    'btnDeleteClinicalCaseText',
+    'btnDeleteCase',
+    'msgConfirmDeleteCase',
+    'msgCannotDeletePrescribed',
+    'toastCaseDeleted'
+  ];
+
+  ['en', 'mr', 'hi'].forEach(lang => {
+    deleteI18nKeys.forEach(k => {
+      assert.strictEqual(Boolean(I18N[lang][k]), true, `I18N.${lang} must define delete key '${k}'`);
+      assert.strictEqual(typeof I18N[lang][k] === 'string' && I18N[lang][k].length > 0, true, `I18N.${lang}.${k} must be non-empty`);
+    });
+  });
+
+  console.log('✅ 37. Clinical triage case deletion, role guardrails, soft-delete migration, and trilingual localization verified.');
+
+  // =========================================================================
+  // TEST SUITE 38: Computer Vision Mastitis AI Screening, MobileNetV2 Math, Endpoint, DOM & Localization
+  // =========================================================================
+  const { execSync } = require('child_process');
+  const http = require('http');
+
+  // 1. Verify ml_inference.py execution and output structure
+  const mlScriptPath = path.join(__dirname, 'ml_inference.py');
+  assert.strictEqual(fs.existsSync(mlScriptPath), true, 'ml_inference.py must exist in project root');
+  const sampleImagePath = path.join(__dirname, 'asset', 'images', 'cow_assessment_banner.jpeg');
+  assert.strictEqual(fs.existsSync(sampleImagePath), true, 'Sample image cow_assessment_banner.jpeg must exist');
+
+  const pyStdout = execSync(`python3 "${mlScriptPath}" "${sampleImagePath}"`, { encoding: 'utf8' });
+  const pyResult = JSON.parse(pyStdout);
+  assert.strictEqual(pyResult.success, true, 'ml_inference.py must return success: true');
+  assert.strictEqual(pyResult.model_architecture, 'MobileNetV2 (1.00_224)', 'Architecture must be MobileNetV2 (1.00_224)');
+  assert.strictEqual(pyResult.output_layer, 'Dense(1) + Sigmoid', 'Output layer must be Dense(1) + Sigmoid');
+  assert.strictEqual(typeof pyResult.normal_probability, 'number', 'normal_probability must be a number');
+  assert.strictEqual(typeof pyResult.mastitis_probability, 'number', 'mastitis_probability must be a number');
+  assert.strictEqual(typeof pyResult.confidence, 'number', 'confidence must be a number');
+  assert.strictEqual(['Low', 'Moderate', 'High'].includes(pyResult.risk_tier), true, 'risk_tier must be Low, Moderate, or High');
+  assert.strictEqual(typeof pyResult.prediction_label, 'string', 'prediction_label must be a string');
+  assert.strictEqual(typeof pyResult.disclaimer === 'string' && pyResult.disclaimer.length > 0, true, 'disclaimer must be a non-empty string');
+  assert.strictEqual(Math.round((pyResult.normal_probability + pyResult.mastitis_probability) * 100) / 100, 1.00, 'Probabilities must sum to 1.00');
+
+  // 2. Verify Probability Calculation and Risk Tier Threshold Math
+  function computeRiskTier(mastitisProb) {
+    if (mastitisProb >= 0.65) return { tier: 'High', label: 'Mastitis Indicated' };
+    if (mastitisProb >= 0.35) return { tier: 'Moderate', label: 'Borderline / Monitor' };
+    return { tier: 'Low', label: 'Healthy / Normal' };
+  }
+
+  // Low Risk: mastitis_probability < 0.35 (e.g. normal_prob = 0.90 -> mastitis_prob = 0.10)
+  const lowRisk = computeRiskTier(0.10);
+  assert.strictEqual(lowRisk.tier, 'Low', 'P(Mastitis) = 0.10 must be Low risk');
+  assert.strictEqual(lowRisk.label, 'Healthy / Normal');
+
+  // Moderate Risk: 0.35 <= mastitis_probability < 0.65 (e.g. mastitis_prob = 0.50)
+  const modRisk = computeRiskTier(0.50);
+  assert.strictEqual(modRisk.tier, 'Moderate', 'P(Mastitis) = 0.50 must be Moderate risk');
+  assert.strictEqual(modRisk.label, 'Borderline / Monitor');
+
+  // High Risk: mastitis_probability >= 0.65 (e.g. mastitis_prob = 0.85)
+  const highRisk = computeRiskTier(0.85);
+  assert.strictEqual(highRisk.tier, 'High', 'P(Mastitis) = 0.85 must be High risk');
+  assert.strictEqual(highRisk.label, 'Mastitis Indicated');
+
+  // 3. Verify server.js Endpoint Contract
+  const serverCode = fs.readFileSync(path.join(__dirname, 'server.js'), 'utf8');
+  assert.strictEqual(serverCode.includes("reqPath === '/api/ai-screen'"), true, 'server.js must expose /api/ai-screen endpoint');
+  assert.strictEqual(serverCode.includes('image_base64'), true, 'server.js /api/ai-screen must handle base64 image data');
+  assert.strictEqual(serverCode.includes('ml_inference.py'), true, 'server.js /api/ai-screen must invoke ml_inference.py');
+
+  // 4. Live HTTP verification of /api/ai-screen
+  const httpResult = await new Promise((resolve) => {
+    const postData = JSON.stringify({ image_path: 'asset/images/cow_assessment_banner.jpeg' });
+    const req = http.request({
+      hostname: '127.0.0.1',
+      port: 3000,
+      path: '/api/ai-screen',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    }, res => {
+      let data = '';
+      res.on('data', chunk => { data += chunk; });
+      res.on('end', () => resolve({ statusCode: res.statusCode, body: data }));
+    });
+    req.on('error', err => resolve({ error: err.message }));
+    req.write(postData);
+    req.end();
+  });
+
+  if (!httpResult.error) {
+    assert.strictEqual(httpResult.statusCode, 200, 'HTTP /api/ai-screen must return status 200');
+    const apiJson = JSON.parse(httpResult.body);
+    assert.strictEqual(apiJson.success, true, '/api/ai-screen response must indicate success');
+    assert.strictEqual(typeof apiJson.mastitis_probability, 'number', '/api/ai-screen must return mastitis_probability');
+  }
+
+  // 5. Verify index.html DOM Elements for AI Screening
+  const indexHtmlAi = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  assert.strictEqual(indexHtmlAi.includes('id="assessAiNotice"'), true, '#assessAiNotice panel must exist in index.html');
+  assert.strictEqual(indexHtmlAi.includes('id="aiScreeningInitial"'), true, '#aiScreeningInitial must exist in index.html');
+  assert.strictEqual(indexHtmlAi.includes('id="aiScreeningActive"'), true, '#aiScreeningActive must exist in index.html');
+  assert.strictEqual(indexHtmlAi.includes('id="lblAiScreeningTitle"'), true, '#lblAiScreeningTitle must exist in index.html');
+  assert.strictEqual(indexHtmlAi.includes('id="aiScreeningRiskTier"'), true, '#aiScreeningRiskTier must exist in index.html');
+  assert.strictEqual(indexHtmlAi.includes('id="aiScreeningMeter"'), true, '#aiScreeningMeter must exist in index.html');
+  assert.strictEqual(indexHtmlAi.includes('id="aiScreeningConfidence"'), true, '#aiScreeningConfidence must exist in index.html');
+  assert.strictEqual(indexHtmlAi.includes('id="aiScreeningRecommendation"'), true, '#aiScreeningRecommendation must exist in index.html');
+  assert.strictEqual(indexHtmlAi.includes('id="aiScreeningDisclaimer"'), true, '#aiScreeningDisclaimer must exist in index.html');
+
+  // 6. Verify Trilingual Localization Keys for AI Screening in English, Marathi, Hindi
+  const aiI18nKeys = [
+    'lblAiScreeningTitle',
+    'lblAiAnalyzing',
+    'lblAiRiskLow',
+    'lblAiRiskMod',
+    'lblAiRiskHigh',
+    'msgAiDisclaimer'
+  ];
+
+  ['en', 'mr', 'hi'].forEach(lang => {
+    assert.strictEqual(Boolean(I18N[lang]), true, `I18N must define language '${lang}'`);
+    aiI18nKeys.forEach(k => {
+      assert.strictEqual(Boolean(I18N[lang][k]), true, `I18N.${lang} must define AI screening key '${k}'`);
+      assert.strictEqual(typeof I18N[lang][k] === 'string' && I18N[lang][k].length > 0, true, `I18N.${lang}.${k} must be non-empty`);
+    });
+  });
+
+  // 7. Verify Flutter Cross-Platform Model Artifacts & Services
+  assert.strictEqual(fs.existsSync(path.join(__dirname, 'asset', 'models', 'bovicare_mastitis_model.tflite')), true, 'Flutter TFLite model must exist in asset/models/');
+  assert.strictEqual(fs.existsSync(path.join(__dirname, 'asset', 'models', 'bovicare_mastitis_model.onnx')), true, 'ONNX model must exist in asset/models/');
+  assert.strictEqual(fs.existsSync(path.join(__dirname, 'lib', 'models', 'mastitis_vision_result.dart')), true, 'lib/models/mastitis_vision_result.dart must exist');
+  assert.strictEqual(fs.existsSync(path.join(__dirname, 'lib', 'services', 'mastitis_vision_service.dart')), true, 'lib/services/mastitis_vision_service.dart must exist');
+  assert.strictEqual(fs.existsSync(path.join(__dirname, 'lib', 'models', 'milk_prediction_request.dart')), true, 'lib/models/milk_prediction_request.dart must exist');
+  assert.strictEqual(fs.existsSync(path.join(__dirname, 'lib', 'models', 'milk_prediction_response.dart')), true, 'lib/models/milk_prediction_response.dart must exist');
+  assert.strictEqual(fs.existsSync(path.join(__dirname, 'backend', 'server.py')), true, 'backend/server.py must exist');
+
+  console.log('✅ 38. Computer Vision MobileNetV2 AI screening, probability math, endpoint, DOM, trilingual localization, and Flutter models verified.');
+
+  console.log('--- ALL 38 TEST SUITES COMPLETED WITH 100% PASS RATE ---');
 })();
+

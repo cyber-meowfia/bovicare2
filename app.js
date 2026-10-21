@@ -190,12 +190,12 @@ let recordsList = [
 // 2. Application State & Storage Settings
 let currentTab = 0;
 let activeRole = 'farmer'; // 'farmer' or 'vet'
-let currentLanguage = localStorage.getItem('bovicare_lang') || 'en';
+let currentLanguage = (typeof localStorage !== 'undefined' ? localStorage.getItem('bovicare_lang') : null) || 'en';
 let currentCompressedImageBlob = null;
 let currentCompressedImageMetadata = null;
 const signedUrlCache = new Map(); // path -> { url, expiresAt }
 
-const BOVICARE_STORAGE_BUCKET = window.BOVICARE_STORAGE_BUCKET || 'bovicare-private-images';
+const BOVICARE_STORAGE_BUCKET = (typeof window !== 'undefined' && window.BOVICARE_STORAGE_BUCKET) || 'bovicare-private-images';
 const FALLBACK_STORAGE_BUCKET = 'udder-images';
 
 // 3. Centralized Multi-Language Dictionary (English, Marathi & Hindi)
@@ -278,6 +278,17 @@ const I18N = {
     btnSubmitAssessText: "Save Assessment & Transmit to Vet",
     lblVoiceBtnText: "Voice Input",
     lblAssessVoiceRead: "Listen Guide",
+    lblTranslateNotesForm: "Translate",
+    lblFilterAll: "All Cattle",
+    lblFilterHealthy: "Healthy",
+    lblFilterMonitor: "To Monitor",
+    phCowSearch: "Search by cow name, ear tag #, breed...",
+    msgSelectCow: "Please select a cow.",
+    msgValidTemp: "Please enter a valid bovine rectal temperature (36.0°C – 43.0°C).",
+    msgAssessSuccess: "Assessment recorded successfully!",
+    msgAssessSavedCloud: "Assessment saved to Supabase cloud!",
+    msgCompressingWebp: "Image is larger than 1 MB cap. Compressing to WebP...",
+    btnSavingAssess: "Saving Assessment...",
 
     // Clinical Overview
     clinicalHeroTitle: "Herd Clinical Health & Udder Epidemiology",
@@ -305,6 +316,55 @@ const I18N = {
     btnAdmitPatientText: "+ Admit Patient",
     btnViewWithholdingSchedule: "View Complete Withholding Schedule & Reminders",
 
+    // Redesigned Clinical Consultation Workspace (English)
+    clinicalWorkspaceTitle: "Clinical Consultation Workspace",
+    clinicalWorkspaceSubtitle: "Interactive patient triage, clinical observations, diagnostic records, and herd epidemiology.",
+    lblClinicalWorkspaceTag: "Veterinary Clinical Consultation",
+    lblActivePatientSelect: "Active Patient Case:",
+    btnAdmitQuickText: "Admit",
+    btnSummarySaveText: "Save Notes",
+    btnSummaryFollowupText: "Follow-Up",
+    lblCaseConcernTitle: "Reported Concern:",
+    lblSubtabOverview: "Overview & Telemetry",
+    lblSubtabObservations: "Observations & Symptoms",
+    lblSubtabImages: "Uploaded Images",
+    lblSubtabDiagnosis: "Diagnosis & Treatment",
+    lblSubtabFollowup: "Follow-Up",
+    lblSubtabHistory: "History & Timeline",
+    lblObsAnatomicalSigns: "Anatomical Signs & Fore-Milk Findings",
+    lblObsSymptomsReported: "Reported Symptoms:",
+    lblObsSwelling: "Udder Swelling / Hardness:",
+    lblObsMilkingPain: "Discomfort During Milking:",
+    lblObsMilkAppearance: "Fore-Milk Strip Cup Appearance:",
+    lblObsYieldDrop: "Daily Milk Yield Fluctuation:",
+    lblObsVitalsHeader: "Recorded Clinical Measurements",
+    lblObsCalibrated: "VCI Calibrated",
+    lblVitalRectalTemp: "Rectal Body Temp",
+    lblVitalCmtScore: "CMT Score",
+    lblVitalScc: "Somatic Cell Count",
+    lblVitalConductivity: "Conductivity",
+    lblObsFarmerNotesTitle: "Farmer-Reported Field Notes",
+    lblBtnTranslateObsNotes: "Translate Notes (Bhashini)",
+    lblGalleryHeader: "Case Visual Records Gallery",
+    lblDiagCardTitle: "Clinical Evaluation & Prescription Plan",
+    lblConfirmedDiagnosis: "Confirmed Clinical Diagnosis",
+    lblVetCmtConfirm: "Confirmed CMT Severity Score",
+    lblTherapeuticRoute: "Therapeutic Administration Route",
+    lblCaseWorkflowStatus: "Case Workflow Status",
+    lblMedicationProtocol: "Medication Protocol & Active Ingredients",
+    lblMilkWithholdingHours: "Mandatory Milk Withholding (Hours)",
+    lblMeatWithholdingDays: "Meat Withholding Period (Days)",
+    lblVetClinicalNotes: "Veterinary Consultation & Prescription Notes",
+    btnSaveDiagnosisPlanText: "Save Diagnosis & Prescription Protocol",
+    btnResetDiagnosisText: "Reset Form",
+    lblScheduleFollowupHeader: "Schedule Re-Examination",
+    lblFollowupDate: "Re-Check Date",
+    lblFollowupDirective: "Clinical Directives & Farmer Guidance",
+    btnRecordFollowupText: "Record Follow-Up Directive",
+    lblOutstandingActionsHeader: "Outstanding Follow-Up Checklist",
+    lblHistoryTimelineHeader: "Health Event Chronology",
+    valUnavailable: "Unavailable",
+
     // Statuses
     statusHealthy: "Healthy",
     statusMonitor: "To monitor",
@@ -312,7 +372,57 @@ const I18N = {
     statusPending: "Pending Review",
     statusUnderReview: "Under Review",
     statusFollowUp: "Follow-up Required",
-    statusClosed: "Closed"
+    statusClosed: "Closed",
+
+    // Profile Edit & Location Assignment (English)
+    lblEditFarmerProfile: "Edit Farm Profile",
+    lblEditVetProfile: "Edit Practice Location",
+    titleEditFarmerModal: "Edit Farm & Profile Details",
+    titleEditVetModal: "Edit Practice Location & Profile",
+    lblSectionFarmerPersonal: "👤 Farmer Personal Details",
+    lblFarmerName: "Full Name",
+    lblFarmerPhone: "Phone Number",
+    lblSectionFarmLocation: "📍 Farm Location & Jurisdiction",
+    lblFarmName: "Dairy Farm Name",
+    lblFarmAddress: "Location / Street Address",
+    lblFarmVillage: "Village / City",
+    lblFarmDistrict: "District",
+    lblFarmState: "State",
+    lblFarmPincode: "Postal PIN Code",
+    btnCancelEditFarmer: "Cancel",
+    btnSaveFarmerProfileText: "Save Farm Profile",
+    lblSectionVetPersonal: "🩺 Veterinarian Personal Details",
+    lblVetName: "Full Name",
+    lblVetPhone: "Emergency Phone Number",
+    lblSectionVetPractice: "📍 Practice Location & Dispensary Jurisdiction",
+    lblVetClinic: "Dispensary / Hospital Affiliation",
+    lblVetAddress: "Practice Address",
+    lblVetVillage: "Village / City",
+    lblVetDistrict: "District",
+    lblVetState: "State",
+    lblVetPincode: "Postal PIN Code",
+    lblVetServiceArea: "Service Jurisdiction / Area",
+    btnCancelEditVet: "Cancel",
+    btnSaveVetProfileText: "Save Practice Profile",
+    lblVetCoverageTitle: "Veterinary Care Coverage",
+    msgVetAssignedNeutral: "Your case is being routed to an eligible veterinary professional.",
+    msgNoVetAvailable: "Veterinary assistance is not yet available for this location.",
+    toastProfileSaved: "Profile and location updated successfully.",
+
+    // Clinical Triage Case Deletion (English)
+    btnDeleteClinicalCaseText: "Delete Case",
+    btnDeleteCase: "Delete",
+    msgConfirmDeleteCase: "Are you sure you want to remove triage case {caseId} for {cowName}?",
+    msgCannotDeletePrescribed: "Cases with active veterinary prescriptions or mandatory milk withholding cannot be deleted.",
+    toastCaseDeleted: "Clinical triage case removed successfully.",
+
+    // Phase 4: Computer Vision AI Screening (English)
+    lblAiScreeningTitle: "Deep Learning Udder Screening",
+    lblAiAnalyzing: "Analyzing udder tissue and quarter symmetry...",
+    lblAiRiskLow: "Low Risk (Healthy)",
+    lblAiRiskMod: "Moderate Risk (Monitor Foremilk)",
+    lblAiRiskHigh: "High Risk (Mastitis Indicated)",
+    msgAiDisclaimer: "AI screening is an assistive diagnostic tool and does not substitute for licensed veterinary clinical evaluation."
   },
   mr: {
     greeting: "शुभ प्रभात, शेतकरी 👋",
@@ -392,6 +502,17 @@ const I18N = {
     btnSubmitAssessText: "तपासणी जतन करा आणि पशुवैद्यांना पाठवा",
     lblVoiceBtnText: "बोलून लिहा",
     lblAssessVoiceRead: "मार्गदर्शन ऐका",
+    lblTranslateNotesForm: "भाषांतर",
+    lblFilterAll: "सर्व जनावरे",
+    lblFilterHealthy: "निरोगी",
+    lblFilterMonitor: "निरीक्षणाखाली",
+    phCowSearch: "नाव, कानातील टॅग किंवा जातीनुसार शोधा...",
+    msgSelectCow: "कृपया कळपातील गाय निवडा.",
+    msgValidTemp: "कृपया योग्य शारीरिक तापमान प्रविष्ट करा (३६.०°C – ४३.०°C).",
+    msgAssessSuccess: "आरोग्य तपासणी यशस्वीरित्या नोंदवली!",
+    msgAssessSavedCloud: "तपासणी क्लाउडवर जतन केली!",
+    msgCompressingWebp: "छायाचित्र १MB पेक्षा मोठे आहे. WebP मध्ये संकुचित करत आहे...",
+    btnSavingAssess: "तपासणी जतन करत आहे...",
 
     // Clinical Overview (Marathi)
     clinicalHeroTitle: "कळप क्लिनिकल आरोग्य आणि कास रोगनिदान",
@@ -419,6 +540,55 @@ const I18N = {
     btnAdmitPatientText: "+ रुग्ण दाखल करा",
     btnViewWithholdingSchedule: "संपूर्ण विथहोल्डिंग वेळापत्रक व स्मरणपत्रे पहा",
 
+    // Redesigned Clinical Consultation Workspace (Marathi)
+    clinicalWorkspaceTitle: "क्लिनिकल सल्लागार कार्यक्षेत्र",
+    clinicalWorkspaceSubtitle: "थेट रुग्ण तपासणी, शारीरिक निरीक्षणे, रोगनिदान नोंदी आणि कळप रोगशास्त्र.",
+    lblClinicalWorkspaceTag: "पशुवैद्यकीय क्लिनिकल सल्लामसलत",
+    lblActivePatientSelect: "सक्रिय रुग्ण निवडा:",
+    btnAdmitQuickText: "दाखल करा",
+    btnSummarySaveText: "नोंद जतन करा",
+    btnSummaryFollowupText: "पुढील तपासणी",
+    lblCaseConcernTitle: "नोंदवलेली चिंता:",
+    lblSubtabOverview: "आढावा व माहिती",
+    lblSubtabObservations: "निरीक्षणे व लक्षणे",
+    lblSubtabImages: "छायाचित्रे",
+    lblSubtabDiagnosis: "निदान व उपचार",
+    lblSubtabFollowup: "पुढील तपासणी",
+    lblSubtabHistory: "इतिहास व नोंदी",
+    lblObsAnatomicalSigns: "शारीरिक लक्षणे आणि दुधाचे स्वरूप",
+    lblObsSymptomsReported: "नोंदवलेली लक्षणे:",
+    lblObsSwelling: "कासेची सूज / कडकपणा:",
+    lblObsMilkingPain: "दूध काढताना त्रास:",
+    lblObsMilkAppearance: "सुरुवातीच्या दुधाचे स्वरूप:",
+    lblObsYieldDrop: "दूध उत्पादनातील घट:",
+    lblObsVitalsHeader: "नोंदवलेली क्लिनिकल मोजमापे",
+    lblObsCalibrated: "VCI प्रमाणित",
+    lblVitalRectalTemp: "शरीराचे तापमान",
+    lblVitalCmtScore: "CMT स्कोअर",
+    lblVitalScc: "सोमॅटिक सेल काउंट",
+    lblVitalConductivity: "विद्युत वाहकता",
+    lblObsFarmerNotesTitle: "शेतकऱ्याने नोंदवलेली निरीक्षणे",
+    lblBtnTranslateObsNotes: "नोंदी भाषांतरित करा (भाषिणी)",
+    lblGalleryHeader: "केस छायाचित्र गॅलरी",
+    lblDiagCardTitle: "क्लिनिकल मूल्यमापन व औषधोपचार योजना",
+    lblConfirmedDiagnosis: "निश्चित क्लिनिकल निदान",
+    lblVetCmtConfirm: "पुष्टी केलेला CMT स्कोअर",
+    lblTherapeuticRoute: "औषध देण्याचा मार्ग",
+    lblCaseWorkflowStatus: "केस कार्यप्रवाह स्थिती",
+    lblMedicationProtocol: "औषधोपचार आणि घटक",
+    lblMilkWithholdingHours: "अनिवार्य दूध विथहोल्डिंग (तास)",
+    lblMeatWithholdingDays: "मांस विथहोल्डिंग कालावधी (दिवस)",
+    lblVetClinicalNotes: "पशुवैद्यकीय सल्ला आणि सूचना",
+    btnSaveDiagnosisPlanText: "निदान व औषधोपचार जतन करा",
+    btnResetDiagnosisText: "फॉर्म पूर्ववत करा",
+    lblScheduleFollowupHeader: "पुन्हा तपासणीचे वेळापत्रक",
+    lblFollowupDate: "पुढील तपासणीची तारीख",
+    lblFollowupDirective: "वैद्यकीय निर्देश व मार्गदर्शन",
+    btnRecordFollowupText: "पुढील तपासणी निर्देश जतन करा",
+    lblOutstandingActionsHeader: "प्रलंबित कृती यादी",
+    lblHistoryTimelineHeader: "आरोग्य इतिहास कालक्रम",
+    valUnavailable: "उपलब्ध नाही",
+
     // Statuses (Marathi)
     statusHealthy: "निरोगी",
     statusMonitor: "निरीक्षणाखाली",
@@ -426,7 +596,57 @@ const I18N = {
     statusPending: "पुनरावलोकन प्रलंबित",
     statusUnderReview: "तपासणी चालू",
     statusFollowUp: "पुढील तपासणी आवश्यक",
-    statusClosed: "बंद"
+    statusClosed: "बंद",
+
+    // Profile Edit & Location Assignment (Marathi)
+    lblEditFarmerProfile: "फार्म प्रोफाइल संपादित करा",
+    lblEditVetProfile: "दवाखाना ठिकाण संपादित करा",
+    titleEditFarmerModal: "शेत व प्रोफाइल तपशील संपादित करा",
+    titleEditVetModal: "पशुवैद्यकीय दवाखाना व ठिकाण संपादन",
+    lblSectionFarmerPersonal: "👤 शेतकरी वैयक्तिक तपशील",
+    lblFarmerName: "पूर्ण नाव",
+    lblFarmerPhone: "फोन नंबर",
+    lblSectionFarmLocation: "📍 शेताचे ठिकाण व कार्यक्षेत्र",
+    lblFarmName: "डेअरी फार्मचे नाव",
+    lblFarmAddress: "पत्ता / रस्त्याचे नाव",
+    lblFarmVillage: "गाव / शहर",
+    lblFarmDistrict: "जिल्हा",
+    lblFarmState: "राज्य",
+    lblFarmPincode: "पिन कोड",
+    btnCancelEditFarmer: "रद्द करा",
+    btnSaveFarmerProfileText: "फार्म प्रोफाइल जतन करा",
+    lblSectionVetPersonal: "🩺 पशुवैद्यक वैयक्तिक तपशील",
+    lblVetName: "पूर्ण नाव",
+    lblVetPhone: "आपत्कालीन फोन नंबर",
+    lblSectionVetPractice: "📍 दवाखाना ठिकाण व कार्यक्षेत्र",
+    lblVetClinic: "दवाखाना / पशुवैद्यकीय रुग्णालय",
+    lblVetAddress: "दवाखान्याचा पत्ता",
+    lblVetVillage: "गाव / शहर",
+    lblVetDistrict: "जिल्हा",
+    lblVetState: "राज्य",
+    lblVetPincode: "पिन कोड",
+    lblVetServiceArea: "सेवा कार्यक्षेत्र / अधिकारक्षेत्र",
+    btnCancelEditVet: "रद्द करा",
+    btnSaveVetProfileText: "दवाखाना तपशील जतन करा",
+    lblVetCoverageTitle: "पशुवैद्यकीय सेवा संरक्षण",
+    msgVetAssignedNeutral: "आपली विनंती पात्र पशुवैद्यकीय अधिकाऱ्याकडे पाठवली जात आहे.",
+    msgNoVetAvailable: "या परिसरासाठी अद्याप पशुवैद्यकीय मदत उपलब्ध नाही.",
+    toastProfileSaved: "प्रोफाइल व ठिकाण माहिती यशस्वीरित्या अद्यतनित केली.",
+
+    // Clinical Triage Case Deletion (Marathi)
+    btnDeleteClinicalCaseText: "केस हटवा",
+    btnDeleteCase: "हटवा",
+    msgConfirmDeleteCase: "तुम्हाला खात्री आहे की तुम्ही {cowName} ची ट्रायज केस {caseId} हटवू इच्छिता?",
+    msgCannotDeletePrescribed: "सक्रिय औषधोपचार किंवा दूध विथहोल्डिंग असलेल्या केसेस हटवता येत नाहीत.",
+    toastCaseDeleted: "क्लिनिकल ट्रायज केस यशस्वीरित्या हटवली.",
+
+    // Phase 4: Computer Vision AI Screening (Marathi)
+    lblAiScreeningTitle: "डीप लर्निंग कास तपासणी",
+    lblAiAnalyzing: "कास आणि सडांची तपासणी सुरू आहे...",
+    lblAiRiskLow: "कमी धोका (निरोगी)",
+    lblAiRiskMod: "मध्यम धोका (सडांवर लक्ष ठेवा)",
+    lblAiRiskHigh: "उच्च धोका (मस्टायटिसची शक्यता)",
+    msgAiDisclaimer: "कृत्रिम बुद्धिमत्ता (AI) तपासणी केवळ मदतीसाठी आहे, प्रत्यक्ष पशुवैद्यकीय उपचारांचा पर्याय नाही."
   },
   hi: {
     greeting: "शुभ प्रभात, किसान 👋",
@@ -506,6 +726,17 @@ const I18N = {
     btnSubmitAssessText: "जांच सहेजें और पशु चिकित्सक को भेजें",
     lblVoiceBtnText: "बोलकर लिखें",
     lblAssessVoiceRead: "निर्देश सुनें",
+    lblTranslateNotesForm: "अनुवाद",
+    lblFilterAll: "सभी पशु",
+    lblFilterHealthy: "स्वस्थ",
+    lblFilterMonitor: "निगरानी में",
+    phCowSearch: "गाय का नाम, कान का टैग # या नस्ल से खोजें...",
+    msgSelectCow: "कृपया झुंड से गाय चुनें।",
+    msgValidTemp: "कृपया मान्य शारीरिक तापमान दर्ज करें (३६.०°C – ४३.०°C)।",
+    msgAssessSuccess: "स्वास्थ्य जांच सफलतापूर्वक दर्ज की गई!",
+    msgAssessSavedCloud: "जांच क्लाउड पर सहेजी गई!",
+    msgCompressingWebp: "फोटो १MB से बड़ा है। WebP में कंप्रेस किया जा रहा है...",
+    btnSavingAssess: "जांच सहेजी जा रही है...",
 
     // Clinical Overview (Hindi)
     clinicalHeroTitle: "झुंड क्लिनिकल स्वास्थ्य और थन महामारी विज्ञान",
@@ -533,6 +764,55 @@ const I18N = {
     btnAdmitPatientText: "+ मरीज भर्ती करें",
     btnViewWithholdingSchedule: "संपूर्ण विथहोल्डिंग अनुसूची व अनुस्मारक देखें",
 
+    // Redesigned Clinical Consultation Workspace (Hindi)
+    clinicalWorkspaceTitle: "क्लिनिकल परामर्श कार्यक्षेत्र",
+    clinicalWorkspaceSubtitle: "प्रत्यक्ष मरीज ट्राइएज, शारीरिक अवलोकन, निदान रिकॉर्ड और झुंड महामारी विज्ञान।",
+    lblClinicalWorkspaceTag: "पशु चिकित्सा क्लिनिकल परामर्श",
+    lblActivePatientSelect: "सक्रिय मरीज चुनें:",
+    btnAdmitQuickText: "भर्ती करें",
+    btnSummarySaveText: "नोट्स सहेजें",
+    btnSummaryFollowupText: "फॉलो-अप",
+    lblCaseConcernTitle: "दर्ज की गई समस्या:",
+    lblSubtabOverview: "अवलोकन व डेटा",
+    lblSubtabObservations: "अवलोकन व लक्षण",
+    lblSubtabImages: "अपलोड फोटो",
+    lblSubtabDiagnosis: "निदान व उपचार",
+    lblSubtabFollowup: "फॉलो-अप",
+    lblSubtabHistory: "इतिहास व रिकॉर्ड",
+    lblObsAnatomicalSigns: "शारीरिक लक्षण व दूध का स्वरूप",
+    lblObsSymptomsReported: "दर्ज किए गए लक्षण:",
+    lblObsSwelling: "थन की सूजन / कठोरता:",
+    lblObsMilkingPain: "दुहते समय दर्द:",
+    lblObsMilkAppearance: "प्रारंभिक दूध का स्वरूप:",
+    lblObsYieldDrop: "दूध उत्पादन में गिरावट:",
+    lblObsVitalsHeader: "दर्ज क्लिनिकल माप",
+    lblObsCalibrated: "VCI कैलिब्रेटेड",
+    lblVitalRectalTemp: "शरीर का तापमान",
+    lblVitalCmtScore: "CMT स्कोर",
+    lblVitalScc: "सोमैटिक सेल काउंट",
+    lblVitalConductivity: "विद्युत चालकता",
+    lblObsFarmerNotesTitle: "किसान द्वारा दर्ज अवलोकन",
+    lblBtnTranslateObsNotes: "नोट्स का अनुवाद करें (भाषिणी)",
+    lblGalleryHeader: "मरीज फोटो गैलरी",
+    lblDiagCardTitle: "क्लिनिकल मूल्यांकन व उपचार योजना",
+    lblConfirmedDiagnosis: "पुष्ट क्लिनिकल निदान",
+    lblVetCmtConfirm: "पुष्ट CMT गंभीरता स्कोर",
+    lblTherapeuticRoute: "दवा देने का मार्ग",
+    lblCaseWorkflowStatus: "केस कार्यप्रवाह स्थिति",
+    lblMedicationProtocol: "दवा प्रोटोकॉल और सामग्री",
+    lblMilkWithholdingHours: "अनिवार्य दूध रोक (घंटे)",
+    lblMeatWithholdingDays: "मांस रोक अवधि (दिन)",
+    lblVetClinicalNotes: "पशु चिकित्सा परामर्श व निर्देश",
+    btnSaveDiagnosisPlanText: "निदान व दवा योजना सहेजें",
+    btnResetDiagnosisText: "फॉर्म रीसेट करें",
+    lblScheduleFollowupHeader: "पुनः जांच अनुसूची",
+    lblFollowupDate: "अगली जांच की तारीख",
+    lblFollowupDirective: "चिकित्सा निर्देश व किसान मार्गदर्शन",
+    btnRecordFollowupText: "फॉलो-अप निर्देश सहेजें",
+    lblOutstandingActionsHeader: "लंबित कार्यों की सूची",
+    lblHistoryTimelineHeader: "स्वास्थ्य घटनाक्रम",
+    valUnavailable: "अनुपलब्ध",
+
     // Statuses (Hindi)
     statusHealthy: "स्वस्थ",
     statusMonitor: "निगरानी में",
@@ -540,27 +820,79 @@ const I18N = {
     statusPending: "समीक्षा लंबित",
     statusUnderReview: "समीक्षा जारी",
     statusFollowUp: "फॉलो-अप आवश्यक",
-    statusClosed: "बंद"
+    statusClosed: "बंद",
+
+    // Profile Edit & Location Assignment (Hindi)
+    lblEditFarmerProfile: "फार्म प्रोफ़ाइल संपादित करें",
+    lblEditVetProfile: "क्लिनिक स्थान संपादित करें",
+    titleEditFarmerModal: "फार्म व प्रोफ़ाइल विवरण संपादित करें",
+    titleEditVetModal: "पशु चिकित्सालय स्थान व प्रोफ़ाइल संपादन",
+    lblSectionFarmerPersonal: "👤 किसान व्यक्तिगत विवरण",
+    lblFarmerName: "पूरा नाम",
+    lblFarmerPhone: "फ़ोन नंबर",
+    lblSectionFarmLocation: "📍 फार्म का स्थान व कार्यक्षेत्र",
+    lblFarmName: "डेयरी फार्म का नाम",
+    lblFarmAddress: "पता / सड़क का नाम",
+    lblFarmVillage: "गाँव / शहर",
+    lblFarmDistrict: "ज़िला",
+    lblFarmState: "राज्य",
+    lblFarmPincode: "पिन कोड",
+    btnCancelEditFarmer: "रद्द करें",
+    btnSaveFarmerProfileText: "फार्म प्रोफ़ाइल सहेजें",
+    lblSectionVetPersonal: "🩺 पशु चिकित्सक व्यक्तिगत विवरण",
+    lblVetName: "पूरा नाम",
+    lblVetPhone: "आपातकालीन फ़ोन नंबर",
+    lblSectionVetPractice: "📍 क्लिनिक स्थान व अधिकार क्षेत्र",
+    lblVetClinic: "डिस्पेंसरी / पशु चिकित्सालय संबद्धता",
+    lblVetAddress: "क्लिनिक का पता",
+    lblVetVillage: "गाँव / शहर",
+    lblVetDistrict: "ज़िला",
+    lblVetState: "राज्य",
+    lblVetPincode: "पिन कोड",
+    lblVetServiceArea: "सेवा कार्यक्षेत्र / अधिकार क्षेत्र",
+    btnCancelEditVet: "रद्द करें",
+    btnSaveVetProfileText: "क्लिनिक प्रोफ़ाइल सहेजें",
+    lblVetCoverageTitle: "पशु चिकित्सा सेवा कवरेज",
+    msgVetAssignedNeutral: "आपका मामला योग्य पशु चिकित्सा पेशेवर को भेजा जा रहा है।",
+    msgNoVetAvailable: "इस क्षेत्र के लिए अभी पशु चिकित्सा सहायता उपलब्ध नहीं है।",
+    toastProfileSaved: "प्रोफ़ाइल व स्थान विवरण सफलतापूर्वक सहेजे गए.",
+
+    // Clinical Triage Case Deletion (Hindi)
+    btnDeleteClinicalCaseText: "केस हटाएं",
+    btnDeleteCase: "हटाएं",
+    msgConfirmDeleteCase: "क्या आप वाकई {cowName} का ट्राइएज केस {caseId} हटाना चाहते हैं?",
+    msgCannotDeletePrescribed: "सक्रिय दवा या अनिवार्य दूध रोक वाले मामलों को हटाया नहीं जा सकता।",
+    toastCaseDeleted: "क्लिनिकल ट्राइएज केस सफलतापूर्वक हटाया गया।",
+
+    // Phase 4: Computer Vision AI Screening (Hindi)
+    lblAiScreeningTitle: "डीप लर्निंग थन व अयन जांच",
+    lblAiAnalyzing: "अयन के ऊतकों की जांच की जा रही है...",
+    lblAiRiskLow: "कम जोखिम (स्वस्थ)",
+    lblAiRiskMod: "मध्यम जोखिम (निगरानी रखें)",
+    lblAiRiskHigh: "उच्च जोखिम (थनैला के संकेत)",
+    msgAiDisclaimer: "एआई जांच केवल एक सहायक नैदानिक उपकरण है और यह पशु चिकित्सक की नैदानिक जांच का विकल्प नहीं है।"
   }
 };
 
 // 4. Lifecycle Initialization
-document.addEventListener('DOMContentLoaded', async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const roleParam = urlParams.get('role') || localStorage.getItem('bovicare_active_role') || 'farmer';
-  applyLanguage(currentLanguage);
-  renderVetPortalHome();
-  renderClinicalOverviewDashboard();
-  renderHomeView();
-  renderRailCases();
-  renderCowsView();
-  renderRecordsView();
-  renderProfileView();
-  populateAssessDropdown();
-  initCloudBackend();
-  await enforceAuthenticatedRoleAndRoute();
-  openSidebar();
-});
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', async () => {
+    const urlParams = typeof window !== 'undefined' && window.location ? new URLSearchParams(window.location.search) : new URLSearchParams();
+    const roleParam = urlParams.get('role') || (typeof localStorage !== 'undefined' ? localStorage.getItem('bovicare_active_role') : null) || 'farmer';
+    applyLanguage(currentLanguage);
+    renderVetPortalHome();
+    renderClinicalOverviewDashboard();
+    renderHomeView();
+    renderRailCases();
+    renderCowsView();
+    renderRecordsView();
+    renderProfileView();
+    populateAssessDropdown();
+    initCloudBackend();
+    await enforceAuthenticatedRoleAndRoute();
+    openSidebar();
+  });
+}
 
 // 5. Gemini-Style Sidebar Controls (Icon Rail <-> Expanded)
 function openSidebar() {
@@ -610,13 +942,17 @@ function toggleSidebar() {
   }
 }
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeSidebar();
-    closeAddCowModal();
-    closeVetReviewModal();
-  }
-});
+if (typeof document !== 'undefined') {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeSidebar();
+      closeAddCowModal();
+      closeVetReviewModal();
+      if (typeof closeEditFarmerProfileModal === 'function') closeEditFarmerProfileModal();
+      if (typeof closeEditVetProfileModal === 'function') closeEditVetProfileModal();
+    }
+  });
+}
 
 // 5b. Tab Switching (Desktop, Mobile & Sidebar Navigation)
 function switchTab(target) {
@@ -626,7 +962,7 @@ function switchTab(target) {
   if (typeof target === 'number') {
     tabIndex = target;
     if (activeRole === 'vet') {
-      const vetTabs = ['tabClinicalOverview', 'tabTriage', 'tabCows', 'tabAssess', 'tabRecords', 'tabProfile'];
+      const vetTabs = ['tabClinicalOverview', 'tabTriage', 'tabCows', 'tabRecords', 'tabProfile'];
       targetId = vetTabs[target] || 'tabClinicalOverview';
     } else {
       const farmerTabs = ['tabHome', 'tabCows', 'tabAssess', 'tabRecords', 'tabProfile'];
@@ -640,7 +976,7 @@ function switchTab(target) {
 
   // Role-Based Tab Route Protection Guard
   const vetOnlyTabs = ['tabClinicalOverview', 'tabTriage'];
-  const farmerOnlyTabs = ['tabHome'];
+  const farmerOnlyTabs = ['tabHome', 'tabAssess'];
 
   if (activeRole === 'farmer' && vetOnlyTabs.includes(targetId)) {
     console.warn(`Access Denied: Farmer account attempted to access ${targetId}`);
@@ -814,8 +1150,67 @@ function applyLanguage(lang) {
   setText('btnSubmitAssessText', dict.btnSubmitAssessText);
   setText('lblVoiceBtnText', dict.lblVoiceBtnText);
   setText('lblAssessVoiceRead', dict.lblAssessVoiceRead);
+  setText('lblTranslateNotesForm', dict.lblTranslateNotesForm || 'Translate');
 
-  // Translate Clinical Overview
+  // Translate Cattle Filter Pills & Search
+  setText('lblFilterAll', dict.lblFilterAll || 'All Cattle');
+  setText('lblFilterHealthy', dict.lblFilterHealthy || 'Healthy');
+  setText('lblFilterMonitor', dict.lblFilterMonitor || 'To Monitor');
+  setPlaceholder('cowSearchInput', dict.phCowSearch || 'Search by cow name, ear tag #, breed...');
+  const cowSelectEl = document.getElementById('assessCowSelect');
+  if (cowSelectEl && cowSelectEl.options.length > 0) {
+    cowSelectEl.options[0].textContent = dict.optAssessSelectCow || 'Select cow...';
+  }
+
+  // Translate Clinical Overview & Workspace
+  setText('clinicalWorkspaceTitle', dict.clinicalWorkspaceTitle);
+  setText('clinicalWorkspaceSubtitle', dict.clinicalWorkspaceSubtitle);
+  setText('lblClinicalWorkspaceTag', dict.lblClinicalWorkspaceTag);
+  setText('lblActivePatientSelect', dict.lblActivePatientSelect);
+  setText('btnAdmitQuickText', dict.btnAdmitQuickText);
+  setText('btnSummarySaveText', dict.btnSummarySaveText);
+  setText('btnSummaryFollowupText', dict.btnSummaryFollowupText);
+  setText('lblCaseConcernTitle', dict.lblCaseConcernTitle);
+  setText('lblSubtabOverview', dict.lblSubtabOverview);
+  setText('lblSubtabObservations', dict.lblSubtabObservations);
+  setText('lblSubtabImages', dict.lblSubtabImages);
+  setText('lblSubtabDiagnosis', dict.lblSubtabDiagnosis);
+  setText('lblSubtabFollowup', dict.lblSubtabFollowup);
+  setText('lblSubtabHistory', dict.lblSubtabHistory);
+  setText('lblObsAnatomicalSigns', dict.lblObsAnatomicalSigns);
+  setText('lblObsSymptomsReported', dict.lblObsSymptomsReported);
+  setText('lblObsSwelling', dict.lblObsSwelling);
+  setText('lblObsMilkingPain', dict.lblObsMilkingPain);
+  setText('lblObsMilkAppearance', dict.lblObsMilkAppearance);
+  setText('lblObsYieldDrop', dict.lblObsYieldDrop);
+  setText('lblObsVitalsHeader', dict.lblObsVitalsHeader);
+  setText('lblObsCalibrated', dict.lblObsCalibrated);
+  setText('lblVitalRectalTemp', dict.lblVitalRectalTemp);
+  setText('lblVitalCmtScore', dict.lblVitalCmtScore);
+  setText('lblVitalScc', dict.lblVitalScc);
+  setText('lblVitalConductivity', dict.lblVitalConductivity);
+  setText('lblObsFarmerNotesTitle', dict.lblObsFarmerNotesTitle);
+  setText('lblBtnTranslateObsNotes', dict.lblBtnTranslateObsNotes);
+  setText('lblGalleryHeader', dict.lblGalleryHeader);
+  setText('lblDiagCardTitle', dict.lblDiagCardTitle);
+  setText('lblConfirmedDiagnosis', dict.lblConfirmedDiagnosis);
+  setText('lblVetCmtConfirm', dict.lblVetCmtConfirm);
+  setText('lblTherapeuticRoute', dict.lblTherapeuticRoute);
+  setText('lblCaseWorkflowStatus', dict.lblCaseWorkflowStatus);
+  setText('lblMedicationProtocol', dict.lblMedicationProtocol);
+  setText('lblMilkWithholdingHours', dict.lblMilkWithholdingHours);
+  setText('lblMeatWithholdingDays', dict.lblMeatWithholdingDays);
+  setText('lblVetClinicalNotes', dict.lblVetClinicalNotes);
+  setText('btnSaveDiagnosisPlanText', dict.btnSaveDiagnosisPlanText);
+  setText('btnResetDiagnosisText', dict.btnResetDiagnosisText);
+  setText('lblScheduleFollowupHeader', dict.lblScheduleFollowupHeader);
+  setText('lblFollowupDate', dict.lblFollowupDate);
+  setText('lblFollowupDirective', dict.lblFollowupDirective);
+  setText('btnRecordFollowupText', dict.btnRecordFollowupText);
+  setText('lblOutstandingActionsHeader', dict.lblOutstandingActionsHeader);
+  setText('lblHistoryTimelineHeader', dict.lblHistoryTimelineHeader);
+
+  // Translate Clinical Telemetry & KPIs
   setText('clinicalHeroTitle', dict.clinicalHeroTitle);
   setText('clinicalHeroDesc', dict.clinicalHeroDesc);
   setText('lblClinicalLivePill', dict.lblClinicalLivePill);
@@ -841,6 +1236,45 @@ function applyLanguage(lang) {
   setText('btnAdmitPatientText', dict.btnAdmitPatientText);
   setText('btnViewWithholdingSchedule', dict.btnViewWithholdingSchedule);
 
+  // Translate Profile Edit Modals & Privacy-Safe Titles
+  setText('titleEditFarmerModal', dict.titleEditFarmerModal);
+  setText('lblSectionFarmerPersonal', dict.lblSectionFarmerPersonal);
+  setText('lblFarmerName', dict.lblFarmerName);
+  setText('lblFarmerPhone', dict.lblFarmerPhone);
+  setText('lblSectionFarmLocation', dict.lblSectionFarmLocation);
+  setText('lblFarmName', dict.lblFarmName);
+  setText('lblFarmAddress', dict.lblFarmAddress);
+  setText('lblFarmVillage', dict.lblFarmVillage);
+  setText('lblFarmDistrict', dict.lblFarmDistrict);
+  setText('lblFarmState', dict.lblFarmState);
+  setText('lblFarmPincode', dict.lblFarmPincode);
+  setText('btnCancelEditFarmer', dict.btnCancelEditFarmer);
+  setText('btnSaveFarmerProfileText', dict.btnSaveFarmerProfileText);
+  setText('lblEditFarmerProfile', dict.lblEditFarmerProfile);
+
+  setText('titleEditVetModal', dict.titleEditVetModal);
+  setText('lblSectionVetPersonal', dict.lblSectionVetPersonal);
+  setText('lblVetName', dict.lblVetName);
+  setText('lblVetPhone', dict.lblVetPhone);
+  setText('lblSectionVetPractice', dict.lblSectionVetPractice);
+  setText('lblVetClinic', dict.lblVetClinic);
+  setText('lblVetAddress', dict.lblVetAddress);
+  setText('lblVetVillage', dict.lblVetVillage);
+  setText('lblVetDistrict', dict.lblVetDistrict);
+  setText('lblVetState', dict.lblVetState);
+  setText('lblVetPincode', dict.lblVetPincode);
+  setText('lblVetServiceArea', dict.lblVetServiceArea);
+  setText('btnCancelEditVet', dict.btnCancelEditVet);
+  setText('btnSaveVetProfileText', dict.btnSaveVetProfileText);
+  setText('lblEditVetProfile', dict.lblEditVetProfile);
+  setText('lblVetCoverageTitle', dict.lblVetCoverageTitle);
+  setText('btnDeleteClinicalCaseText', dict.btnDeleteClinicalCaseText || 'Delete Case');
+
+  // Refresh active clinical workspace view if present
+  if (typeof renderClinicalCaseWorkspace === 'function') {
+    renderClinicalCaseWorkspace(activeClinicalCaseId);
+  }
+
   updateNavRoleLabels();
 
   // Legacy compatibility tokens
@@ -864,7 +1298,24 @@ function toggleLanguage() {
 }
 
 // Bhashini / Speech Synthesis Assistant for Farmers
+let isSpeakingGuide = false;
+
 function readAssessmentGuideAloud() {
+  const btn = document.getElementById('btnAssessVoiceRead');
+  const lbl = document.getElementById('lblAssessVoiceRead');
+  const dict = I18N[currentLanguage] || I18N.en;
+
+  if (isSpeakingGuide) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    isSpeakingGuide = false;
+    if (btn) btn.classList.remove('playing');
+    if (lbl) lbl.textContent = dict.lblAssessVoiceRead || 'Listen Guide';
+    showToast(currentLanguage === 'mr' ? 'मार्गदर्शन थांबवले.' : (currentLanguage === 'hi' ? 'निर्देश रोक दिए गए।' : 'Audio guide stopped.'));
+    return;
+  }
+
   let textToSpeak = '';
   let langCode = 'en-IN';
 
@@ -879,15 +1330,97 @@ function readAssessmentGuideAloud() {
     langCode = 'en-US';
   }
 
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = langCode;
-    utterance.rate = 0.95;
-    window.speechSynthesis.speak(utterance);
-    showToast(currentLanguage === 'mr' ? 'सूचना वाचून दाखवत आहे...' : (currentLanguage === 'hi' ? 'निर्देश पढ़े जा रहे हैं...' : 'Reading instructions aloud...'));
-  } else {
+  if (!('speechSynthesis' in window)) {
     showToast('Speech audio is not supported in this browser.');
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(textToSpeak);
+  utterance.lang = langCode;
+  utterance.rate = 0.92;
+
+  // Try to pick natural Indic voice when available in modern browser
+  try {
+    const voices = window.speechSynthesis.getVoices();
+    const matchingVoice = voices.find(v => v.lang && (v.lang === langCode || v.lang.startsWith(langCode.slice(0, 2))));
+    if (matchingVoice) utterance.voice = matchingVoice;
+  } catch (e) {
+    // Continue with default browser utterance
+  }
+
+  utterance.onstart = () => {
+    isSpeakingGuide = true;
+    if (btn) btn.classList.add('playing');
+    if (lbl) lbl.textContent = currentLanguage === 'mr' ? 'थांबवा (वाचत आहे)' : (currentLanguage === 'hi' ? 'रोकें (पढ़ रहा है)' : 'Stop Audio');
+    showToast(currentLanguage === 'mr' ? 'सूचना वाचून दाखवत आहे...' : (currentLanguage === 'hi' ? 'निर्देश पढ़े जा रहे हैं...' : 'Reading instructions aloud...'));
+  };
+
+  utterance.onend = () => {
+    isSpeakingGuide = false;
+    if (btn) btn.classList.remove('playing');
+    if (lbl) lbl.textContent = dict.lblAssessVoiceRead || 'Listen Guide';
+  };
+
+  utterance.onerror = () => {
+    isSpeakingGuide = false;
+    if (btn) btn.classList.remove('playing');
+    if (lbl) lbl.textContent = dict.lblAssessVoiceRead || 'Listen Guide';
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+// Central Bhashini Client Translation Integration
+async function translateWithBhashini(text, sourceLang = 'en', targetLang = 'mr') {
+  if (!text || typeof text !== 'string' || !text.trim()) {
+    return { success: false, translatedText: text, message: 'Empty text' };
+  }
+  if (sourceLang === targetLang) {
+    return { success: true, translatedText: text, sourceLang, targetLang };
+  }
+
+  try {
+    const res = await fetch('/api/bhashini/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, sourceLang, targetLang })
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    if (data.success && data.translatedText) {
+      return {
+        success: true,
+        translatedText: data.translatedText,
+        sourceLang,
+        targetLang,
+        provider: data.provider || 'bhashini',
+        protectedTokensCount: data.protectedTokensCount || 0
+      };
+    }
+
+    return {
+      success: false,
+      fallback: true,
+      translatedText: text,
+      message: data.message || 'Bhashini live translation unavailable.',
+      sourceLang,
+      targetLang
+    };
+  } catch (err) {
+    console.warn('[Bhashini] Client translation notice:', err.message);
+    return {
+      success: false,
+      fallback: true,
+      translatedText: text,
+      error: err.message,
+      sourceLang,
+      targetLang
+    };
   }
 }
 
@@ -900,12 +1433,14 @@ function toggleSpeechRecognitionFor(fieldId) {
   const statusNotice = document.getElementById('voiceStatusNotice');
   const micIcon = document.getElementById('voiceMicIcon');
   const voiceBtnText = document.getElementById('lblVoiceBtnText');
+  const voiceBtn = document.getElementById('btnVoiceAssessNotes');
   const dict = I18N[currentLanguage] || I18N.en;
 
   if (isListeningForNotes && speechRecognitionInstance) {
     speechRecognitionInstance.stop();
     isListeningForNotes = false;
     if (micIcon) micIcon.textContent = '🎤';
+    if (voiceBtn) voiceBtn.classList.remove('listening');
     if (voiceBtnText) voiceBtnText.textContent = dict.lblVoiceBtnText || 'Voice Input';
     if (statusNotice) {
       statusNotice.style.display = 'none';
@@ -929,6 +1464,7 @@ function toggleSpeechRecognitionFor(fieldId) {
     speechRecognitionInstance.onstart = () => {
       isListeningForNotes = true;
       if (micIcon) micIcon.textContent = '⏹️';
+      if (voiceBtn) voiceBtn.classList.add('listening');
       if (voiceBtnText) voiceBtnText.textContent = currentLanguage === 'mr' ? 'थांबवा' : (currentLanguage === 'hi' ? 'रोकें' : 'Stop');
       if (statusNotice) {
         statusNotice.style.display = 'block';
@@ -939,8 +1475,10 @@ function toggleSpeechRecognitionFor(fieldId) {
     };
 
     speechRecognitionInstance.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
+      let transcript = event.results[0][0].transcript || '';
       if (transcript && targetField) {
+        // Clinical digit normalization (e.g. Devanagari numerals to standard Arabic for measurements)
+        transcript = transcript.replace(/[०-९]/g, d => '०१२३४५६७८९'.indexOf(d));
         const existing = targetField.value ? targetField.value + ' ' : '';
         targetField.value = existing + transcript;
         showToast(currentLanguage === 'mr' ? 'आवाज यशस्वीरित्या नोंदवला!' : (currentLanguage === 'hi' ? 'आवाज सफलतापूर्वक दर्ज किया गया!' : 'Voice transcript added!'));
@@ -950,18 +1488,23 @@ function toggleSpeechRecognitionFor(fieldId) {
     speechRecognitionInstance.onerror = (event) => {
       isListeningForNotes = false;
       if (micIcon) micIcon.textContent = '🎤';
+      if (voiceBtn) voiceBtn.classList.remove('listening');
       if (voiceBtnText) voiceBtnText.textContent = dict.lblVoiceBtnText || 'Voice Input';
       if (statusNotice) {
         statusNotice.style.display = 'block';
         statusNotice.style.background = '#FEE2E2';
         statusNotice.style.color = '#991B1B';
-        statusNotice.textContent = currentLanguage === 'mr' ? 'मायक्रोफोन त्रुटी किंवा परवानगी नाकारली.' : (currentLanguage === 'hi' ? 'माइक्रोफ़ोन त्रुटि या अनुमति अस्वीकृत।' : 'Microphone error or permission denied.');
+        const msg = event.error === 'not-allowed'
+          ? (currentLanguage === 'mr' ? 'मायक्रोफोन परवानगी नाकारली.' : (currentLanguage === 'hi' ? 'माइक्रोफ़ोन अनुमति अस्वीकृत।' : 'Microphone permission denied.'))
+          : (currentLanguage === 'mr' ? 'आवाज ओळखण्यात अडचण आली.' : (currentLanguage === 'hi' ? 'आवाज पहचानने में समस्या आई।' : 'Speech recognition error.'));
+        statusNotice.textContent = msg;
       }
     };
 
     speechRecognitionInstance.onend = () => {
       isListeningForNotes = false;
       if (micIcon) micIcon.textContent = '🎤';
+      if (voiceBtn) voiceBtn.classList.remove('listening');
       if (voiceBtnText) voiceBtnText.textContent = dict.lblVoiceBtnText || 'Voice Input';
       setTimeout(() => {
         if (statusNotice) statusNotice.style.display = 'none';
@@ -971,6 +1514,26 @@ function toggleSpeechRecognitionFor(fieldId) {
     speechRecognitionInstance.start();
   } catch (err) {
     showToast('Voice service initialization error.');
+  }
+}
+
+// Quick in-form notes translation (e.g. Marathi/Hindi notes to English or vice-versa)
+async function translateNotesInForm() {
+  const notesField = document.getElementById('assessNotes');
+  if (!notesField || !notesField.value.trim()) {
+    showToast(currentLanguage === 'mr' ? 'कृपया आधी काही नोंदी लिहा किंवा बोला.' : (currentLanguage === 'hi' ? 'कृपया पहले कुछ नोट्स लिखें या बोलें।' : 'Please enter or speak notes first.'));
+    return;
+  }
+  const sourceText = notesField.value.trim();
+  const targetLang = currentLanguage === 'en' ? 'mr' : 'en';
+  showToast(currentLanguage === 'mr' ? 'भाषांतर करत आहे...' : (currentLanguage === 'hi' ? 'अनुवाद हो रहा है...' : 'Translating notes...'));
+  
+  const res = await translateWithBhashini(sourceText, currentLanguage, targetLang);
+  if (res && res.translatedText && res.translatedText !== sourceText) {
+    notesField.value = sourceText + '\n\n[' + (targetLang === 'en' ? 'English' : 'मराठी') + ']: ' + res.translatedText;
+    showToast(currentLanguage === 'mr' ? 'भाषांतर जोडले गेले!' : (currentLanguage === 'hi' ? 'अनुवाद जोड़ दिया गया!' : 'Translation appended!'));
+  } else {
+    showToast(res.message || 'Translation unavailable.');
   }
 }
 
@@ -989,21 +1552,32 @@ function renderHomeView() {
 
   const container = document.getElementById('homeCowsContainer');
   if (container) {
-    container.innerHTML = cows.slice(0, 3).map(cow => `
-      <div class="cow-item-card" onclick="openCowDetailsModal('${cow.id}')">
-        <div class="cow-thumb-box">
-          <img src="${cow.photo || 'assets/images/cow_banner.jpeg'}" alt="${cow.name}">
+    if (cows.length === 0) {
+      container.innerHTML = `
+        <div style="background:var(--white); border-radius:16px; padding:28px 16px; text-align:center; color:var(--muted); border:1px dashed var(--border);">
+          <div style="font-size:26px; margin-bottom:6px;">🐄</div>
+          <strong style="color:var(--ink); font-size:14px; display:block;">No cattle registered yet</strong>
+          <p style="font-size:12px; margin:4px auto 12px; max-width:280px;">Register your cows to track milk yields and monitor health.</p>
+          <button type="button" class="btn-primary-action" onclick="openAddCowModal()" style="margin:0 auto; padding:7px 14px; font-size:12px;">+ Add Cattle</button>
         </div>
-        <div class="cow-info-col">
-          <div class="cow-item-name">${cow.name}</div>
-          <div class="cow-item-meta">${cow.tag} · ${cow.breed}</div>
+      `;
+    } else {
+      container.innerHTML = cows.slice(0, 3).map(cow => `
+        <div class="cow-item-card" onclick="openCowDetailsModal('${cow.id}')">
+          <div class="cow-thumb-box">
+            <img src="${cow.photo || 'assets/images/cow_banner.jpeg'}" alt="${cow.name}">
+          </div>
+          <div class="cow-info-col">
+            <div class="cow-item-name">${cow.name}</div>
+            <div class="cow-item-meta">${cow.tag} · ${cow.breed}</div>
+          </div>
+          <span class="status-pill-badge ${cow.status}">
+            ● ${cow.status === 'healthy' ? 'Healthy' : 'To monitor'}
+          </span>
+          <span class="chevron-arrow">›</span>
         </div>
-        <span class="status-pill-badge ${cow.status}">
-          ● ${cow.status === 'healthy' ? 'Healthy' : 'To monitor'}
-        </span>
-        <span class="chevron-arrow">›</span>
-      </div>
-    `).join('');
+      `).join('');
+    }
   }
 
   renderRailCases();
@@ -1123,6 +1697,7 @@ function renderCowsView(searchQuery = currentCattleSearch, statusFilter = curren
     return;
   }
 
+  const dict = I18N[currentLanguage] || I18N.en;
   container.innerHTML = list.map(cow => `
     <div class="cow-item-card" onclick="openCowDetailsModal('${cow.id}')" title="Click to view ${cow.name}'s medical details">
       <div class="cow-thumb-box">
@@ -1130,10 +1705,10 @@ function renderCowsView(searchQuery = currentCattleSearch, statusFilter = curren
       </div>
       <div class="cow-info-col">
         <div class="cow-item-name">${cow.name}</div>
-        <div class="cow-item-meta">${cow.tag} · ${cow.breed} · Last checked: ${cow.lastChecked || 'Recent'}</div>
+        <div class="cow-item-meta">${cow.tag} · ${cow.breed} · ${currentLanguage === 'mr' ? 'शेवटची तपासणी' : (currentLanguage === 'hi' ? 'अंतिम जांच' : 'Last checked')}: ${cow.lastChecked || (currentLanguage === 'mr' ? 'नुकतीच' : (currentLanguage === 'hi' ? 'हाल ही में' : 'Recent'))}</div>
       </div>
       <span class="status-pill-badge ${cow.status}">
-        ● ${cow.status === 'healthy' ? 'Healthy' : 'To monitor'}
+        ● ${cow.status === 'healthy' ? (dict.statusHealthy || 'Healthy') : (dict.statusMonitor || 'To monitor')}
       </span>
       <span class="chevron-arrow">›</span>
     </div>
@@ -1282,6 +1857,17 @@ function renderRecordsView() {
   const container = document.getElementById('recordsTimelineGroup');
   if (!container) return;
 
+  if (recordsList.length === 0) {
+    container.innerHTML = `
+      <div style="background:var(--white); border-radius:16px; padding:32px 20px; text-align:center; color:var(--muted); font-size:13px; border:1px dashed var(--border);">
+        <div style="font-size:28px; margin-bottom:8px;">📋</div>
+        <strong style="color:var(--ink); font-size:14.5px; display:block;">No health records found</strong>
+        <p style="margin:4px auto 0 auto; font-size:12px; max-width:320px;">Routine checks and submitted assessments will appear here once recorded.</p>
+      </div>
+    `;
+    return;
+  }
+
   container.innerHTML = recordsList.map(rec => `
     <div class="cow-item-card" style="cursor:default;">
       <div class="cow-thumb-box" style="background:#E7F3E5; font-size:18px;">
@@ -1303,12 +1889,16 @@ function renderRecordsView() {
 function populateAssessDropdown() {
   const select = document.getElementById('assessCowSelect');
   if (!select) return;
-  select.innerHTML = '<option value="">Select cow from herd...</option>' + 
+  const currentVal = select.value;
+  const dict = I18N[currentLanguage] || I18N.en;
+  const placeholder = dict.optAssessSelectCow || 'Select cow from herd...';
+  select.innerHTML = `<option value="">${placeholder}</option>` + 
     cows.map(c => `<option value="${c.id}">${c.name} (${c.tag}) — ${c.breed}</option>`).join('');
+  if (currentVal) select.value = currentVal;
 }
 
 function openAssessForCow(cowId) {
-  switchTab(3);
+  switchTab('tabAssess');
   const select = document.getElementById('assessCowSelect');
   if (select) select.value = cowId;
 }
@@ -1323,7 +1913,8 @@ async function handleImageSelected(inputEl) {
 
   // Strict 1 MB size check
   if (file.size > 1048576) {
-    showToast('Image is larger than 1 MB cap. Compressing to WebP...');
+    const dict = I18N[currentLanguage] || I18N.en;
+    showToast(dict.msgCompressingWebp || 'Image is larger than 1 MB cap. Compressing to WebP...');
   }
 
   const preview = document.getElementById('assessImagePreview');
@@ -1343,9 +1934,105 @@ async function handleImageSelected(inputEl) {
       uploadText.textContent = `Attached (${(compressed.sizeBytes / 1024).toFixed(1)} KB WebP)`;
     }
     showToast(`Photo compressed to ${(compressed.sizeBytes / 1024).toFixed(1)} KB WebP`);
+
+    // Phase 4: Automatically trigger deep learning computer vision screening
+    triggerAiMastitisScreening(compressed.blob);
   } catch (err) {
     console.error('Image compression failed:', err);
     showToast('Failed to process image. Please try another photo.');
+  }
+}
+
+let latestAiScreeningResult = null;
+
+async function triggerAiMastitisScreening(blob) {
+  if (!blob || typeof document === 'undefined') return;
+  const initialNotice = document.getElementById('aiScreeningInitial');
+  const activeNotice = document.getElementById('aiScreeningActive');
+  const riskTierEl = document.getElementById('aiScreeningRiskTier');
+  const meterEl = document.getElementById('aiScreeningMeter');
+  const confidenceEl = document.getElementById('aiScreeningConfidence');
+  const recEl = document.getElementById('aiScreeningRecommendation');
+  const dict = (typeof I18N !== 'undefined' && typeof currentLanguage !== 'undefined' && I18N[currentLanguage]) ? I18N[currentLanguage] : (typeof I18N !== 'undefined' ? I18N.en : {});
+
+  if (initialNotice) initialNotice.style.display = 'none';
+  if (activeNotice) activeNotice.style.display = 'block';
+
+  if (riskTierEl) {
+    riskTierEl.textContent = dict.lblAiAnalyzing || 'Analyzing udder tissue...';
+    riskTierEl.style.background = '#E5E7EB';
+    riskTierEl.style.color = '#374151';
+  }
+  if (meterEl) {
+    meterEl.style.width = '30%';
+    meterEl.style.background = '#3B82F6';
+  }
+
+  try {
+    const base64Data = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
+    const response = await fetch('/api/ai-screen', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image_base64: base64Data })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Screening service returned ${response.status}`);
+    }
+
+    const result = await response.json();
+    latestAiScreeningResult = result;
+
+    if (result && result.success) {
+      const mastitisProb = result.mastitis_probability ?? 0.0;
+      const confidence = result.confidence ?? 0.0;
+      const tier = result.risk_tier || 'Low';
+
+      if (riskTierEl) {
+        if (tier === 'High') {
+          riskTierEl.textContent = dict.lblAiRiskHigh || 'High Risk (Mastitis Indicated)';
+          riskTierEl.style.background = '#FDE8E8';
+          riskTierEl.style.color = '#9B1C1C';
+        } else if (tier === 'Moderate') {
+          riskTierEl.textContent = dict.lblAiRiskMod || 'Moderate Risk (Monitor Foremilk)';
+          riskTierEl.style.background = '#FEF08A';
+          riskTierEl.style.color = '#854D0E';
+        } else {
+          riskTierEl.textContent = dict.lblAiRiskLow || 'Low Risk (Healthy)';
+          riskTierEl.style.background = '#DEF7EC';
+          riskTierEl.style.color = '#03543F';
+        }
+      }
+
+      if (meterEl) {
+        meterEl.style.width = `${Math.max(5, Math.min(100, Math.round(mastitisProb * 100)))}%`;
+        meterEl.style.background = tier === 'High' ? '#EF4444' : (tier === 'Moderate' ? '#F59E0B' : '#10B981');
+      }
+
+      if (confidenceEl) {
+        confidenceEl.textContent = `${(confidence * 100).toFixed(1)}% (Mastitis Risk: ${(mastitisProb * 100).toFixed(1)}%)`;
+      }
+
+      if (recEl) {
+        recEl.textContent = result.recommendation || '';
+      }
+    }
+  } catch (err) {
+    console.warn('AI screening service notice:', err);
+    if (riskTierEl) {
+      riskTierEl.textContent = 'Screening Standby';
+      riskTierEl.style.background = '#F3F4F6';
+      riskTierEl.style.color = '#6B7280';
+    }
+    if (recEl) {
+      recEl.textContent = 'Photo saved for veterinary evaluation. Local inference available upon server connection.';
+    }
   }
 }
 
@@ -1435,16 +2122,17 @@ async function uploadUdderImageObject(storagePath, fileBlob, options) {
 // 12. Submit Assessment & Live Cloud Sync
 async function submitAssessment(e) {
   e.preventDefault();
+  const dict = I18N[currentLanguage] || I18N.en;
   const cowId = document.getElementById('assessCowSelect').value;
   const cow = cows.find(c => c.id === cowId);
   if (!cow) {
-    alert('Please select a cow.');
+    showToast(dict.msgSelectCow || 'Please select a cow.');
     return;
   }
 
   const bodyTemp = parseFloat(document.getElementById('assessBodyTemp').value) || 38.6;
   if (bodyTemp < 36.0 || bodyTemp > 43.0) {
-    showToast('Please enter a valid bovine rectal temperature (36.0°C – 43.0°C).');
+    showToast(dict.msgValidTemp || 'Please enter a valid bovine rectal temperature (36.0°C – 43.0°C).');
     return;
   }
   const quarters = Array.from(document.querySelectorAll('input[name="quarter"]:checked')).map(cb => cb.value);
@@ -1460,7 +2148,7 @@ async function submitAssessment(e) {
   const btn = document.getElementById('btnSubmitAssess');
   const btnText = document.getElementById('btnSubmitAssessText');
   if (btn) btn.disabled = true;
-  if (btnText) btnText.textContent = 'Saving Assessment...';
+  if (btnText) btnText.textContent = dict.btnSavingAssess || 'Saving Assessment...';
 
   // LIVE SUPABASE PERSISTENCE
   if (isSupabaseConfigured() && currentFarm && currentSession?.user) {
@@ -1518,14 +2206,14 @@ async function submitAssessment(e) {
         details: `Temp: ${bodyTemp}°C | Milk: ${milkAppearance} | Swelling: ${swelling} | CMT: ${cmtScore}`
       });
 
-      showToast('Assessment saved to Supabase cloud!');
+      showToast(dict.msgAssessSavedCloud || 'Assessment saved to Supabase cloud!');
       await loadBackendData();
     } catch (err) {
       console.error('Supabase save error:', err);
       showToast('Error syncing with cloud. Saved locally.');
     } finally {
       if (btn) btn.disabled = false;
-      if (btnText) btnText.textContent = 'Save Assessment & Notify Vet';
+      if (btnText) btnText.textContent = dict.btnSubmitAssessText || 'Save Assessment & Transmit to Vet';
     }
   }
 
@@ -1568,12 +2256,12 @@ async function submitAssessment(e) {
   const previewContainer = document.getElementById('assessImagePreviewContainer');
   if (previewContainer) previewContainer.style.display = 'none';
   const uploadText = document.getElementById('assessUploadText');
-  if (uploadText) uploadText.textContent = 'Click to capture / select photo';
+  if (uploadText) uploadText.textContent = dict.assessUploadText || 'Click to capture / select photo';
   const notesField = document.getElementById('assessNotes');
   if (notesField) notesField.value = '';
   document.querySelectorAll('input[name="quarter"]:checked').forEach(cb => cb.checked = false);
 
-  showToast('Assessment recorded successfully!');
+  showToast(dict.msgAssessSuccess || 'Assessment recorded successfully!');
   renderHomeView();
   renderVetPortalHome();
   renderClinicalOverviewDashboard();
@@ -1922,7 +2610,13 @@ function openVetReviewModal(caseId) {
     <div style="background:var(--cream); padding:12px 14px; border-radius:12px; margin-bottom:14px; font-size:12.5px; border:1px solid #EDE5CC;">
       <p style="margin:0 0 4px 0;"><strong>Quarters Involved:</strong> <span style="color:var(--forest); font-weight:700;">${quarters}</span></p>
       <p style="margin:0 0 4px 0;"><strong>Symptoms:</strong> ${symptoms}</p>
-      <p style="margin:0; font-style:italic; color:var(--ink);"><strong>Farmer Notes:</strong> "${notes}"</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-top:4px;">
+        <p style="margin:0; font-style:italic; color:var(--ink); flex:1;"><strong>Farmer Notes:</strong> "${escapeHtml(notes)}"</p>
+        <button type="button" class="btn-bhashini-mini" id="btnTranslateNotesModal" onclick="translateFarmerNotesInModal('${c.id}')" title="Translate Farmer Notes with Bhashini">
+          <span>🌐</span> <span id="lblBtnTranslateNotes">Translate Notes (Bhashini)</span>
+        </button>
+      </div>
+      <div id="boxFarmerNotesTranslated" class="bhashini-translation-box" style="display:none;"></div>
     </div>
 
     ${c.image ? `
@@ -1967,8 +2661,14 @@ function openVetReviewModal(caseId) {
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="vetRx">3. Medication & Therapeutic Protocol (Rx)</label>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <label class="form-label" for="vetRx" style="margin:0;">3. Medication & Therapeutic Protocol (Rx)</label>
+          <button type="button" class="btn-bhashini-mini" id="btnTranslateRxModal" onclick="translatePrescriptionInModal()" title="Translate Prescription for Farmer">
+            <span>🌐</span> <span>Translate Rx for Farmer</span>
+          </button>
+        </div>
         <input type="text" id="vetRx" class="form-input" value="${currentRx}" required placeholder="e.g. Cefquinome intramammary infusion 75mg q12h x 3d">
+        <div id="boxRxTranslated" class="bhashini-translation-box" style="display:none;"></div>
       </div>
 
       <div class="form-row-2">
@@ -1988,13 +2688,88 @@ function openVetReviewModal(caseId) {
         <textarea id="vetNotes" class="form-textarea" rows="2" required placeholder="Palpation heat, firmness, stripping frequency, and milking order recommendations...">${c.treatmentPlan?.clinical_notes || 'Milk affected quarter last. Discard milk for 72 hours. Apply cool compress twice daily.'}</textarea>
       </div>
 
-      <button type="submit" class="btn-primary-action" style="width:100%; justify-content:center; padding:13px; font-size:13.5px; margin-top:8px;">
-        <span>Transmit Confirmed Diagnosis & Treatment Plan</span>
-      </button>
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button type="button" class="btn-cancel" onclick="deleteCase('${escapeHtml(c.id || c.caseId)}', 'vet')" style="padding:12px 14px; font-size:12.5px; color:#DC2626; border-color:#FCA5A5; background:#FEF2F2;" id="btnModalDeleteCase" title="Delete or dismiss case from clinical queue">
+          <span>✕ ${I18N[currentLanguage]?.btnDeleteCase || 'Delete Case'}</span>
+        </button>
+        <button type="submit" class="btn-primary-action" style="flex:2; justify-content:center; padding:13px; font-size:13.5px;">
+          <span>Transmit Confirmed Diagnosis & Treatment Plan</span>
+        </button>
+      </div>
     </form>
   `;
 
   modal.classList.add('open');
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function translateFarmerNotesInModal(caseId) {
+  const c = casesList.find(x => x.id === caseId || x.caseId === caseId);
+  const notes = c?.notes || '';
+  const box = document.getElementById('boxFarmerNotesTranslated');
+  const btn = document.getElementById('btnTranslateNotesModal');
+  const lbl = document.getElementById('lblBtnTranslateNotes');
+  if (!box || !notes) return;
+
+  const targetLang = currentLanguage === 'en' ? 'en' : 'en'; // default to English for clinical vet review
+  const sourceLang = /[\u0900-\u097F]/.test(notes) ? 'mr' : 'en';
+
+  if (lbl) lbl.textContent = 'Translating...';
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await translateWithBhashini(notes, sourceLang, targetLang);
+    box.style.display = 'block';
+    const langLabel = targetLang === 'en' ? 'English' : (targetLang === 'mr' ? 'मराठी' : 'हिन्दी');
+    box.innerHTML = `
+      <div class="bhashini-tag">🌐 Bhashini Tele-Triage Translation (${langLabel})</div>
+      <div>${escapeHtml(res.translatedText)}</div>
+    `;
+    showToast('Farmer notes translated successfully!');
+  } catch (err) {
+    showToast('Translation service unavailable.');
+  } finally {
+    if (lbl) lbl.textContent = 'Translate Notes (Bhashini)';
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function translatePrescriptionInModal() {
+  const rxInput = document.getElementById('vetRx');
+  const notesInput = document.getElementById('vetNotes');
+  const box = document.getElementById('boxRxTranslated');
+  const btn = document.getElementById('btnTranslateRxModal');
+  if (!box || !rxInput) return;
+
+  const rxText = rxInput.value.trim();
+  const notesText = notesInput ? notesInput.value.trim() : '';
+  const combined = `${rxText}. ${notesText}`.trim();
+  if (!combined) {
+    showToast('Please enter prescription protocol first.');
+    return;
+  }
+
+  // Translate to farmer's native language (Marathi or Hindi)
+  const targetLang = currentLanguage === 'hi' ? 'hi' : 'mr';
+  if (btn) btn.innerHTML = '<span>⏳ Translating...</span>';
+
+  try {
+    const res = await translateWithBhashini(combined, 'en', targetLang);
+    box.style.display = 'block';
+    const langLabel = targetLang === 'mr' ? 'मराठी (शेतकऱ्यांसाठी सूचना)' : 'हिन्दी (किसान के लिए निर्देश)';
+    box.innerHTML = `
+      <div class="bhashini-tag">🌐 Bhashini Indic Instructions (${langLabel})</div>
+      <div style="font-weight:600; color:var(--forest);">${escapeHtml(res.translatedText)}</div>
+    `;
+    showToast('Prescription translated to Indic instructions!');
+  } catch (err) {
+    showToast('Translation service unavailable.');
+  } finally {
+    if (btn) btn.innerHTML = '<span>🌐</span> <span>Translate Rx for Farmer</span>';
+  }
 }
 
 function closeVetReviewModal() {
@@ -2168,36 +2943,15 @@ function setRole(role) {
 }
 
 function updateActiveRoleBadges() {
-  const isMr = currentLanguage === 'mr';
-  const isVet = activeRole === 'vet';
-
   const activeBadge = document.getElementById('activeRoleBadge');
   if (activeBadge) {
     activeBadge.style.cursor = 'default';
-    activeBadge.title = isVet ? 'Active Role: Licensed Veterinarian' : 'Active Role: Dairy Farmer';
     activeBadge.onclick = null;
-    if (isVet) {
-      activeBadge.textContent = isMr ? '🩺 परवानाधारक पशुवैद्यक' : '🩺 Licensed Veterinarian';
-      activeBadge.classList.add('vet');
-    } else {
-      activeBadge.textContent = isMr ? '🌾 दुग्ध उत्पादक शेतकरी' : '🌾 Dairy Farmer';
-      activeBadge.classList.remove('vet');
-    }
   }
-
   const sideBadge = document.getElementById('sideActiveRoleBadge');
   if (sideBadge) {
     sideBadge.style.cursor = 'default';
-    sideBadge.title = isVet ? 'Active Role: Licensed Veterinarian' : 'Active Role: Dairy Farmer';
     sideBadge.onclick = null;
-    const icon = isVet ? '🩺' : '🌾';
-    const label = isVet ? (isMr ? 'पशुवैद्यक' : 'Veterinarian') : (isMr ? 'शेतकरी' : 'Farmer');
-    sideBadge.innerHTML = `<span class="role-icon">${icon}</span><span class="sidebar-nav-label role-text">${label}</span>`;
-    if (isVet) {
-      sideBadge.classList.add('vet');
-    } else {
-      sideBadge.classList.remove('vet');
-    }
   }
 }
 
@@ -2230,6 +2984,16 @@ async function enforceAuthenticatedRoleAndRoute() {
           }
           trustedRole = profile.role === 'veterinarian' ? 'vet' : 'farmer';
         }
+      } else {
+        const isAuthActive = localStorage.getItem('bovicare_active_role');
+        const hasSessionCookie = typeof document !== 'undefined' && document.cookie && document.cookie.includes('sb-');
+        if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured() && !isAuthActive && !hasSessionCookie) {
+          console.warn('No active session found. Redirecting to login.html');
+          if (typeof window !== 'undefined') {
+            window.location.href = 'login.html';
+            return;
+          }
+        }
       }
     } catch (e) {
       console.warn('Session verification fallback:', e);
@@ -2250,6 +3014,24 @@ async function enforceAuthenticatedRoleAndRoute() {
 
   // Enforce the verified role
   setRole(trustedRole);
+}
+
+// 16b. User Sign Out Functionality
+async function logoutUser() {
+  try {
+    let supabase = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof initSupabase === 'function' ? initSupabase() : null);
+    if (supabase && supabase.auth) {
+      await supabase.auth.signOut();
+    }
+  } catch (e) {
+    console.warn('Sign out error:', e);
+  }
+  localStorage.removeItem('bovicare_active_role');
+  localStorage.removeItem('bovicare_auth_session');
+  if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
+  if (typeof window !== 'undefined') {
+    window.location.href = 'login.html';
+  }
 }
 
 function updateNavRoleLabels() {
@@ -2293,10 +3075,6 @@ function updateNavRoleLabels() {
     if (navLinkCows) navLinkCows.textContent = isMr ? 'नेमलेले कळप' : 'Assigned Herds';
     if (sideLinkCows) sideLinkCows.textContent = isMr ? 'नेमलेले कळप' : 'Assigned Herds';
     if (lblNavCows) lblNavCows.textContent = isMr ? 'कळप' : 'Herds';
-
-    if (navLinkAssess) navLinkAssess.textContent = isMr ? 'क्लिनिकल तपासणी' : 'Clinical Check';
-    if (sideLinkAssess) sideLinkAssess.textContent = isMr ? 'क्लिनिकल तपासणी' : 'Clinical Check';
-    if (lblNavAssess) lblNavAssess.textContent = isMr ? 'तपासणी' : 'Assess';
 
     if (navLinkRecords) navLinkRecords.textContent = isMr ? 'औषध व मुदत नोंदी' : 'Rx Holds';
     if (sideLinkRecords) sideLinkRecords.textContent = isMr ? 'औषध व मुदत नोंदी' : 'Rx Holds';
@@ -2481,15 +3259,25 @@ function renderProfileView() {
     ? `<span id="dbStatusBadge" style="font-weight:700; font-size:12px; color:var(--forest); display:inline-flex; align-items:center; gap:4px;">● Supabase Cloud Connected</span>`
     : `<span id="dbStatusBadge" style="font-weight:700; font-size:12px; color:#D97706; display:inline-flex; align-items:center; gap:4px;">● Offline Demo Mode</span>`;
 
+  const dict = I18N[currentLanguage] || I18N.en;
+
   if (activeRole === 'farmer') {
     const farmerName = currentProfile?.full_name || "Ramesh Patil";
     const farmerPhone = currentProfile?.phone_number || "+91 98220 14829";
     const farmName = currentFarm?.name || "Sahyadri Dairy Farm";
     const farmCode = currentFarm?.registration_code || "FARM-MH-4019";
-    const farmLocation = currentFarm?.location_address || "Haveli, Pune District, Maharashtra";
+    const farmLocation = currentFarm?.location_address || 
+      [currentFarm?.village_city, currentFarm?.district, currentFarm?.state, currentFarm?.pincode].filter(Boolean).join(', ') || 
+      "Haveli, Pune District, Maharashtra";
     const totalCattle = cows.length;
     const healthyCows = cows.filter(c => c.status === 'healthy').length;
     const monitorCows = totalCattle - healthyCows;
+
+    // Strict Farmer Vet Privacy: Never display assigned vet name, phone, clinic or photo to farmer.
+    const hasAssignedVet = Boolean(currentFarm?.assigned_vet_id);
+    const vetCoverageStatusText = hasAssignedVet 
+      ? (dict.msgVetAssignedNeutral || "Your case is being routed to an eligible veterinary professional.")
+      : (dict.msgNoVetAvailable || "Veterinary assistance is not yet available for this location.");
 
     container.innerHTML = `
       <div class="tab-header">
@@ -2512,7 +3300,19 @@ function renderProfileView() {
               </div>
             </div>
           </div>
-          <div>${dbBadgeHtml}</div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+            <div>${dbBadgeHtml}</div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+              <button type="button" class="btn-primary-action" id="btnEditFarmerProfile" onclick="openEditFarmerProfileModal()" style="display:inline-flex; align-items:center; gap:6px; padding:6px 14px; font-size:12px; font-weight:700; border-radius:8px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <span id="lblEditFarmerProfile">${dict.lblEditFarmerProfile || 'Edit Farm Profile'}</span>
+              </button>
+              <button type="button" class="btn-logout" onclick="logoutUser()" style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; font-size:12px; font-weight:700; border-radius:8px; border:1px solid #FCA5A5; background:#FEF2F2; color:#991B1B; cursor:pointer;" title="Sign out of current account">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="profile-details-grid">
@@ -2537,8 +3337,10 @@ function renderProfileView() {
             <div class="profile-detail-value">Twice daily (05:30 AM & 05:00 PM)</div>
           </div>
           <div class="profile-detail-box">
-            <div class="profile-detail-label">Nearest Vet Dispensary</div>
-            <div class="profile-detail-value">Pune District Veterinary Hospital</div>
+            <div class="profile-detail-label" id="lblVetCoverageTitle">${dict.lblVetCoverageTitle || 'Veterinary Care Coverage'}</div>
+            <div class="profile-detail-value" id="valVetCoverageStatus" style="font-size:12px; color:${hasAssignedVet ? 'var(--forest)' : '#B45309'}; font-weight:600;">
+              ${vetCoverageStatusText}
+            </div>
           </div>
         </div>
       </div>
@@ -2616,9 +3418,16 @@ function renderProfileView() {
             <div class="cow-info-col">
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div class="cow-item-name">${c.cowName} (${c.cowTag})</div>
-                <span class="status-pill-badge ${c.status === 'treatment_prescribed' ? 'healthy' : 'monitor'}">
-                  ${c.status === 'treatment_prescribed' ? '● Prescription Active' : '● Awaiting Vet Review'}
-                </span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="status-pill-badge ${c.status === 'treatment_prescribed' ? 'healthy' : 'monitor'}">
+                    ${c.status === 'treatment_prescribed' ? '● Prescription Active' : '● Awaiting Vet Review'}
+                  </span>
+                  ${(!c.treatmentPlan && c.status !== 'treatment_prescribed') ? `
+                    <button type="button" class="btn-delete-case-farmer" onclick="deleteCase('${c.id || c.caseId}', 'farmer')" style="display:inline-flex; align-items:center; justify-content:center; background:#FEF2F2; border:1px solid #FCA5A5; color:#DC2626; cursor:pointer; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;" title="Delete consultation request">
+                      <span>✕ ${dict.btnDeleteCase || 'Delete'}</span>
+                    </button>
+                  ` : ''}
+                </div>
               </div>
               <div class="cow-item-meta">${c.date || 'Recent'} · Quarters: ${Array.isArray(c.quarters) ? c.quarters.join(', ') : c.quarters}</div>
               ${c.treatmentPlan ? `
@@ -2641,6 +3450,8 @@ function renderProfileView() {
     const vetPhone = currentProfile?.phone_number || "+91 94231 77610";
     const vetLicense = currentProfile?.vet_license_number || "VCI-MAH-2024-8842";
     const vetClinic = currentProfile?.vet_clinic_affiliation || "Pune District Veterinary Dispensary & Animal Hospital";
+    const vetAddress = currentProfile?.practice_address || [currentProfile?.village_city, currentProfile?.district, currentProfile?.state, currentProfile?.pincode].filter(Boolean).join(', ') || "Station Road, Haveli, Pune";
+    const vetServiceArea = currentProfile?.service_area || "Pune District (8 Assigned Dairy Farms)";
     const pendingCount = casesList.filter(c => c.status === 'open').length;
     const prescribedCount = casesList.filter(c => c.status === 'treatment_prescribed').length;
 
@@ -2665,7 +3476,19 @@ function renderProfileView() {
               </div>
             </div>
           </div>
-          <div>${dbBadgeHtml}</div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+            <div>${dbBadgeHtml}</div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+              <button type="button" class="btn-primary-action" id="btnEditVetProfile" onclick="openEditVetProfileModal()" style="display:inline-flex; align-items:center; gap:6px; padding:6px 14px; font-size:12px; font-weight:700; border-radius:8px; background:linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <span id="lblEditVetProfile">${dict.lblEditVetProfile || 'Edit Practice Location'}</span>
+              </button>
+              <button type="button" class="btn-logout" onclick="logoutUser()" style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; font-size:12px; font-weight:700; border-radius:8px; border:1px solid #FCA5A5; background:#FEF2F2; color:#991B1B; cursor:pointer;" title="Sign out of current account">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="profile-details-grid">
@@ -2682,16 +3505,16 @@ function renderProfileView() {
             <div class="profile-detail-value">${vetPhone}</div>
           </div>
           <div class="profile-detail-box">
-            <div class="profile-detail-label">Clinical Specialization</div>
-            <div class="profile-detail-value">Bovine Udder Health & Mastitis Management</div>
+            <div class="profile-detail-label">Practice Address</div>
+            <div class="profile-detail-value">${vetAddress}</div>
           </div>
           <div class="profile-detail-box">
             <div class="profile-detail-label">Practice Jurisdiction</div>
-            <div class="profile-detail-value">Pune District (8 Assigned Dairy Farms)</div>
+            <div class="profile-detail-value">${vetServiceArea}</div>
           </div>
           <div class="profile-detail-box">
             <div class="profile-detail-label">Tele-Triage Availability</div>
-            <div class="profile-detail-value" style="color:var(--forest);">Active & On-Call</div>
+            <div class="profile-detail-value" style="color:var(--forest);">${currentProfile?.is_active_vet !== false ? 'Active & On-Call' : 'Inactive'}</div>
           </div>
         </div>
       </div>
@@ -2732,9 +3555,6 @@ function renderProfileView() {
         <div style="display:flex; gap:8px;">
           <button type="button" class="btn-primary-action" onclick="openAddTriageCaseModal()" style="font-size:12px; padding:6px 12px; background:linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);">
             <span>+ Add Triage Case</span>
-          </button>
-          <button type="button" class="btn-secondary" onclick="createSampleClinicalCase()" style="font-size:12px; padding:6px 12px; border:1px solid #CBD5E1; color:#334155; background:#FFFFFF;">
-            <span>⚡ Quick Simulate</span>
           </button>
         </div>
       </div>
@@ -2808,10 +3628,10 @@ function renderVetCasesQueue() {
         <div style="font-size:36px; margin-bottom:8px;">🩺</div>
         <h4 style="font-size:16px; font-weight:800; color:var(--ink); margin-bottom:6px;">No Cases Currently in Triage Queue</h4>
         <p style="font-size:12.5px; color:var(--muted); max-width:440px; margin:0 auto 16px auto; line-height:1.45;">
-          All herd members are currently stable. You can generate a clinical test case to evaluate symptoms and formulate a treatment protocol.
+          All herd members are currently stable. New clinical triage cases submitted by farmers or registered via intake will appear here.
         </p>
-        <button type="button" class="btn-primary-action" onclick="createSampleClinicalCase()" style="margin:0 auto; padding:10px 20px; font-size:13px;">
-          <span>+ Generate Clinical Test Case</span>
+        <button type="button" class="btn-primary-action" onclick="openAddTriageCaseModal()" style="margin:0 auto; padding:10px 20px; font-size:13px;">
+          <span>+ Add Triage Case</span>
         </button>
       </div>
     `;
@@ -2851,9 +3671,15 @@ function renderVetCasesQueue() {
           ` : ''}
         </div>
 
-        <button type="button" class="btn-primary-action" onclick="event.stopPropagation(); openVetReviewModal('${c.id}')" style="width:100%; justify-content:center; padding:9px 14px; font-size:12.5px; margin-top:2px;">
-          <span>📋 ${isPrescribed ? 'Update Clinical Evaluation & Rx' : 'Perform Clinical Evaluation & Prescribe Plan'}</span>
-        </button>
+        <div style="display:flex; gap:8px; margin-top:2px;">
+          <button type="button" class="btn-cancel" onclick="event.stopPropagation(); deleteCase('${c.id || c.caseId}', 'vet')" style="padding:9px 12px; font-size:12px; color:#DC2626; border-color:#FCA5A5; background:#FEF2F2;" title="Delete / Dismiss case">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2-2V7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>${I18N[currentLanguage]?.btnDeleteCase || 'Delete'}</span>
+          </button>
+          <button type="button" class="btn-primary-action" onclick="event.stopPropagation(); openVetReviewModal('${c.id}')" style="flex:1; justify-content:center; padding:9px 14px; font-size:12.5px;">
+            <span>📋 ${isPrescribed ? 'Update Clinical Evaluation & Rx' : 'Perform Clinical Evaluation & Prescribe Plan'}</span>
+          </button>
+        </div>
       </div>
     `;
   }).join('');
@@ -2937,13 +3763,19 @@ async function loadBackendData() {
           renderHomeView();
           renderCowsView();
           populateAssessDropdown();
+        } else {
+          cows = [];
+          renderHomeView();
+          renderCowsView();
+          populateAssessDropdown();
         }
 
-        // Load live mastitis cases from Supabase
+        // Load live mastitis cases from Supabase (excluding soft-deleted cases)
         const { data: dbCases } = await supabaseClient
           .from('mastitis_cases')
           .select('*, cows(name, tag_number, breed), udder_images(storage_path)')
           .eq('farm_id', currentFarm.id)
+          .is('deleted_at', null)
           .order('opened_at', { ascending: false });
 
         if (dbCases && dbCases.length > 0) {
@@ -2978,6 +3810,11 @@ async function loadBackendData() {
           renderVetCasesQueue();
           renderRailCases();
           renderVetPortalHome();
+        } else {
+          casesList = [];
+          renderVetCasesQueue();
+          renderRailCases();
+          renderVetPortalHome();
         }
 
         // Load health records from Supabase
@@ -2997,6 +3834,9 @@ async function loadBackendData() {
             details: r.details,
             status: r.record_type.includes('Mastitis') ? 'To monitor' : 'Healthy'
           }));
+          renderRecordsView();
+        } else {
+          recordsList = [];
           renderRecordsView();
         }
         renderProfileView();
@@ -3052,6 +3892,7 @@ function closeRemindersModal() {
 }
 
 function showToast(message) {
+  if (typeof document === 'undefined') return;
   const toast = document.getElementById('toastNotification');
   if (!toast) return;
   toast.textContent = message;
@@ -3059,7 +3900,10 @@ function showToast(message) {
   setTimeout(() => toast.classList.remove('visible'), 2800);
 }
 
-// 18. Clinical Overview & Herd Epidemiology Dashboard
+// 18. Clinical Overview & Consultation Workspace Controller
+let activeClinicalCaseId = 'CASE-2026-081';
+let activeClinicalSubTab = 'overview';
+
 function renderClinicalOverviewDashboard() {
   const container = document.getElementById('tabClinicalOverview');
   if (!container) return;
@@ -3068,6 +3912,12 @@ function renderClinicalOverviewDashboard() {
   const monitorCows = cows.filter(c => c.status !== 'healthy').length;
   const activeCases = casesList.filter(c => c.status === 'open' || c.urgency === 'urgent' || c.urgency === 'critical').length;
 
+  const isMr = currentLanguage === 'mr';
+  const isHi = currentLanguage === 'hi';
+  const unitActive = isMr ? 'सक्रिय' : (isHi ? 'सक्रिय' : 'Active');
+  const unitQuarters = isMr ? 'क्वार्टर' : (isHi ? 'क्वार्टर' : 'Quarters');
+  const unitLiters = isMr ? 'लिटर' : (isHi ? 'लीटर' : 'Liters');
+
   // 1. KPI: Mastitis Rate
   const mastitisRate = ((Math.max(monitorCows, 1) / totalCattle) * 100).toFixed(1);
   const elRate = document.getElementById('kpiMastitisRate');
@@ -3075,7 +3925,7 @@ function renderClinicalOverviewDashboard() {
 
   // 2. KPI: Active Triage Cases
   const elActive = document.getElementById('kpiActiveTriageCases');
-  if (elActive) elActive.textContent = `${activeCases || 3} Active`;
+  if (elActive) elActive.textContent = `${activeCases || 3} ${unitActive}`;
 
   // 3. KPI: Quarters at Risk
   let lfCount = 0, rfCount = 0, lrCount = 0, rrCount = 0;
@@ -3091,11 +3941,867 @@ function renderClinicalOverviewDashboard() {
   });
   const totalQuarters = Math.max(lfCount + rfCount + lrCount + rrCount, 5);
   const elQuarters = document.getElementById('kpiQuartersAtRisk');
-  if (elQuarters) elQuarters.textContent = `${totalQuarters} Quarters`;
+  if (elQuarters) elQuarters.textContent = `${totalQuarters} ${unitQuarters}`;
 
   // 4. KPI: Safe Withholding Liters
   const activeHolds = casesList.filter(c => c.treatmentPlan && c.treatmentPlan.milk_withdrawal_hours);
   const totalSafeLiters = Math.max(activeHolds.length * 66, 132);
   const elSafe = document.getElementById('kpiSafeWithholdingLiters');
-  if (elSafe) elSafe.textContent = `${totalSafeLiters} Liters`;
+  if (elSafe) elSafe.textContent = `${totalSafeLiters} ${unitLiters}`;
+
+  // 5. Populate Active Case Switcher & Render Workspace
+  populateClinicalActiveCaseSelect();
+  renderClinicalCaseWorkspace(activeClinicalCaseId);
 }
+
+function populateClinicalActiveCaseSelect() {
+  const select = document.getElementById('clinicalActiveCaseSelect');
+  if (!select) return;
+
+  if (casesList.length === 0) {
+    select.innerHTML = '<option value="">No active clinical cases</option>';
+    return;
+  }
+
+  // Ensure activeClinicalCaseId is valid
+  if (!casesList.some(c => c.id === activeClinicalCaseId || c.caseId === activeClinicalCaseId)) {
+    activeClinicalCaseId = casesList[0].id || casesList[0].caseId;
+  }
+
+  select.innerHTML = casesList.map(c => {
+    const isUrgent = c.urgency === 'urgent' || c.urgency === 'critical';
+    const isRx = c.status === 'treatment_prescribed' || Boolean(c.treatmentPlan);
+    const badge = isUrgent ? '🚨' : (isRx ? '●' : '⚠️');
+    const selectedAttr = (c.id === activeClinicalCaseId || c.caseId === activeClinicalCaseId) ? 'selected' : '';
+    return `<option value="${c.id || c.caseId}" ${selectedAttr}>${badge} ${escapeHtml(c.cowName)} (${escapeHtml(c.cowTag)}) — ${c.id || c.caseId}</option>`;
+  }).join('');
+}
+
+function switchActiveClinicalCase(caseId) {
+  if (!caseId) return;
+  activeClinicalCaseId = caseId;
+  renderClinicalCaseWorkspace(caseId);
+}
+
+function renderClinicalCaseWorkspace(caseId) {
+  const c = casesList.find(x => x.id === caseId || x.caseId === caseId) || casesList[0];
+  if (!c) return;
+
+  const dict = I18N[currentLanguage] || I18N.en;
+  const isMr = currentLanguage === 'mr';
+  const isHi = currentLanguage === 'hi';
+  const unavailableText = dict.valUnavailable || (isMr ? 'उपलब्ध नाही' : (isHi ? 'अनुपलब्ध' : 'Unavailable'));
+
+  // Determine species emoji & description
+  const isBuffalo = String(c.breed || '').toLowerCase().includes('buffalo');
+  const speciesEmoji = isBuffalo ? '🐃' : '🐄';
+  const speciesDesc = isBuffalo ? (isMr ? '🐃 मुऱ्हा म्हैस' : (isHi ? '🐃 मुर्राह भैंस' : '🐃 Murrah Buffalo')) : `${speciesEmoji} ${c.breed || 'Indigenous Dairy Cow'}`;
+
+  // 1. Update Compact Case Summary (Always Visible)
+  const elAvatar = document.getElementById('caseSummaryAvatar');
+  if (elAvatar) elAvatar.textContent = speciesEmoji;
+
+  const elAnimal = document.getElementById('caseSummaryAnimal');
+  if (elAnimal) elAnimal.textContent = `${c.cowName} (${c.cowTag})`;
+
+  const elSpecies = document.getElementById('caseSummarySpecies');
+  if (elSpecies) elSpecies.textContent = speciesDesc;
+
+  const elFarm = document.getElementById('caseSummaryFarm');
+  if (elFarm) elFarm.textContent = `🌾 ${c.farmName || 'Sahyadri Dairy Farm · Shed 2'}`;
+
+  const elId = document.getElementById('caseSummaryId');
+  if (elId) elId.textContent = `📋 ${c.id || c.caseId}`;
+
+  const elDate = document.getElementById('caseSummaryDate');
+  if (elDate) elDate.textContent = `📅 ${c.date || 'Today'}`;
+
+  const elStatus = document.getElementById('caseSummaryStatus');
+  if (elStatus) {
+    const isPrescribed = c.status === 'treatment_prescribed' || Boolean(c.treatmentPlan);
+    if (isPrescribed) {
+      elStatus.className = 'status-pill-badge healthy';
+      elStatus.textContent = isMr ? '● उपचार सक्रिय' : (isHi ? '● उपचार सक्रिय' : '● Treatment Active');
+    } else {
+      elStatus.className = 'status-pill-badge monitor';
+      elStatus.textContent = isMr ? '⚠️ क्लिनिकल ट्रायज' : (isHi ? '⚠️ क्लिनिकल ट्राइएज' : '⚠️ Clinical Triage');
+    }
+  }
+
+  const elConcern = document.getElementById('caseSummaryConcern');
+  if (elConcern) {
+    const concernSummary = c.notes || (Array.isArray(c.symptoms) ? c.symptoms.join(', ') : 'Physical observation recorded.');
+    elConcern.textContent = concernSummary;
+  }
+
+  // 2. Update Observations & Symptoms Pane
+  const quartersStr = Array.isArray(c.quarters) ? c.quarters.join(', ') : (c.quarters || unavailableText);
+  const elQuarterTag = document.getElementById('obsQuartersTag');
+  if (elQuarterTag) elQuarterTag.textContent = quartersStr;
+
+  const elSymptomsList = document.getElementById('obsSymptomsList');
+  if (elSymptomsList) {
+    const symList = Array.isArray(c.symptoms) ? c.symptoms : [c.symptoms || 'Observations recorded'];
+    elSymptomsList.innerHTML = symList.map((s, idx) => {
+      const cls = idx === 0 ? 'warning' : 'danger';
+      return `<span class="clinical-chip ${cls}">${escapeHtml(s)}</span>`;
+    }).join('');
+  }
+
+  // Swelling, Pain, Fore-Milk & Yield
+  const elSwelling = document.getElementById('obsSwellingValue');
+  if (elSwelling) {
+    elSwelling.textContent = c.notes?.toLowerCase().includes('edema') ? (isMr ? 'कासदाह सूज (एडेमा)' : 'सूजन (एडेमा)') : (isMr ? 'तीव्र कडकपणा / सूज' : 'गंभीर सूजन व कड़ापन');
+  }
+
+  const elPain = document.getElementById('obsPainValue');
+  if (elPain) {
+    elPain.textContent = c.notes?.toLowerCase().includes('restless') ? (isMr ? 'अस्वस्थ, दूध काढताना त्रास' : 'बेचैनी, पैर पटकना') : (isMr ? 'मध्यम अस्वस्थता' : 'हल्की बेचैनी');
+  }
+
+  const elMilk = document.getElementById('obsMilkValue');
+  if (elMilk) {
+    elMilk.textContent = c.notes?.toLowerCase().includes('curd') ? (isMr ? 'दुधात गाठी / चोथा उपस्थित' : 'दूध में थक्के / गुठलियां') : (isMr ? 'सामान्य पांढरे' : 'साफ मलाईदार');
+  }
+
+  // Measurements & Vitals (Never show 0 for missing data; show unavailableText)
+  const elTemp = document.getElementById('obsValTemp');
+  if (elTemp) elTemp.textContent = c.temp ? c.temp.split(' ')[0] : unavailableText;
+
+  const elCmt = document.getElementById('obsValCmt');
+  if (elCmt) elCmt.textContent = c.cmt ? c.cmt.split(' ')[0] : unavailableText;
+
+  const elScc = document.getElementById('obsValScc');
+  if (elScc) elScc.textContent = c.scc ? c.scc.split(' ')[0] : unavailableText;
+
+  const elCond = document.getElementById('obsValConductivity');
+  if (elCond) elCond.textContent = c.ec || unavailableText;
+
+  // Farmer Notes
+  const elNotes = document.getElementById('obsFarmerNotes');
+  if (elNotes) elNotes.textContent = `"${c.notes || 'Farmer observed clinical changes during milking cluster attachment.'}"`;
+
+  const boxTrans = document.getElementById('boxObsNotesTranslated');
+  if (boxTrans) boxTrans.style.display = 'none';
+
+  // 3. Update Uploaded Images Gallery Pane
+  const elGallery = document.getElementById('clinicalImageGallery');
+  if (elGallery) {
+    if (c.image) {
+      elGallery.innerHTML = `
+        <div class="clinical-gallery-card" onclick="openClinicalImagePreview('${c.image}', '${escapeHtml(c.cowName)} (${escapeHtml(c.cowTag)})', 'Quarter inspection photo · ${escapeHtml(quartersStr)}')">
+          <img src="${c.image}" alt="Clinical udder inspection" class="clinical-gallery-img" onerror="this.onerror=null; this.src='assets/images/cow_banner.jpeg';">
+          <div class="clinical-gallery-caption">
+            <span>🔍 ${escapeHtml(c.cowName)} · ${escapeHtml(quartersStr)}</span>
+            <span style="color:#2563EB; font-weight:700;">Inspect ↗</span>
+          </div>
+        </div>
+      `;
+    } else {
+      elGallery.innerHTML = `
+        <div style="grid-column: 1 / -1; background:#F8FAFC; border:1px dashed #CBD5E1; border-radius:12px; padding:24px; text-align:center; color:var(--muted);">
+          <div style="font-size:28px; margin-bottom:6px;">📷</div>
+          <div style="font-size:13px; font-weight:700; color:var(--ink);">No additional clinical photographs attached to this record</div>
+          <div style="font-size:11.5px; margin-top:4px;">Farmer completed physical California Mastitis Test (CMT) examination on-site.</div>
+        </div>
+      `;
+    }
+  }
+
+  // 4. Update Diagnosis & Treatment Form (Preserves user entry if active form untouched)
+  const selDiag = document.getElementById('clinicalDiagSelect');
+  if (selDiag) {
+    selDiag.value = c.diagnosis?.diagnosis || (c.symptoms?.some(s => s.toLowerCase().includes('subclinical')) ? 'subclinical_mastitis' : 'clinical_mastitis');
+  }
+
+  const selCmt = document.getElementById('clinicalCmtSelect');
+  if (selCmt) {
+    const rawCmt = c.diagnosis?.cmt_score || c.cmt?.split(' ')[0] || '3+';
+    selCmt.value = ['0', 'Trace', '1+', '2+', '3+'].includes(rawCmt) ? rawCmt : '3+';
+  }
+
+  const selRoute = document.getElementById('clinicalRouteSelect');
+  if (selRoute) {
+    selRoute.value = c.treatmentPlan?.route || 'intramammary';
+  }
+
+  const selStatus = document.getElementById('clinicalCaseStatusSelect');
+  if (selStatus) {
+    selStatus.value = c.status || 'open';
+  }
+
+  const txtMed = document.getElementById('clinicalMedicationProtocol');
+  if (txtMed) {
+    txtMed.value = c.treatmentPlan?.medication_protocol || 'Cefquinome 75mg LC intramammary infusion q12h x 3 days with barrier teat sanitization';
+  }
+
+  const inpMilk = document.getElementById('clinicalMilkWithdrawal');
+  if (inpMilk) {
+    inpMilk.value = c.treatmentPlan?.milk_withdrawal_hours || 72;
+  }
+
+  const inpMeat = document.getElementById('clinicalMeatWithdrawal');
+  if (inpMeat) {
+    inpMeat.value = c.treatmentPlan?.meat_withdrawal_days || 7;
+  }
+
+  const txtNotes = document.getElementById('clinicalVetNotes');
+  if (txtNotes) {
+    txtNotes.value = c.diagnosis?.clinical_notes || c.treatmentPlan?.notes || 'Acute clinical mastitis confirmed. Complete full 3-day course. Retest CMT prior to bulk tank milk release.';
+  }
+
+  const badgeDiagStatus = document.getElementById('diagPrescriptionStatusBadge');
+  if (badgeDiagStatus) {
+    const isPrescribed = c.status === 'treatment_prescribed' || Boolean(c.treatmentPlan);
+    badgeDiagStatus.className = `status-pill-badge ${isPrescribed ? 'healthy' : 'monitor'}`;
+    badgeDiagStatus.textContent = isPrescribed ? '● Active Prescription' : '⚠️ Pending Evaluation';
+  }
+
+  // 5. Update Follow-Up Defaults
+  const inpFollowupDate = document.getElementById('clinicalFollowupDate');
+  if (inpFollowupDate && !inpFollowupDate.value) {
+    const nextDate = new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString().split('T')[0];
+    inpFollowupDate.value = nextDate;
+  }
+
+  // 6. Update Longitudinal Timeline
+  const elHistoryTag = document.getElementById('historyPatientTag');
+  if (elHistoryTag) elHistoryTag.textContent = `${c.cowName} (${c.cowTag})`;
+
+  const elTimeline = document.getElementById('clinicalHistoryTimeline');
+  if (elTimeline) {
+    elTimeline.innerHTML = `
+      <div class="clinical-timeline-item">
+        <div class="clinical-timeline-date">Today (06:30 AM Milking)</div>
+        <div class="clinical-timeline-text">
+          <strong>Acute Flare-up Reported:</strong> Farmer logged ${escapeHtml(quartersStr)} firmness with curds in strip cup. Clinical vitals: Temp ${c.temp || unavailableText}, CMT ${c.cmt || unavailableText}.
+        </div>
+      </div>
+      <div class="clinical-timeline-item">
+        <div class="clinical-timeline-date">Yesterday (18:00 PM)</div>
+        <div class="clinical-timeline-text">
+          <strong>Evening Milking Observation:</strong> Cluster takeoff liner slip noted. Mild restlessness during cluster attachment.
+        </div>
+      </div>
+      <div class="clinical-timeline-item">
+        <div class="clinical-timeline-date">14 Days Ago</div>
+        <div class="clinical-timeline-text">
+          <strong>Routine Bulk Tank Herd Screen:</strong> Herd somatic cell count within Grade A incentive bonus tier.
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Sub-Tab Section Switcher (Overview, Observations, Images, Diagnosis, Followup, History)
+function switchClinicalSubTab(tabName) {
+  activeClinicalSubTab = tabName;
+  const subTabs = ['overview', 'observations', 'images', 'diagnosis', 'followup', 'history'];
+
+  subTabs.forEach(name => {
+    // Capitalize first letter for ID matching
+    const cap = name.charAt(0).toUpperCase() + name.slice(1);
+    const btn = document.getElementById(`btnSubtab${cap}`);
+    const pane = document.getElementById(`paneClinical${cap}`);
+
+    const isMatch = name === tabName;
+    if (btn) {
+      btn.classList.toggle('active', isMatch);
+      btn.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+    }
+    if (pane) {
+      pane.style.display = isMatch ? 'flex' : 'none';
+      pane.classList.toggle('active', isMatch);
+    }
+  });
+}
+
+// Save Clinical Diagnosis & Prescription Plan
+async function saveClinicalDiagnosisForm() {
+  const c = casesList.find(x => x.id === activeClinicalCaseId || x.caseId === activeClinicalCaseId) || casesList[0];
+  if (!c) {
+    showToast('No active case selected.');
+    return;
+  }
+
+  const diag = document.getElementById('clinicalDiagSelect')?.value || 'clinical_mastitis';
+  const cmt = document.getElementById('clinicalCmtSelect')?.value || '3+';
+  const route = document.getElementById('clinicalRouteSelect')?.value || 'intramammary';
+  const status = document.getElementById('clinicalCaseStatusSelect')?.value || 'treatment_prescribed';
+  const protocol = document.getElementById('clinicalMedicationProtocol')?.value.trim() || 'Cefquinome 75mg LC q12h x 3d';
+  const milkWithhold = parseInt(document.getElementById('clinicalMilkWithdrawal')?.value, 10) || 72;
+  const meatWithhold = parseInt(document.getElementById('clinicalMeatWithdrawal')?.value, 10) || 7;
+  const vetNotes = document.getElementById('clinicalVetNotes')?.value.trim() || 'Clinical evaluation saved.';
+
+  // Update in-memory casesList
+  c.status = status;
+  c.diagnosis = {
+    diagnosis: diag,
+    cmt_score: cmt,
+    clinical_notes: vetNotes,
+    diagnosed_at: new Date().toISOString()
+  };
+  c.treatmentPlan = {
+    medication_protocol: protocol,
+    route: route,
+    milk_withdrawal_hours: milkWithhold,
+    meat_withdrawal_days: meatWithhold,
+    notes: vetNotes,
+    prescribed_at: new Date().toISOString()
+  };
+
+  // If Supabase is available and authenticated, save to database
+  if (typeof supabaseClient !== 'undefined' && supabaseClient && typeof currentSession !== 'undefined' && currentSession?.user) {
+    try {
+      await supabaseClient
+        .from('cases')
+        .update({
+          status: status,
+          diagnosis: c.diagnosis,
+          treatment_plan: c.treatmentPlan,
+          updated_at: new Date().toISOString()
+        })
+        .match({ id: c.id });
+    } catch (err) {
+      console.warn('Supabase case update warning:', err);
+    }
+  }
+
+  // Refresh UI
+  renderClinicalOverviewDashboard();
+  showToast(currentLanguage === 'mr' ? 'क्लिनिकल निदान व औषधोपचार योजना यशस्वीरित्या जतन केली!' : (currentLanguage === 'hi' ? 'क्लिनिकल निदान व दवा योजना सफलतापूर्वक सहेजी गई!' : 'Clinical evaluation & prescription saved successfully!'));
+}
+
+function resetClinicalDiagnosisForm() {
+  renderClinicalCaseWorkspace(activeClinicalCaseId);
+  showToast('Form reset to current case record.');
+}
+
+function recordClinicalFollowupDirective() {
+  const dateVal = document.getElementById('clinicalFollowupDate')?.value;
+  const directiveVal = document.getElementById('clinicalFollowupDirective')?.value.trim();
+
+  if (!dateVal && !directiveVal) {
+    showToast('Please specify a follow-up re-check date or directive.');
+    return;
+  }
+
+  const feed = document.getElementById('clinicalFollowupActionsList');
+  if (feed && directiveVal) {
+    const newItem = document.createElement('label');
+    newItem.className = 'clinical-check-item';
+    newItem.innerHTML = `
+      <input type="checkbox" onchange="showToast('Action item updated!')">
+      <span>
+        <strong>Scheduled Re-Check (${dateVal || 'Upcoming'}):</strong> ${escapeHtml(directiveVal)}
+      </span>
+    `;
+    feed.prepend(newItem);
+  }
+
+  showToast('Follow-up directive recorded!');
+}
+
+// Image Lightbox Modal Preview
+function openClinicalImagePreview(src, title, caption) {
+  const modal = document.getElementById('modalClinicalImagePreview');
+  const imgEl = document.getElementById('previewModalImage');
+  const titleEl = document.getElementById('previewModalTitle');
+  const capEl = document.getElementById('previewModalCaption');
+
+  if (imgEl && src) imgEl.src = src;
+  if (titleEl && title) titleEl.textContent = title;
+  if (capEl && caption) capEl.textContent = caption;
+
+  if (modal) modal.classList.add('open');
+}
+
+function closeClinicalImagePreview() {
+  const modal = document.getElementById('modalClinicalImagePreview');
+  if (modal) modal.classList.remove('open');
+}
+
+// Bhashini Translation for Farmer Notes inside Clinical Workspace
+async function translateClinicalFarmerNotes() {
+  const c = casesList.find(x => x.id === activeClinicalCaseId || x.caseId === activeClinicalCaseId) || casesList[0];
+  const notes = c?.notes || '';
+  const box = document.getElementById('boxObsNotesTranslated');
+  const btn = document.getElementById('btnTranslateObsNotes');
+  const lbl = document.getElementById('lblBtnTranslateObsNotes');
+  if (!box || !notes) {
+    showToast('No farmer notes available to translate.');
+    return;
+  }
+
+  const targetLang = currentLanguage === 'en' ? 'en' : currentLanguage;
+  const sourceLang = /[\u0900-\u097F]/.test(notes) ? (currentLanguage === 'hi' ? 'hi' : 'mr') : 'en';
+
+  if (lbl) lbl.textContent = 'Translating...';
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await translateWithBhashini(notes, sourceLang, targetLang);
+    box.style.display = 'block';
+    const langLabel = targetLang === 'en' ? 'English' : (targetLang === 'mr' ? 'मराठी' : 'हिन्दी');
+    box.innerHTML = `
+      <div class="bhashini-tag">🌐 Bhashini Tele-Triage Translation (${langLabel})</div>
+      <div style="font-style:normal; margin-top:4px;">${escapeHtml(res.translatedText)}</div>
+    `;
+    showToast('Farmer notes translated successfully!');
+  } catch (err) {
+    showToast('Translation service unavailable.');
+  } finally {
+    if (lbl) lbl.textContent = I18N[currentLanguage]?.lblBtnTranslateObsNotes || 'Translate Notes (Bhashini)';
+    if (btn) btn.disabled = false;
+  }
+}
+
+// ==============================================================================
+// 19. EDITABLE PROFILES & LOCATION-BASED VET ASSIGNMENT ENGINE
+// ==============================================================================
+
+// Candidate veterinarians for local matching / demo mode
+let candidateVetsList = [
+  {
+    id: "00000000-0000-0000-0000-000000000001",
+    role: "veterinarian",
+    full_name: "Dr. Anjali Deshmukh, B.V.Sc & A.H.",
+    phone_number: "+91 94231 77610",
+    vet_clinic_affiliation: "Pune District Veterinary Dispensary",
+    practice_address: "Station Road, Haveli",
+    village_city: "Haveli",
+    district: "Pune",
+    state: "Maharashtra",
+    pincode: "411028",
+    service_area: "Pune District",
+    is_verified_vet: true,
+    is_active_vet: true,
+    created_at: "2026-01-01T00:00:00Z"
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000002",
+    role: "veterinarian",
+    full_name: "Dr. Sachin Kulkarni, M.V.Sc",
+    phone_number: "+91 98223 99812",
+    vet_clinic_affiliation: "Baramati Bovine Referral Center",
+    practice_address: "Baramati MIDC Road",
+    village_city: "Baramati",
+    district: "Pune",
+    state: "Maharashtra",
+    pincode: "413102",
+    service_area: "Baramati & Haveli Tehsils",
+    is_verified_vet: true,
+    is_active_vet: true,
+    created_at: "2026-01-15T00:00:00Z"
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000003",
+    role: "veterinarian",
+    full_name: "Dr. Vijay Shinde, B.V.Sc",
+    phone_number: "+91 97654 32100",
+    vet_clinic_affiliation: "Satara Regional Veterinary Polyclinic",
+    practice_address: "NH4 Bypass, Satara",
+    village_city: "Satara",
+    district: "Satara",
+    state: "Maharashtra",
+    pincode: "415001",
+    service_area: "Satara & Western Maharashtra",
+    is_verified_vet: true,
+    is_active_vet: true,
+    created_at: "2026-02-01T00:00:00Z"
+  }
+];
+
+/**
+ * Deterministic 4-tier location-based veterinarian assignment engine
+ * Tier 4: Exact Postal PIN code match
+ * Tier 3: Same Village/City AND District
+ * Tier 2: Same District
+ * Tier 1: Same State
+ * Tier 0: No match (returns NULL)
+ * Stability Rule: Avoid unnecessary reassignment if current vet maintains the same or higher match tier
+ * Tie-breaker: Earliest registration (created_at ASC), then lowest UUID (id ASC)
+ */
+function matchVetForFarmLocally(farm, vets = candidateVetsList) {
+  if (!farm) return null;
+
+  const farmPin = (farm.pincode || '').trim().toLowerCase();
+  const farmVillage = (farm.village_city || '').trim().toLowerCase();
+  const farmDistrict = (farm.district || '').trim().toLowerCase();
+  const farmState = (farm.state || '').trim().toLowerCase();
+
+  function computeTier(v) {
+    if (!v) return 0;
+    if (v.role !== 'veterinarian') return 0;
+    if (v.is_verified_vet !== true) return 0;
+    if (v.is_active_vet === false) return 0;
+
+    const vPin = (v.pincode || '').trim().toLowerCase();
+    const vVillage = (v.village_city || '').trim().toLowerCase();
+    const vDistrict = (v.district || '').trim().toLowerCase();
+    const vState = (v.state || '').trim().toLowerCase();
+
+    if (farmPin && vPin && farmPin === vPin) return 4;
+    if (farmVillage && vVillage && farmVillage === vVillage && farmDistrict && vDistrict && farmDistrict === vDistrict) return 3;
+    if (farmDistrict && vDistrict && farmDistrict === vDistrict) return 2;
+    if (farmState && vState && farmState === vState) return 1;
+    return 0;
+  }
+
+  // Stability Check: Evaluate current assigned vet
+  let currentTier = 0;
+  if (farm.assigned_vet_id) {
+    const currentAssignedVet = vets.find(v => v.id === farm.assigned_vet_id);
+    if (currentAssignedVet) {
+      currentTier = computeTier(currentAssignedVet);
+    }
+  }
+
+  // Eligible candidate vets with non-zero tier
+  const eligibleCandidates = vets
+    .filter(v => v.role === 'veterinarian' && v.is_verified_vet === true && v.is_active_vet !== false)
+    .map(v => ({ vet: v, tier: computeTier(v) }))
+    .filter(item => item.tier > 0);
+
+  if (eligibleCandidates.length === 0) {
+    return null;
+  }
+
+  // Sort by: tier DESC, created_at ASC, id ASC
+  eligibleCandidates.sort((a, b) => {
+    if (b.tier !== a.tier) return b.tier - a.tier;
+    const aDate = new Date(a.vet.created_at || '1970-01-01').getTime();
+    const bDate = new Date(b.vet.created_at || '1970-01-01').getTime();
+    if (aDate !== bDate) return aDate - bDate;
+    return String(a.vet.id).localeCompare(String(b.vet.id));
+  });
+
+  const bestCandidate = eligibleCandidates[0];
+
+  // Stability rule: Avoid unnecessary reassignment if current vet maintains the same or higher match tier
+  if (currentTier > 0 && currentTier >= bestCandidate.tier) {
+    return farm.assigned_vet_id;
+  }
+
+  return bestCandidate.vet.id;
+}
+
+// Farmer Profile Modal Controllers
+function openEditFarmerProfileModal() {
+  const modal = document.getElementById('modalEditFarmerProfile');
+  if (!modal) return;
+
+  const nameInput = document.getElementById('editFarmerName');
+  const phoneInput = document.getElementById('editFarmerPhone');
+  const farmNameInput = document.getElementById('editFarmName');
+  const farmAddrInput = document.getElementById('editFarmAddress');
+  const villageInput = document.getElementById('editFarmVillage');
+  const distInput = document.getElementById('editFarmDistrict');
+  const stateInput = document.getElementById('editFarmState');
+  const pinInput = document.getElementById('editFarmPincode');
+
+  if (nameInput) nameInput.value = currentProfile?.full_name || "Ramesh Patil";
+  if (phoneInput) phoneInput.value = currentProfile?.phone_number || "+91 98220 14829";
+  if (farmNameInput) farmNameInput.value = currentFarm?.name || "Sahyadri Dairy Farm";
+  if (farmAddrInput) farmAddrInput.value = currentFarm?.location_address || "Gat No. 42, Haveli Road";
+  if (villageInput) villageInput.value = currentFarm?.village_city || "Haveli";
+  if (distInput) distInput.value = currentFarm?.district || "Pune";
+  if (stateInput) stateInput.value = currentFarm?.state || "Maharashtra";
+  if (pinInput) pinInput.value = currentFarm?.pincode || "411028";
+
+  modal.classList.add('open');
+}
+
+function closeEditFarmerProfileModal() {
+  const modal = document.getElementById('modalEditFarmerProfile');
+  if (modal) modal.classList.remove('open');
+}
+
+async function saveFarmerProfile(event) {
+  if (event) event.preventDefault();
+
+  const name = document.getElementById('editFarmerName')?.value.trim();
+  const phone = document.getElementById('editFarmerPhone')?.value.trim();
+  const farmName = document.getElementById('editFarmName')?.value.trim();
+  const farmAddr = document.getElementById('editFarmAddress')?.value.trim() || '';
+  const village = document.getElementById('editFarmVillage')?.value.trim();
+  const district = document.getElementById('editFarmDistrict')?.value.trim();
+  const state = document.getElementById('editFarmState')?.value.trim();
+  const pincode = document.getElementById('editFarmPincode')?.value.trim();
+
+  if (!name || !farmName || !village || !district || !state || !pincode) {
+    showToast('Please fill all required profile and location fields.');
+    return;
+  }
+
+  const saveBtn = document.getElementById('btnSaveFarmerProfile');
+  const saveBtnText = document.getElementById('btnSaveFarmerProfileText');
+  const origBtnText = saveBtnText ? saveBtnText.textContent : 'Save Farm Profile';
+  if (saveBtnText) saveBtnText.textContent = 'Saving...';
+  if (saveBtn) saveBtn.disabled = true;
+
+  try {
+    if (!currentProfile) currentProfile = {};
+    if (!currentFarm) currentFarm = {};
+
+    currentProfile.full_name = name;
+    currentProfile.phone_number = phone;
+
+    currentFarm.name = farmName;
+    currentFarm.location_address = farmAddr;
+    currentFarm.village_city = village;
+    currentFarm.district = district;
+    currentFarm.state = state;
+    currentFarm.pincode = pincode;
+
+    if (isSupabaseConfigured() && currentSession?.user) {
+      await supabaseClient
+        .from('profiles')
+        .update({
+          full_name: name,
+          phone_number: phone,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', currentSession.user.id);
+
+      if (currentFarm.id) {
+        await supabaseClient
+          .from('farms')
+          .update({
+            name: farmName,
+            location_address: farmAddr,
+            village_city: village,
+            district: district,
+            state: state,
+            pincode: pincode,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentFarm.id);
+
+        try {
+          const { data: matchedVetId } = await supabaseClient
+            .rpc('match_vet_for_farm', { p_farm_id: currentFarm.id });
+          if (matchedVetId !== undefined) {
+            currentFarm.assigned_vet_id = matchedVetId;
+          }
+        } catch (rpcErr) {
+          console.warn('Location match RPC fallback:', rpcErr);
+          currentFarm.assigned_vet_id = matchVetForFarmLocally(currentFarm);
+        }
+      }
+    } else {
+      currentFarm.assigned_vet_id = matchVetForFarmLocally(currentFarm);
+    }
+
+    closeEditFarmerProfileModal();
+    renderProfileView();
+    const dict = I18N[currentLanguage] || I18N.en;
+    showToast(dict.toastProfileSaved || 'Profile and farm location updated successfully.');
+  } catch (err) {
+    console.error('Error saving farmer profile:', err);
+    showToast('Failed to save profile: ' + (err.message || 'Unknown error'));
+  } finally {
+    if (saveBtn) saveBtn.disabled = false;
+    if (saveBtnText) saveBtnText.textContent = origBtnText;
+  }
+}
+
+// Veterinarian Profile Modal Controllers
+function openEditVetProfileModal() {
+  const modal = document.getElementById('modalEditVetProfile');
+  if (!modal) return;
+
+  const nameInput = document.getElementById('editVetName');
+  const phoneInput = document.getElementById('editVetPhone');
+  const clinicInput = document.getElementById('editVetClinic');
+  const addrInput = document.getElementById('editVetAddress');
+  const villageInput = document.getElementById('editVetVillage');
+  const distInput = document.getElementById('editVetDistrict');
+  const stateInput = document.getElementById('editVetState');
+  const pinInput = document.getElementById('editVetPincode');
+  const areaInput = document.getElementById('editVetServiceArea');
+
+  if (nameInput) nameInput.value = currentProfile?.full_name || "Dr. Anjali Deshmukh, B.V.Sc & A.H.";
+  if (phoneInput) phoneInput.value = currentProfile?.phone_number || "+91 94231 77610";
+  if (clinicInput) clinicInput.value = currentProfile?.vet_clinic_affiliation || "Pune District Veterinary Dispensary";
+  if (addrInput) addrInput.value = currentProfile?.practice_address || "Station Road, Animal Husbandry Campus";
+  if (villageInput) villageInput.value = currentProfile?.village_city || "Haveli";
+  if (distInput) distInput.value = currentProfile?.district || "Pune";
+  if (stateInput) stateInput.value = currentProfile?.state || "Maharashtra";
+  if (pinInput) pinInput.value = currentProfile?.pincode || "411028";
+  if (areaInput) areaInput.value = currentProfile?.service_area || "Haveli Tehsil & Surrounding Dairy Co-ops";
+
+  modal.classList.add('open');
+}
+
+function closeEditVetProfileModal() {
+  const modal = document.getElementById('modalEditVetProfile');
+  if (modal) modal.classList.remove('open');
+}
+
+async function saveVetProfile(event) {
+  if (event) event.preventDefault();
+
+  const name = document.getElementById('editVetName')?.value.trim();
+  const phone = document.getElementById('editVetPhone')?.value.trim();
+  const clinic = document.getElementById('editVetClinic')?.value.trim();
+  const address = document.getElementById('editVetAddress')?.value.trim() || '';
+  const village = document.getElementById('editVetVillage')?.value.trim();
+  const district = document.getElementById('editVetDistrict')?.value.trim();
+  const state = document.getElementById('editVetState')?.value.trim();
+  const pincode = document.getElementById('editVetPincode')?.value.trim();
+  const serviceArea = document.getElementById('editVetServiceArea')?.value.trim() || '';
+
+  if (!name || !clinic || !village || !district || !state || !pincode) {
+    showToast('Please fill all required practice and location fields.');
+    return;
+  }
+
+  const saveBtn = document.getElementById('btnSaveVetProfile');
+  const saveBtnText = document.getElementById('btnSaveVetProfileText');
+  const origBtnText = saveBtnText ? saveBtnText.textContent : 'Save Practice Profile';
+  if (saveBtnText) saveBtnText.textContent = 'Saving...';
+  if (saveBtn) saveBtn.disabled = true;
+
+  try {
+    if (!currentProfile) currentProfile = {};
+
+    currentProfile.full_name = name;
+    currentProfile.phone_number = phone;
+    currentProfile.vet_clinic_affiliation = clinic;
+    currentProfile.practice_address = address;
+    currentProfile.village_city = village;
+    currentProfile.district = district;
+    currentProfile.state = state;
+    currentProfile.pincode = pincode;
+    currentProfile.service_area = serviceArea;
+
+    if (isSupabaseConfigured() && currentSession?.user) {
+      await supabaseClient
+        .from('profiles')
+        .update({
+          full_name: name,
+          phone_number: phone,
+          vet_clinic_affiliation: clinic,
+          practice_address: address,
+          village_city: village,
+          district: district,
+          state: state,
+          pincode: pincode,
+          service_area: serviceArea,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', currentSession.user.id);
+    }
+
+    closeEditVetProfileModal();
+    renderProfileView();
+    const dict = I18N[currentLanguage] || I18N.en;
+    showToast(dict.toastProfileSaved || 'Practice location and details updated.');
+  } catch (err) {
+    console.error('Error saving vet profile:', err);
+    showToast('Failed to save profile: ' + (err.message || 'Unknown error'));
+  } finally {
+    if (saveBtn) saveBtn.disabled = false;
+    if (saveBtnText) saveBtnText.textContent = origBtnText;
+  }
+}
+
+// ==============================================================================
+// 20. CLINICAL TRIAGE CASE DELETION & LIFECYCLE MANAGEMENT
+// ==============================================================================
+
+/**
+ * Delete / dismiss a clinical triage case with role-based guardrails:
+ * - Farmers may only delete open cases without an active treatment plan / milk withholding
+ * - Veterinarians have clinical discretion to dismiss / delete triage cases
+ * - Soft-deletes case in Supabase (deleted_at = NOW()) and immediately prunes client state
+ */
+async function deleteCase(caseId, callerRole = 'vet') {
+  if (!caseId) return { success: false, reason: 'missing_id' };
+  const dict = (typeof I18N !== 'undefined' && typeof currentLanguage !== 'undefined' && I18N[currentLanguage]) ? I18N[currentLanguage] : (typeof I18N !== 'undefined' ? I18N.en : {});
+
+  const targetCase = casesList.find(c => c.id === caseId || c.caseId === caseId);
+  if (!targetCase) {
+    showToast('Case not found.');
+    return { success: false, reason: 'not_found' };
+  }
+
+  // Farmer Guardrail: Cannot delete case if it has an active prescription or milk withholding
+  if (callerRole === 'farmer' && (targetCase.treatmentPlan || targetCase.status === 'treatment_prescribed')) {
+    showToast(dict.msgCannotDeletePrescribed || 'Cases with active veterinary prescriptions or mandatory milk withholding cannot be deleted.');
+    return { success: false, reason: 'prescribed_guardrail' };
+  }
+
+  const cowName = targetCase.cowName || 'Livestock';
+  const caseCode = targetCase.caseId || targetCase.id;
+  const confirmTemplate = dict.msgConfirmDeleteCase || 'Are you sure you want to remove triage case {caseId} for {cowName}?';
+  const confirmMsg = confirmTemplate.replace('{caseId}', caseCode).replace('{cowName}', cowName);
+
+  // Confirmation prompt (browser dialog in interactive mode)
+  if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
+    if (!window.confirm(confirmMsg)) {
+      return { success: false, reason: 'cancelled' };
+    }
+  }
+
+  // Supabase soft-delete update
+  if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured() && typeof currentSession !== 'undefined' && currentSession?.user && typeof supabaseClient !== 'undefined') {
+    try {
+      const { error: rpcErr } = await supabaseClient.rpc('soft_delete_case', { p_case_id: targetCase.id });
+      if (rpcErr) {
+        await supabaseClient
+          .from('mastitis_cases')
+          .update({ deleted_at: new Date().toISOString() })
+          .eq('id', targetCase.id);
+      }
+    } catch (dbErr) {
+      console.warn('Supabase soft-delete error, updating locally:', dbErr);
+    }
+  }
+
+  // Prune from in-memory casesList
+  casesList = casesList.filter(c => c.id !== caseId && c.caseId !== caseId);
+
+  // Close modals if open
+  if (typeof document !== 'undefined') {
+    if (typeof closeVetReviewModal === 'function') closeVetReviewModal();
+
+    // Re-render UI components
+    if (typeof renderVetCasesQueue === 'function') renderVetCasesQueue();
+    if (typeof renderRailCases === 'function') renderRailCases();
+    if (typeof renderProfileView === 'function') renderProfileView();
+    if (typeof renderVetPortalHome === 'function') renderVetPortalHome();
+    if (typeof renderClinicalCaseWorkspace === 'function') {
+      if (activeClinicalCaseId === caseId || activeClinicalCaseId === targetCase.caseId) {
+        activeClinicalCaseId = casesList.length > 0 ? (casesList[0].id || casesList[0].caseId) : null;
+      }
+      renderClinicalCaseWorkspace(activeClinicalCaseId);
+    }
+  }
+
+  showToast(dict.toastCaseDeleted || 'Clinical triage case removed successfully.');
+  return { success: true, caseId: targetCase.id || targetCase.caseId };
+}
+
+function deleteActiveClinicalCase() {
+  if (!activeClinicalCaseId) {
+    showToast('No active clinical case selected.');
+    return;
+  }
+  deleteCase(activeClinicalCaseId, 'vet');
+}
+
+// Node.js test environment exports
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    matchVetForFarmLocally,
+    candidateVetsList,
+    deleteCase,
+    deleteActiveClinicalCase,
+    get casesList() { return casesList; },
+    set casesList(val) { casesList = val; },
+    I18N
+  };
+}
+

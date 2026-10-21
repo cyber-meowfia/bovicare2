@@ -1841,6 +1841,19 @@ html, body {
   transform: translateY(-1px);
 }
 
+.btn-audio-guide.playing {
+  background: #DCFCE7;
+  border-color: #16A34A;
+  color: #15803D;
+  animation: audioPulse 1.6s infinite ease-in-out;
+}
+
+@keyframes audioPulse {
+  0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(22, 163, 74, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+}
+
 .btn-voice-input {
   background: #FEF3C7;
   border: 1px solid #F59E0B;
@@ -1859,6 +1872,65 @@ html, body {
 
 .btn-voice-input:hover {
   background: #FDE68A;
+}
+
+.btn-voice-input.listening {
+  background: #FEE2E2;
+  border-color: #EF4444;
+  color: #B91C1C;
+  animation: micPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes micPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.btn-bhashini-mini {
+  background: #EFF6FF;
+  border: 1px solid #93C5FD;
+  color: #1D4ED8;
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.16s ease;
+  font-family: inherit;
+}
+
+.btn-bhashini-mini:hover {
+  background: #DBEAFE;
+  border-color: #3B82F6;
+  transform: translateY(-1px);
+}
+
+.bhashini-translation-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.bhashini-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #0369A1;
+  background: #E0F2FE;
+  padding: 2px 7px;
+  border-radius: 6px;
+  margin-bottom: 5px;
 }
 
 .assess-form-wrapper {
@@ -3242,5 +3314,691 @@ body.portal-vet-theme .clinical-overview-hero::after {
   text-transform: uppercase;
   font-weight: 700;
 }
+
+/* Clean Clinical Section Titles */
+.clinical-section-title-wrap {
+  margin-top: 10px;
+  margin-bottom: 2px;
+}
+
+.clinical-section-heading {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0F172A;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.01em;
+}
+
+.clinical-section-subheading {
+  font-size: 12.5px;
+  color: var(--muted);
+  display: block;
+  margin-top: 2px;
+}
+
+/* Collapsible Antimicrobial Formulary Reference */
+.clinical-formulary-details {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-top: 10px;
+  transition: all 0.2s ease;
+}
+
+.clinical-formulary-details[open] {
+  background: #FFFFFF;
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.clinical-formulary-summary {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  list-style: none;
+}
+
+.clinical-formulary-summary::-webkit-details-marker {
+  display: none;
+}
+
+.clinical-details-arrow {
+  font-size: 11px;
+  color: #64748B;
+  transition: transform 0.2s ease;
+}
+
+.clinical-formulary-details[open] .clinical-details-arrow {
+  transform: rotate(180deg);
+}
+
+/* ==========================================================================
+   SIMPLIFIED CLINICAL OVERVIEW & CONSULTATION WORKSPACE STYLES
+   ========================================================================== */
+
+/* 1. Header & Active Patient Selector */
+.clinical-workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+.clinical-workspace-title-wrap {
+  flex: 1;
+  min-width: 280px;
+}
+
+.clinical-badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #E0F2FE;
+  border: 1px solid #BAE6FD;
+  color: #0369A1;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.clinical-workspace-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 4px 0;
+  letter-spacing: -0.01em;
+}
+
+.clinical-workspace-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.clinical-patient-switcher-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 260px;
+}
+
+.clinical-switcher-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.clinical-switcher-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.clinical-case-dropdown {
+  flex: 1;
+  background: #F8FAFC;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  outline: none;
+  transition: all 0.18s ease;
+  cursor: pointer;
+}
+
+.clinical-case-dropdown:focus {
+  border-color: #2563EB;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* 2. Compact Case Summary (Always Visible) */
+.clinical-case-summary-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-left: 5px solid #2563EB;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow 0.18s ease;
+}
+
+body.portal-vet-theme .clinical-case-summary-card {
+  border-left-color: #0284C7;
+}
+
+.clinical-summary-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.clinical-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.clinical-avatar-circle {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: #EFF6FF;
+  border: 1px solid #DBEAFE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.clinical-summary-title-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.clinical-animal-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.clinical-pill {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+
+.clinical-pill.species {
+  background: #F1F5F9;
+  color: #334155;
+  border: 1px solid #E2E8F0;
+}
+
+.clinical-summary-meta-line {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 3px;
+}
+
+.clinical-meta-sep {
+  color: #CBD5E1;
+  font-size: 10px;
+}
+
+.clinical-summary-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-summary-action {
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  border: none;
+}
+
+.btn-summary-action.primary {
+  background: #1E40AF;
+  color: #FFFFFF;
+}
+
+.btn-summary-action.primary:hover {
+  background: #1D4ED8;
+  transform: translateY(-1px);
+}
+
+.btn-summary-action.secondary {
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  color: #334155;
+}
+
+.btn-summary-action.secondary:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+}
+
+.clinical-summary-concern-bar {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.clinical-concern-label {
+  font-weight: 700;
+  color: #B45309;
+  flex-shrink: 0;
+}
+
+.clinical-concern-text {
+  color: #78350F;
+  line-height: 1.4;
+}
+
+/* 3. Sub-Tab Section Navigation */
+.clinical-subnav-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 10px 2px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: 2px solid #E2E8F0;
+  margin-top: -6px;
+}
+
+.clinical-subnav-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.clinical-subnav-btn {
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.18s ease;
+}
+
+.clinical-subnav-btn:hover {
+  background: #F0F7FF;
+  border-color: #93C5FD;
+  color: #1E40AF;
+}
+
+.clinical-subnav-btn.active {
+  background: #1E40AF;
+  border-color: #1E40AF;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+}
+
+body.portal-vet-theme .clinical-subnav-btn.active {
+  background: #0284C7;
+  border-color: #0284C7;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+}
+
+/* 4. Sub-Tab Panes */
+.clinical-subtab-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeInClinicalPane 0.2s ease forwards;
+}
+
+@keyframes fadeInClinicalPane {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 5. Clean Clinical Section Cards */
+.clinical-section-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.clinical-card-header-clean {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #F1F5F9;
+  padding-bottom: 10px;
+}
+
+.clinical-card-header-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clinical-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink);
+  border-bottom: 1px dashed #F1F5F9;
+  padding-bottom: 8px;
+}
+
+.clinical-detail-row strong {
+  color: #475569;
+  font-weight: 600;
+}
+
+.clinical-chip-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.clinical-chip {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.clinical-chip.warning {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.clinical-chip.danger {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+/* 6. Vitals Grid */
+.clinical-vitals-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .clinical-vitals-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.clinical-vital-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.clinical-vital-box .vital-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.clinical-vital-box .vital-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.clinical-vital-box .vital-sub {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.clinical-farmer-quote {
+  margin: 0;
+  background: #F8FAFC;
+  border-left: 4px solid #3B82F6;
+  border-radius: 0 10px 10px 0;
+  padding: 14px 16px;
+  font-size: 13.5px;
+  font-style: italic;
+  color: #1E293B;
+  line-height: 1.5;
+}
+
+/* 7. Image Gallery Grid */
+.clinical-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.clinical-gallery-card {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  position: relative;
+}
+
+.clinical-gallery-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border-color: #2563EB;
+}
+
+.clinical-gallery-img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+  background: #0B1F16;
+}
+
+.clinical-gallery-caption {
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1E293B;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #FFFFFF;
+}
+
+/* 8. Diagnosis Form Controls */
+.clinical-form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 680px) {
+  .clinical-form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.clinical-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.clinical-form-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.clinical-form-input,
+.clinical-form-select,
+.clinical-form-textarea {
+  border: 1.5px solid #CBD5E1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #0F172A;
+  background: #FFFFFF;
+  transition: border-color 0.18s ease;
+  font-family: inherit;
+}
+
+.clinical-form-input:focus,
+.clinical-form-select:focus,
+.clinical-form-textarea:focus {
+  outline: none;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* 9. Follow-Up Checklist Feed */
+.clinical-checklist-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.clinical-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  cursor: pointer;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.clinical-check-item input[type="checkbox"] {
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+/* 10. Longitudinal Patient Timeline */
+.clinical-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  padding-left: 24px;
+}
+
+.clinical-timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: #E2E8F0;
+}
+
+.clinical-timeline-item {
+  position: relative;
+  font-size: 13px;
+}
+
+.clinical-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2563EB;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 0 0 2px #93C5FD;
+}
+
+.clinical-timeline-date {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  margin-bottom: 2px;
+}
+
+.clinical-timeline-text {
+  color: #1E293B;
+  line-height: 1.45;
+}
+
+/* 11. Modal Image Preview */
+.modal-preview-img-wrap {
+  text-align: center;
+  background: #0B132B;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.modal-preview-img {
+  max-height: 380px;
+  max-width: 100%;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
 
 

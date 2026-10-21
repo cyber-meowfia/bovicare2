@@ -1,4 +1,8 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'services/mastitis_vision_service.dart';
+import 'models/mastitis_vision_result.dart';
+import 'api_test_screen.dart';
 
 void main() {
   runApp(const BoviCareApp());
@@ -247,20 +251,24 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          _navDestination(0, Icons.home_rounded, Icons.home_outlined, 'Home'),
-          _navDestination(1, Icons.pets_rounded, Icons.pets_outlined, 'My Cows'),
-          _centerAssessNavDestination(2, 'Assess'),
-          _navDestination(
-            3,
-            Icons.assignment_rounded,
-            Icons.assignment_outlined,
-            'Records',
+          Expanded(child: _navDestination(0, Icons.home_rounded, Icons.home_outlined, 'Home')),
+          Expanded(child: _navDestination(1, Icons.pets_rounded, Icons.pets_outlined, 'My Cows')),
+          Expanded(child: _centerAssessNavDestination(2, 'Assess')),
+          Expanded(
+            child: _navDestination(
+              3,
+              Icons.assignment_rounded,
+              Icons.assignment_outlined,
+              'Records',
+            ),
           ),
-          _navDestination(
-            4,
-            Icons.person_rounded,
-            Icons.person_outline_rounded,
-            'Profile',
+          Expanded(
+            child: _navDestination(
+              4,
+              Icons.person_rounded,
+              Icons.person_outline_rounded,
+              'Profile',
+            ),
           ),
         ],
       ),
@@ -1963,32 +1971,38 @@ class BoviCareProfilePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                ListTile(
-                  tileColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: Color(0xFFE8ECE4)),
+                Material(
+                  color: Colors.transparent,
+                  child: ListTile(
+                    tileColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: const BorderSide(color: Color(0xFFE8ECE4)),
+                    ),
+                    leading: const Icon(Icons.language_rounded, color: Color(0xFF5E8E25)),
+                    title: const Text('Language: English / मराठी'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () {
+                      showMessage(context, 'Language switcher available in settings.');
+                    },
                   ),
-                  leading: const Icon(Icons.language_rounded, color: Color(0xFF5E8E25)),
-                  title: const Text('Language: English / मराठी'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () {
-                    showMessage(context, 'Language switcher available in settings.');
-                  },
                 ),
                 const SizedBox(height: 12),
-                ListTile(
-                  tileColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: Color(0xFFE8ECE4)),
+                Material(
+                  color: Colors.transparent,
+                  child: ListTile(
+                    tileColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: const BorderSide(color: Color(0xFFE8ECE4)),
+                    ),
+                    leading: const Icon(Icons.notifications_active_outlined, color: Color(0xFF5E8E25)),
+                    title: const Text('SMS & WhatsApp Alerts'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () {
+                      showMessage(context, 'Alert preferences saved.');
+                    },
                   ),
-                  leading: const Icon(Icons.notifications_active_outlined, color: Color(0xFF5E8E25)),
-                  title: const Text('SMS & WhatsApp Alerts'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () {
-                    showMessage(context, 'Alert preferences saved.');
-                  },
                 ),
                 const SizedBox(height: 24),
                 OutlinedButton.icon(
@@ -2967,10 +2981,11 @@ class _AssessPageState extends State<AssessPage> {
     );
   }
 
-  // 3. AI Photo / Thermal Scanner Simulation
+  // 3. AI Photo / Udder Vision Scanner
   void _openAiPhotoScanner() {
     bool isScanning = false;
-    bool scanDone = false;
+    MastitisVisionResult? scanResult;
+    final visionService = MastitisVisionService();
 
     showModalBottomSheet<void>(
       context: context,
@@ -2985,141 +3000,197 @@ class _AssessPageState extends State<AssessPage> {
                 color: Color(0xFF161817),
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 44,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF3B403D),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'AI Udder Vision Scanner',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3B403D),
+                        borderRadius: BorderRadius.circular(2),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF285536),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text('AI Model v2.4', style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600)),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-
-                  // Viewfinder
-                  Container(
-                    width: double.infinity,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF222624),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF3B443F)),
                     ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Stack(
-                      alignment: Alignment.center,
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Reticle
-                        Positioned.fill(
-                          child: Padding(
-                            padding: const EdgeInsets.all(18),
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: isScanning ? const Color(0xFF4CAF50) : const Color(0xFF6C7C71),
-                                  width: 1.5,
+                        const Text(
+                          'AI Udder Vision Scanner',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF285536),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text('MobileNetV2 TFLite', style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Viewfinder
+                    Container(
+                      width: double.infinity,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF222624),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFF3B443F)),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Reticle
+                          Positioned.fill(
+                            child: Padding(
+                              padding: const EdgeInsets.all(18),
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: isScanning ? const Color(0xFF4CAF50) : const Color(0xFF6C7C71),
+                                    width: 1.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
-                                borderRadius: BorderRadius.circular(14),
                               ),
                             ),
                           ),
-                        ),
-                        if (isScanning)
-                          const Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CircularProgressIndicator(color: Color(0xFF81C784)),
-                                SizedBox(height: 12),
-                                Text(
-                                  'Analyzing quarter symmetry & thermal index...',
-                                  style: TextStyle(color: Color(0xFFA5D6A7), fontSize: 12),
-                                ),
-                              ],
-                            ),
-                          )
-                        else if (scanDone)
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
+                          if (isScanning)
+                            const Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CircularProgressIndicator(color: Color(0xFF81C784)),
+                                  SizedBox(height: 12),
+                                  Text(
+                                    'Executing MobileNetV2 mastitis inference...',
+                                    style: TextStyle(color: Color(0xFFA5D6A7), fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            )
+                          else if (scanResult != null)
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    scanResult!.riskTier == 'High'
+                                        ? Icons.warning_amber_rounded
+                                        : Icons.verified_rounded,
+                                    color: scanResult!.riskTier == 'High'
+                                        ? const Color(0xFFE57373)
+                                        : const Color(0xFF81C784),
+                                    size: 36,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    scanResult!.label,
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Mastitis Risk: ${(scanResult!.mastitisProbability * 100).toStringAsFixed(1)}% (Tier: ${scanResult!.riskTier})',
+                                    style: TextStyle(
+                                      color: scanResult!.riskTier == 'High' ? const Color(0xFFEF9A9A) : const Color(0xFFA5D6A7),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Healthy Baseline: ${(scanResult!.normalProbability * 100).toStringAsFixed(1)}%',
+                                    style: const TextStyle(color: Color(0xFFB0BEC5), fontSize: 11),
+                                  ),
+                                ],
+                              ),
+                            )
+                          else
+                            const Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.verified_rounded, color: Color(0xFF81C784), size: 36),
+                              children: [
+                                Icon(Icons.center_focus_strong_rounded, color: Color(0xFF8C9E91), size: 44),
                                 SizedBox(height: 8),
-                                Text('Scan Complete: Udder Symmetry 98.4%', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
-                                SizedBox(height: 4),
-                                Text('Thermal Index: 38.6°C (Normal) · Confidence: 97.2%', style: TextStyle(color: Color(0xFFB0BEC5), fontSize: 11)),
+                                Text('Align udder inside frame to screen', style: TextStyle(color: Color(0xFFB5C4BA), fontSize: 13)),
                               ],
                             ),
-                          )
-                        else
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.center_focus_strong_rounded, color: Color(0xFF8C9E91), size: 44),
-                              SizedBox(height: 8),
-                              Text('Align udder inside frame', style: TextStyle(color: Color(0xFFB5C4BA), fontSize: 13)),
-                            ],
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 18),
+                    const SizedBox(height: 18),
 
-                  SizedBox(
-                    width: double.infinity,
-                    height: 46,
-                    child: FilledButton.icon(
-                      onPressed: isScanning
-                          ? null
-                          : () {
-                              setScanState(() {
-                                isScanning = true;
-                                scanDone = false;
-                              });
-                              Future.delayed(const Duration(milliseconds: 1400), () {
+                    if (scanResult != null) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF222624),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Recommendation: ${scanResult!.recommendation}',
+                              style: const TextStyle(color: Color(0xFFD2DDD5), fontSize: 12),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              scanResult!.disclaimer,
+                              style: const TextStyle(color: Color(0xFF8B9B90), fontSize: 10.5, fontStyle: FontStyle.italic),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                    ],
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 46,
+                      child: FilledButton.icon(
+                        onPressed: isScanning
+                            ? null
+                            : () async {
+                                setScanState(() {
+                                  isScanning = true;
+                                });
+                                // Generate a 224x224 RGB test buffer representing bovine udder tissue
+                                final testBuffer = Uint8List(224 * 224 * 3);
+                                for (int i = 0; i < testBuffer.length; i += 3) {
+                                  testBuffer[i] = 185; // R
+                                  testBuffer[i + 1] = 145; // G
+                                  testBuffer[i + 2] = 140; // B
+                                }
+                                final result = await visionService.predictFromRgbBytes(testBuffer);
                                 if (ctx.mounted) {
                                   setScanState(() {
                                     isScanning = false;
-                                    scanDone = true;
+                                    scanResult = result;
                                   });
                                 }
-                              });
-                            },
-                      icon: const Icon(Icons.camera_alt_rounded, size: 18),
-                      label: Text(scanDone ? 'Scan Again' : 'Capture & Analyze Udder'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF285536),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              },
+                        icon: const Icon(Icons.camera_alt_rounded, size: 18),
+                        label: Text(scanResult != null ? 'Scan Again' : 'Capture & Screen Udder'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF285536),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
@@ -3770,7 +3841,64 @@ class _AssessPageState extends State<AssessPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 12),
+
+                  // Tabular Random Forest Inference Banner
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ApiTestScreen()),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF176B45).withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFF176B45).withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF176B45),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.biotech_rounded, color: Colors.white, size: 20),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Random Forest Milk Sensor Lab',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF176B45),
+                                    ),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    'Test 5-parameter biochemical prediction (Temp, pH, Conductivity, SCC, Yield)',
+                                    style: TextStyle(fontSize: 11, color: Color(0xFF556558)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF176B45)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
 
                   // NEW FEATURE: Choose Cow to Screen Carousel
                   Padding(

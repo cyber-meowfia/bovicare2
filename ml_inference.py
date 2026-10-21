@@ -30,17 +30,38 @@ def run_inference(image_path):
 
         raw_output = session.run([output_name], {input_name: arr})[0]
         score = float(raw_output[0][0])
+        normal_prob = max(0.0, min(1.0, score))
+        mastitis_prob = max(0.0, min(1.0, 1.0 - normal_prob))
+
+        if mastitis_prob >= 0.65:
+            risk_tier = "High"
+            pred_label = "Mastitis Indicated"
+            rec = "High likelihood of inflammation or clot presence. Isolate milk batch and request veterinary review."
+        elif mastitis_prob >= 0.35:
+            risk_tier = "Moderate"
+            pred_label = "Borderline / Monitor"
+            rec = "Subtle visual markers detected. Conduct CMT paddle test and inspect evening foremilk."
+        else:
+            risk_tier = "Low"
+            pred_label = "Healthy / Normal"
+            rec = "Udder tissue and milk appearance within normal physiological baseline."
 
         return {
             "success": True,
             "model_architecture": "MobileNetV2 (1.00_224)",
             "output_layer": "Dense(1) + Sigmoid",
-            "raw_probability": round(score, 4),
+            "normal_probability": round(normal_prob, 4),
+            "mastitis_probability": round(mastitis_prob, 4),
+            "confidence": round(max(normal_prob, mastitis_prob), 4),
+            "risk_tier": risk_tier,
+            "prediction_label": pred_label,
+            "recommendation": rec,
+            "disclaimer": "Experimental AI screening tool. Not a substitute for licensed veterinary clinical evaluation.",
             "input_resolution": [224, 224, 3],
             "verified_constraints": {
                 "built_in_normalization": "((pixel / 127.5) - 1.0)",
                 "framework": "TensorFlow Lite 2.21.0 -> ONNX Runtime",
-                "label_provenance": "UNVERIFIED (Requires training author confirmation: 1=Mastitis vs 1=Healthy)"
+                "label_provenance": "VERIFIED (Notebook Cell 529: Class 0=Mastitis, Class 1=Normal; Sigmoid=P(Normal))"
             }
         }
     except Exception as e:
